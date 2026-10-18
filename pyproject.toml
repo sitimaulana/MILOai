@@ -1,0 +1,63 @@
+[project]
+name = "ai-milo"
+version = "0.1.0"
+description = "MILO - Multimodal Interactive Learning Companion AI Backend"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Web framework
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27.0",
+    # OpenAI
+    "openai>=1.50.0",
+    # Whisper local
+    "openai-whisper>=20240930",
+    "torch>=2.1.0",
+    "torchaudio>=2.1.0",
+    "ffmpeg-python>=0.2.0",
+    # LangChain & RAG
+    "langchain>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langchain-community>=0.3.0",
+    "langchain-chroma>=0.1.4",
+    "chromadb>=0.5.0",
+    "langchain-huggingface>=0.0.3",
+    "sentence-transformers>=3.0.0",
+    # Document loaders
+    "pypdf>=4.0.0",
+    "python-docx>=1.1.0",
+    "unstructured>=0.15.0",
+    # Database (PostgreSQL for prod, SQLite for local dev)
+    "sqlalchemy>=2.0.0",
+    "asyncpg>=0.29.0",
+    "aiosqlite>=0.20.0",
+    "alembic>=1.13.0",
+    "psycopg2-binary>=2.9.0",
+    # Utilities
+    "pydantic>=2.8.0",
+    "pydantic-settings>=2.4.0",
+    "python-dotenv>=1.0.0",
+    "numpy>=1.26.0",
+    "edge-tts>=7.3.1",
+    "imageio-ffmpeg>=0.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

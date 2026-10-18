@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MILO PRACTICE — English Speaking Practice</title>
+    <link rel="stylesheet" href="/ui/css/practice.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="practice-body">
+
+    <!-- Header: ← MILO PRACTICE ... Level B1 -->
+    <header class="practice-nav-header">
+        <a href="/ui/setup.html" class="back-to-setup" id="brandExitLink" title="Kembali ke Setup">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>MILO PRACTICE</span>
+        </a>
+        <div class="level-badge-pill" id="practiceLevelPill">
+            Level B1
+        </div>
+    </header>
+
+    <!-- Horizontal Blue Progress Bar -->
+    <div class="session-progress-strip">
+        <div class="progress-strip-fill" id="progressBarFill" style="width: 20%;"></div>
+    </div>
+
+    <!-- Main Practice Canvas (Two Floating White Cards) -->
+    <main class="practice-main-canvas">
+
+        <!-- Left Card: Progress Sesi -->
+        <aside class="card-progress-sesi">
+            <h3 class="title-progress-sesi">Progress Sesi</h3>
+
+            <!-- Topik Box -->
+            <div class="box-topik-card">
+                <div class="label-topik">Topik</div>
+                <div class="value-topik" id="practiceTopicValue">Job Interview</div>
+            </div>
+
+            <!-- AI Speech Evaluation Live Panel -->
+            <div class="box-evaluation-panel">
+                <div class="eval-panel-header">
+                    <h4 class="title-evaluation-panel">AI Speech Evaluation</h4>
+                    <div class="subtitle-hasil-evaluasi">Pembetulan & Tips Berbicara</div>
+                </div>
+
+                <!-- 3 Category Tabs: Grammar, Vocabulary, Fluency (Tanpa Angka Score) -->
+                <div class="eval-pillars-nav">
+                    <button type="button" class="eval-pillar-tab active" data-pillar="grammar" id="tabGrammar">
+                        <i class="fa-solid fa-spell-check"></i>
+                        <span>Grammar</span>
+                        <span class="tab-badge" id="badgeGrammar">0</span>
+                    </button>
+                    <button type="button" class="eval-pillar-tab" data-pillar="vocab" id="tabVocab">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Vocab</span>
+                        <span class="tab-badge" id="badgeVocab">0</span>
+                    </button>
+                    <button type="button" class="eval-pillar-tab" data-pillar="fluency" id="tabFluency">
+                        <i class="fa-solid fa-comments"></i>
+                        <span>Fluency</span>
+                        <span class="tab-badge" id="badgeFluency">0</span>
+                    </button>
+                </div>
+
+                <!-- Dynamic Content Area for Active Pillar -->
+                <div class="eval-pillars-content">
+                    <!-- Default Initial Placeholder -->
+                    <div id="evalInitialPlaceholder" class="eval-initial-placeholder">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                        <p>Mulai berbicara untuk melihat pembetulan tata bahasa, kosakata, & kelancaran dari AI Tutor.</p>
+                    </div>
+
+                    <!-- Grammar Pane -->
+                    <div class="pillar-pane" id="paneGrammar" style="display: none;">
+                        <div class="pillar-section">
+                            <div class="pillar-section-heading">
+                                <i class="fa-solid fa-circle-check"></i> Pembetulan Grammar
+                            </div>
+                            <div class="pillar-items-stream" id="streamGrammar">
+                                <div class="pillar-empty-item">Tata bahasa Anda sudah rapi!</div>
+                            </div>
+                        </div>
+                        <div class="pillar-tip-box" id="tipBoxGrammar">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <div>
+                                <div class="pillar-tip-label">Tips Grammar:</div>
+                                <div class="pillar-tip-text" id="tipTextGrammar">Perhatikan tenses dan subject-verb agreement saat berbicara.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vocabulary Pane -->
+                    <div class="pillar-pane" id="paneVocab" style="display: none;">
+                        <div class="pillar-section">
+                            <div class="pillar-section-heading">
+                                <i class="fa-solid fa-arrow-trend-up"></i> Pembetulan & Pilihan Kata
+                            </div>
+                            <div class="pillar-items-stream" id="streamVocab">
+                                <div class="pillar-empty-item">Pilihan kata sudah tepat.</div>
+                            </div>
+                        </div>
+                        <div class="pillar-tip-box" id="tipBoxVocab">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <div>
+                                <div class="pillar-tip-label">Tips Kosakata:</div>
+                                <div class="pillar-tip-text" id="tipTextVocab">Gunakan kosakata deskriptif tingkat lanjut untuk memperkaya penjelasan.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fluency Pane -->
+                    <div class="pillar-pane" id="paneFluency" style="display: none;">
+                        <div class="pillar-section">
+                            <div class="pillar-section-heading">
+                                <i class="fa-solid fa-wave-square"></i> Pembetulan Alur & Frasa Natural
+                            </div>
+                            <div class="pillar-items-stream" id="streamFluency">
+                                <div class="pillar-empty-item">Alur pengucapan mengalir dengan baik.</div>
+                            </div>
+                        </div>
+                        <div class="pillar-tip-box" id="tipBoxFluency">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <div>
+                                <div class="pillar-tip-label">Tips Kelancaran:</div>
+                                <div class="pillar-tip-text" id="tipTextFluency">Gunakan kata penghubung seperti 'Moreover', 'In other words' agar kalimat mengalir.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Positive Encouragement Note -->
+                <div class="eval-positive-note" id="evalPositiveNote" style="display: none;">
+                    <i class="fa-solid fa-thumbs-up"></i>
+                    <span id="evalPositiveText">Great effort!</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Card: Conversation & Audio Waveform -->
+        <section class="card-conversation">
+            <!-- Chat Dialogue Stream -->
+            <div class="chat-dialogue-stream" id="messagesContainer">
+                <!-- Initial messages injected here -->
+            </div>
+
+            <!-- Typing text input slide (toggled by keyboard button) -->
+            <div class="text-input-slide" id="textInputSlide" style="display: none;">
+                <input type="text" id="userTextInput" placeholder="Ketik jawaban Anda di sini..." autocomplete="off">
+                <button id="btnSendText" title="Kirim">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <!-- Audio Waveform Box (at bottom of conversation card) -->
+            <div class="box-audio-waveform" id="waveformBox">
+                <div class="waveform-bars-wrapper">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Controls Shelf: [Keyboard] [Big Blue Mic] [Red Hangup] -->
+    <footer class="bottom-dock-controls">
+        <button class="dock-btn btn-keyboard" id="btnToggleKeyboard" title="Toggle Keyboard">
+            <i class="fa-solid fa-keyboard"></i>
+        </button>
+
+        <button class="dock-btn btn-mic-main" id="btnMicAction" title="Tekan untuk Berbicara">
+            <i class="fa-solid fa-microphone"></i>
+        </button>
+
+        <button class="dock-btn btn-end-session" id="btnEndSession" title="Akhiri Sesi">
+            <i class="fa-solid fa-phone" style="transform: rotate(135deg);"></i>
+        </button>
+    </footer>
+
+    <!-- Global Helpers and Logic Script -->
+    <script src="/ui/js/common.js?v=2"></script>
+    <script src="/ui/js/practice.js?v=2"></script>
+</body>
+</html>

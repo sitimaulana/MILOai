@@ -1,0 +1,23 @@
+[
+  {
+    "id": "b1_present_perfect_travel_001",
+    "text": "Present perfect can describe travel experience when no finished past time is specified. Example: I have visited Bali three times.",
+    "metadata": {
+      "level": "B1",
+      "skill": "speaking",
+      "category": "grammar",
+      "topic": "travel",
+      "feedback_type": "grammar"
+    }
+  },
+  {
+    "id": "b2_argumentation_001",
+    "text": "A B2 learner should be encouraged to develop a viewpoint with reasons and examples and respond to another viewpoint.",
+    "metadata": {
+      "level": "B2",
+      "skill": "speaking",
+      "category": "argumentation",
+      "feedback_type": "speaking"
+    }
+  }
+]

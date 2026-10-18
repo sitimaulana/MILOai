@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables
+.env
+*.env.local
+
+# ChromaDB (generated, can be re-created by running ingest.py)
+knowledge_base/chroma_db/
+
+# Whisper model cache (large files, auto-downloaded)
+~/.cache/whisper/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Logs
+*.log
+
+# Uploaded audio files (temporary)
+uploads/
+temp/

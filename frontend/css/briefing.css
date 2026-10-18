@@ -1,0 +1,460 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MILO AI English Tutor — Pre-Session Briefing ("Jaring Pengaman")
+   Aesthetic: Warm Sand + Modern Floating Cards + Playful Cyan Accents
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --sand-bg: #EFE4CC;
+    --sand-grad: linear-gradient(180deg, #F9F5EC 0%, #EFE1C7 60%, #F5E9D5 100%);
+    --card-bg: #FFFFFF;
+    --tint-blue: #EEF4FF;
+    --blue-accent: #0066FF;
+    --blue-hover: #0052CC;
+    --orange-primary: #FF5E36;
+    --orange-hover: #E04823;
+    --text-navy: #1B254B;
+    --text-slate: #64748B;
+    --border-subtle: rgba(0, 0, 0, 0.05);
+
+    /* Playful Cyan Tokens */
+    --cyan-soft-bg: rgba(6, 182, 212, 0.12);
+    --cyan-soft-border: rgba(6, 182, 212, 0.32);
+    --cyan-text: #0E7490;
+    --cyan-hover-bg: rgba(6, 182, 212, 0.22);
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.briefing-body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--sand-grad);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-navy);
+    overflow-x: hidden;
+}
+
+/* ─── Top Header Navigation ─────────────────────────────────────────────────── */
+.briefing-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 48px 12px;
+}
+
+.btn-header-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    color: var(--text-navy);
+    font-size: 18px;
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-header-back:hover {
+    transform: translateX(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    background: #F8FAFC;
+}
+
+.header-badges-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-badge-pill {
+    background: #FFFFFF;
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-navy);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.header-badge-pill.level {
+    background: var(--orange-primary);
+    color: #FFFFFF;
+}
+
+/* ─── Main Content Container ─────────────────────────────────────────────────── */
+.briefing-main-container {
+    flex: 1;
+    max-width: 860px;
+    width: calc(100% - 64px);
+    margin: 0 auto;
+    padding: 10px 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ─── Safety Net Warm Banner (Speaking Anxiety Reducer) ──────────────────────── */
+.safety-net-banner {
+    background: linear-gradient(135deg, #FFFFFF 0%, #F6F9FF 100%);
+    border-radius: 24px;
+    padding: 22px 28px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
+    border: 1.5px solid rgba(0, 102, 255, 0.12);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.safety-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: #EFF6FF;
+    color: var(--blue-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+}
+
+.safety-text-block h1 {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 4px;
+    letter-spacing: -0.3px;
+}
+
+.safety-text-block p {
+    font-size: 13.5px;
+    color: var(--text-slate);
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* ─── Scenario Context Card ──────────────────────────────────────────────────── */
+.briefing-card {
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 24px 28px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.card-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.section-icon-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--tint-blue);
+    color: var(--blue-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+
+.section-icon-dot.cyan {
+    background: var(--cyan-soft-bg);
+    color: var(--cyan-text);
+}
+
+.section-icon-dot.mic {
+    background: #FEF3C7;
+    color: #D97706;
+}
+
+.card-section-header h2 {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-navy);
+}
+
+.scenario-context-text {
+    font-size: 14.5px;
+    color: #334155;
+    line-height: 1.6;
+    background: #F8FAFC;
+    padding: 16px 20px;
+    border-radius: 16px;
+    border-left: 4px solid var(--blue-accent);
+    margin-bottom: 8px;
+}
+
+.scenario-roleplay-tag {
+    display: inline-block;
+    background: var(--tint-blue);
+    color: var(--blue-accent);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+/* ─── Target Vocabulary (Playful Cyan Chips) ─────────────────────────────────── */
+.vocab-subtext {
+    font-size: 13px;
+    color: var(--text-slate);
+    margin-bottom: 14px;
+}
+
+.vocab-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.vocab-chip {
+    background: var(--cyan-soft-bg);
+    border: 1.5px solid var(--cyan-soft-border);
+    color: var(--cyan-text);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
+}
+
+.vocab-chip i {
+    font-size: 11px;
+    opacity: 0.75;
+    transition: transform 0.15s ease;
+}
+
+.vocab-chip:hover {
+    background: var(--cyan-hover-bg);
+    border-color: #06B6D4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.18);
+}
+
+.vocab-chip:hover i {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.vocab-chip:active {
+    transform: translateY(0);
+}
+
+/* ─── Mic Check Component (Interactive Box) ──────────────────────────────────── */
+.mic-check-card {
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 26px 28px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+    border: 2px dashed #CBD5E1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.mic-check-card.tested {
+    border-color: #10B981;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);
+    box-shadow: 0 8px 28px rgba(16, 185, 129, 0.12);
+}
+
+.mic-check-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-navy);
+    margin-bottom: 6px;
+}
+
+.mic-check-desc {
+    font-size: 13px;
+    color: var(--text-slate);
+    max-width: 460px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.mic-visualizer-container {
+    width: 100%;
+    max-width: 420px;
+    height: 60px;
+    background: #F8FAFC;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E2E8F0;
+    position: relative;
+}
+
+#micVisualizerCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.mic-action-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.btn-test-mic {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--blue-accent);
+    color: #FFFFFF;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0, 102, 255, 0.3);
+    transition: all 0.22s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.btn-test-mic:hover {
+    background: var(--blue-hover);
+    transform: scale(1.06);
+    box-shadow: 0 8px 24px rgba(0, 102, 255, 0.4);
+}
+
+.btn-test-mic.listening {
+    background: var(--orange-primary);
+    box-shadow: 0 0 0 10px rgba(255, 94, 54, 0.2);
+    animation: micPulse 1.4s infinite;
+}
+
+@keyframes micPulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 94, 54, 0.4); }
+    70% { box-shadow: 0 0 0 16px rgba(255, 94, 54, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 94, 54, 0); }
+}
+
+.mic-status-badge {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-slate);
+    transition: color 0.2s ease;
+}
+
+.mic-status-badge.success {
+    color: #059669;
+}
+
+/* ─── Bottom CTA Bar ("Start Session") ────────────────────────────────────────── */
+.briefing-bottom-shelf {
+    background: #FFFFFF;
+    border-radius: 36px 36px 0 0;
+    padding: 18px 48px 22px;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    margin-top: auto;
+}
+
+.shelf-reminder-note {
+    font-size: 13px;
+    color: var(--text-slate);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shelf-reminder-note i {
+    color: var(--blue-accent);
+}
+
+.btn-start-session {
+    background: var(--orange-primary);
+    color: #FFFFFF;
+    border: none;
+    padding: 14px 38px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(255, 94, 54, 0.32);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-start-session:hover:not(:disabled) {
+    background: var(--orange-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(255, 94, 54, 0.42);
+}
+
+.btn-start-session:disabled {
+    background: #CBD5E1;
+    color: #64748B;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}
+
+/* Notification pill */
+.audio-toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text-navy);
+    color: #FFFFFF;
+    padding: 10px 22px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s ease;
+    z-index: 999;
+}
+
+.audio-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}

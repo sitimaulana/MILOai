@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Session Briefing — MILO AI English Tutor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/ui/css/briefing.css">
+</head>
+<body class="briefing-body">
+
+    <!-- Top Header Navigation -->
+    <header class="briefing-header">
+        <a href="/ui/setup.html" class="btn-header-back" title="Kembali ke Setup" id="btnBackToSetup">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="header-badges-group">
+            <span class="header-badge-pill level" id="briefingLevelBadge">Level B1</span>
+            <span class="header-badge-pill" id="briefingTopicBadge">Job Interview Practice</span>
+        </div>
+        <div style="width: 44px;"></div>
+    </header>
+
+    <!-- Main Briefing Container -->
+    <main class="briefing-main-container">
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             1. SAFETY NET BANNER (Anxiety Reducer)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <div class="safety-net-banner">
+            <div class="safety-icon-wrapper">
+                <i class="fa-solid fa-shield-heart"></i>
+            </div>
+            <div class="safety-text-block">
+                <h1>Jaring Pengaman: Ruang Aman Latihanmu</h1>
+                <p>Tarik napas santai! Di sini tidak ada nilai yang menghakimi kesalahanmu. MILO adalah AI tutor yang sabar dan siap mendampingimu untuk membangun rasa percaya diri berbicara bahasa Inggris.</p>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             2. SCENARIO CONTEXT (Skenario Konteks & Peran Pengguna)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="briefing-card">
+            <div class="card-section-header">
+                <div class="section-icon-dot">
+                    <i class="fa-solid fa-masks-theater"></i>
+                </div>
+                <h2>Skenario & Peran Kamu Hari Ini</h2>
+            </div>
+            <span class="scenario-roleplay-tag" id="scenarioRoleplayTag">Roleplay: Job Candidate</span>
+            <div class="scenario-context-text" id="scenarioDescription">
+                Kamu berperan sebagai pelamar kerja yang sedang menjalani sesi wawancara profesional bersama MILO (Hiring Manager). Ceritakan latar belakang, keahlian, dan motivasimu dengan percaya diri.
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             3. TARGET VOCABULARY (Playful Cyan Chips)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="briefing-card">
+            <div class="card-section-header">
+                <div class="section-icon-dot cyan">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h2>Target Vocabulary & Frasa Rekomendasi</h2>
+            </div>
+            <p class="vocab-subtext">
+                Gunakan kosakata atau frasa kunci berikut selama berbicara untuk melatih kelancaranmu. <strong>Klik pada frasa</strong> untuk mendengarkan contoh pelafalan:
+            </p>
+            <div class="vocab-chips-container" id="vocabChipsContainer">
+                <!-- Dynamically populated chips in playful cyan -->
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             4. MIC CHECK COMPONENT (Interactive Real-Time Waveform)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="mic-check-card" id="micCheckCard">
+            <h2 class="mic-check-title"><i class="fa-solid fa-microphone-lines" style="color: var(--blue-accent); margin-right: 6px;"></i> Uji Mikrofon (Mic Check)</h2>
+            <p class="mic-check-desc">
+                Tekan tombol mikrofon di bawah dan bicaralah selama 2 detik (misal: <em>"Hello MILO, I am ready"</em>) untuk memvalidasi bahwa suara terdengar jernih.
+            </p>
+
+            <!-- Dynamic Waveform Canvas -->
+            <div class="mic-visualizer-container">
+                <canvas id="micVisualizerCanvas" width="420" height="60"></canvas>
+            </div>
+
+            <!-- Action Row -->
+            <div class="mic-action-row">
+                <button type="button" class="btn-test-mic" id="btnTestMic" title="Klik untuk menguji mikrofon">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+            </div>
+
+            <!-- Status Indicator -->
+            <div class="mic-status-badge" id="micStatusBadge">
+                <i class="fa-solid fa-circle-info"></i> Mikrofon belum diuji. Klik tombol di atas untuk memulai tes.
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         BOTTOM DOCK / SHELF (CTA Start Session - Disabled until Mic Validated)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <footer class="briefing-bottom-shelf">
+        <div class="shelf-reminder-note" id="shelfReminderNote">
+            <i class="fa-solid fa-lock"></i>
+            <span>Selesaikan <strong>Mic Check</strong> terlebih dahulu untuk membuka sesi latihan.</span>
+        </div>
+        <button type="button" class="btn-start-session" id="btnStartSession" disabled>
+            <span>Mulai Sesi Latihan</span>
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </footer>
+
+    <!-- Audio Speech Toast -->
+    <div class="audio-toast" id="audioToast">Pronunciation playing...</div>
+
+    <!-- Scripts -->
+    <script src="/ui/js/common.js"></script>
+    <script src="/ui/js/briefing.js"></script>
+</body>
+</html>

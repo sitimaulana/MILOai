@@ -1,0 +1,14 @@
+{
+  "id": "unique_id",
+  "text": "retrievable knowledge",
+  "metadata": {
+    "level": "B1",
+    "skill": "speaking",
+    "category": "grammar",
+    "topic": "travel",
+    "difficulty": "intermediate",
+    "source": "British Council",
+    "source_year": 2026,
+    "feedback_type": "grammar"
+  }
+}

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Dashboard & History — MILO AI</title>
+    <link rel="stylesheet" href="/ui/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="milo-navbar">
+        <a href="/ui/index.html" class="nav-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+                <span class="brand-title">MILO</span>
+                <span class="brand-tag">Dashboard</span>
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="/ui/index.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/ui/setup.html" class="nav-link"><i class="fa-solid fa-microphone"></i> Practice</a>
+            <a href="/ui/dashboard.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        </nav>
+        <div>
+            <a href="/ui/setup.html" class="nav-cta-btn">
+                <i class="fa-solid fa-play"></i> New Session
+            </a>
+        </div>
+    </header>
+
+    <main class="dashboard-page-wrapper">
+        <!-- Dashboard Header -->
+        <div class="dash-header-row">
+            <div>
+                <h2>Your Speaking Progress</h2>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Track competency improvements and previous practice transcripts.</p>
+            </div>
+            <a href="/ui/setup.html" class="btn-primary">
+                <i class="fa-solid fa-plus"></i> Start Practice Session
+            </a>
+        </div>
+
+        <!-- Metric Summary Cards -->
+        <section class="stats-summary-grid">
+            <div class="stat-metric-card">
+                <div class="stat-icon-wrapper total">
+                    <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="stat-info-box">
+                    <span class="stat-big-val" id="statTotalSessions">0</span>
+                    <span class="stat-label-text">Total Sessions</span>
+                </div>
+            </div>
+
+            <div class="stat-metric-card">
+                <div class="stat-icon-wrapper overall">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="stat-info-box">
+                    <span class="stat-big-val" id="statOverallScore">0</span>
+                    <span class="stat-label-text">Avg Overall Score</span>
+                </div>
+            </div>
+
+            <div class="stat-metric-card">
+                <div class="stat-icon-wrapper grammar">
+                    <i class="fa-solid fa-spell-check"></i>
+                </div>
+                <div class="stat-info-box">
+                    <span class="stat-big-val" id="statGrammarScore">0</span>
+                    <span class="stat-label-text">Grammar Score</span>
+                </div>
+            </div>
+
+            <div class="stat-metric-card">
+                <div class="stat-icon-wrapper vocab">
+                    <i class="fa-solid fa-book-sparkles"></i>
+                </div>
+                <div class="stat-info-box">
+                    <span class="stat-big-val" id="statVocabScore">0</span>
+                    <span class="stat-label-text">Vocabulary Score</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Sessions History -->
+        <section class="history-table-card">
+            <div class="table-header-flex">
+                <h3>Recent Practice Sessions</h3>
+                <span id="sessionCountBadge" style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Showing latest sessions</span>
+            </div>
+
+            <div class="history-items-list" id="historySessionsContainer">
+                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 12px;"></i>
+                    <p>Loading your session history...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/ui/js/common.js"></script>
+    <script src="/ui/js/dashboard.js"></script>
+</body>
+</html>

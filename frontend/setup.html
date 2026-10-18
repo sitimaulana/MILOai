@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Level, Target & Topik — MILO AI English Tutor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/ui/css/setup.css">
+</head>
+<body class="setup-body">
+
+    <!-- Top Header Navigation -->
+    <header class="setup-nav-header">
+        <button type="button" class="btn-header-back" title="Kembali" id="btnHeaderBack">
+            <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <div class="stepper-dots-wrapper">
+            <span class="stepper-dot active" id="dotStep1" title="Langkah 1: Level"></span>
+            <span class="stepper-dot" id="dotStep2" title="Langkah 2: Daily Goal"></span>
+            <span class="stepper-dot" id="dotStep3" title="Langkah 3: Topik"></span>
+        </div>
+        <div style="width: 44px;"></div>
+    </header>
+
+    <!-- Main Setup Content Container -->
+    <main class="setup-main-container">
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 1: LEVEL SELECTION (Exact Mockup Layout)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="step1LevelContainer">
+            <!-- Question Speech Bubble -->
+            <div class="prompt-bubble-card">
+                <h2>Seberapa ahli kamu berbicara<br>Bahasa Inggris?</h2>
+            </div>
+
+            <!-- 2 Target Levels (B1 and B2) + Diagnostic Quiz -->
+            <div class="levels-grid-layout" style="grid-template-columns: 1fr 1fr;">
+                <!-- Card 1: Intermediate (B1) - Selected Default -->
+                <div class="level-selection-card selected" data-level="B1">
+                    <span class="recommended-mini-pill">Rekomendasi</span>
+                    <div class="signal-icon-box">
+                        <div class="signal-bars">
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar"></span>
+                            <span class="signal-bar"></span>
+                        </div>
+                    </div>
+                    <div class="card-text-block">
+                        <div class="card-title-text">Intermediate (B1)</div>
+                        <div class="card-desc-text">Membangun kelancaran berbicara & kosakata profesional untuk percakapan sehari-hari dan kerja.</div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Upper-Int. (B2) -->
+                <div class="level-selection-card" data-level="B2">
+                    <div class="signal-icon-box">
+                        <div class="signal-bars">
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar active"></span>
+                            <span class="signal-bar"></span>
+                        </div>
+                    </div>
+                    <div class="card-text-block">
+                        <div class="card-title-text">Upper-Int. (B2)</div>
+                        <div class="card-desc-text">Percakapan lancar, spontan, dan mendalam menuju penguasaan level expert.</div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Bingung? Cari tahu levelmu disini! (Spanning 2 columns) -->
+                <div class="level-selection-card card-help-quiz" id="btnOpenLevelQuiz" style="grid-column: span 2;">
+                    <div class="help-icon-box">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div class="card-title-text">Bingung memilih antara B1 atau B2?</div>
+                        <div class="card-desc-text">Cari tahu level yang paling tepat untukmu dalam 20 detik! <i class="fa-solid fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 2: SELECT DAILY GOAL (New Requested Step)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="step2GoalContainer" style="display: none;">
+            <!-- Question Speech Bubble -->
+            <div class="prompt-bubble-card">
+                <h2>Berapa lama target latihanmu<br>setiap hari?</h2>
+            </div>
+
+            <!-- Daily Goals Grid -->
+            <div class="goals-grid-layout">
+                <!-- Goal 1: 5 Min / Day -->
+                <div class="goal-selection-card" data-goal="5_min">
+                    <div class="goal-icon-box g5">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="card-title-text">5 Menit / Hari</div>
+                            <span class="goal-badge-pill">Santai</span>
+                        </div>
+                        <div class="card-desc-text">Satu sesi latihan kilat. Sangat cocok untuk membangun kebiasaan tanpa beban.</div>
+                    </div>
+                </div>
+
+                <!-- Goal 2: 15 Min / Day (Recommended Default) -->
+                <div class="goal-selection-card selected" data-goal="15_min">
+                    <div class="goal-icon-box g15">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="card-title-text">15 Menit / Hari</div>
+                            <span class="goal-badge-pill rec">Rekomendasi</span>
+                        </div>
+                        <div class="card-desc-text">Dua sampai tiga skenario percakapan teratur. Paling efektif untuk kemajuan nyata.</div>
+                    </div>
+                </div>
+
+                <!-- Goal 3: 30 Min / Day -->
+                <div class="goal-selection-card" data-goal="30_min">
+                    <div class="goal-icon-box g30">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div style="display: flex; align-items: center;">
+                            <div class="card-title-text">30 Menit / Hari</div>
+                            <span class="goal-badge-pill">Intensif</span>
+                        </div>
+                        <div class="card-desc-text">Sesi latihan mendalam menyeluruh. Sangat ideal untuk persiapan wawancara kerja atau ujian.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 3: TOPIC SELECTION (Matching Warm Aesthetic)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="step3TopicContainer" style="display: none;">
+            <!-- Question Speech Bubble -->
+            <div class="prompt-bubble-card">
+                <h2>Pilih skenario percakapan yang<br>ingin kamu latih hari ini:</h2>
+            </div>
+
+            <!-- Topics Grid Layout -->
+            <div class="topics-grid-layout">
+                <!-- Topic 1: Job Interview -->
+                <div class="topic-selection-card selected" data-topic="job_interview">
+                    <div class="topic-icon-box interview">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div class="card-title-text">Job Interview Practice</div>
+                        <div class="card-desc-text">MILO bertindak sebagai pewawancara kerja. Latih pertanyaan profesional, background, dan behavioral.</div>
+                        <div class="topic-tags-row">
+                            <span class="topic-mini-tag">Formal English</span>
+                            <span class="topic-mini-tag">Career</span>
+                            <span class="topic-mini-tag">Self-Introduction</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topic 2: Academic Discussion -->
+                <div class="topic-selection-card" data-topic="academic_discussion">
+                    <div class="topic-icon-box academic">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div class="card-title-text">Academic Discussion</div>
+                        <div class="card-desc-text">Diskusi ilmiah seputar riset, teknologi, dan budaya. Latih argumen terstruktur dan kosakata akademis.</div>
+                        <div class="topic-tags-row">
+                            <span class="topic-mini-tag">Critical Thinking</span>
+                            <span class="topic-mini-tag">Presentasi</span>
+                            <span class="topic-mini-tag">Scholarly Vocabulary</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topic 3: Daily Conversation -->
+                <div class="topic-selection-card" data-topic="daily_conversation">
+                    <div class="topic-icon-box daily">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div class="card-text-block" style="flex: 1;">
+                        <div class="card-title-text">Daily Conversation</div>
+                        <div class="card-desc-text">Obrolan santai dan luwes tentang hobi, traveling, dan kehidupan sehari-hari untuk melatih kelancaran alami.</div>
+                        <div class="topic-tags-row">
+                            <span class="topic-mini-tag">Casual Fluency</span>
+                            <span class="topic-mini-tag">Everyday Idioms</span>
+                            <span class="topic-mini-tag">Social</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         BOTTOM DOCK / SHELF (Always Visible, Sticky UX)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <footer class="setup-bottom-shelf">
+        <!-- Step 1 Controls -->
+        <div id="shelfStep1" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div class="shelf-info-text">
+                <span class="shelf-info-badge">Langkah 1/3</span>
+                <span id="shelfLevelLabel">Level Terpilih: Intermediate (B1)</span>
+            </div>
+            <button type="button" class="btn-cta-next" id="btnGotoStep2">
+                <span>Lanjut: Target Harian</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Step 2 Controls -->
+        <div id="shelfStep2" style="display: none; align-items: center; justify-content: space-between; width: 100%;">
+            <button type="button" class="btn-cta-secondary" id="btnBackToStep1">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Ganti Level</span>
+            </button>
+            <div class="shelf-info-text">
+                <span class="shelf-info-badge" id="shelfGoalBadge">15 Menit / Hari</span>
+                <span id="shelfGoalLabel">Konsisten (Rekomendasi)</span>
+            </div>
+            <button type="button" class="btn-cta-next" id="btnGotoStep3">
+                <span>Lanjut: Pilih Topik</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Step 3 Controls -->
+        <div id="shelfStep3" style="display: none; align-items: center; justify-content: space-between; width: 100%;">
+            <button type="button" class="btn-cta-secondary" id="btnBackToStep2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Ganti Target</span>
+            </button>
+            <div class="shelf-info-text">
+                <span class="shelf-info-badge" id="shelfFinalLevelBadge">Level B1</span>
+                <span>Siap menuju briefing & cek audio</span>
+            </div>
+            <button type="button" class="btn-cta-next" id="btnLaunchPractice" style="background: var(--blue-accent); box-shadow: 0 4px 18px rgba(0, 102, 255, 0.3);">
+                <span>Lanjut ke Pre-Session Briefing</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         DIAGNOSTIC MINI-MODAL ("Cari Tahu Levelmu Disini")
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="quizModalOverlay">
+        <div class="modal-dialog-box">
+            <div class="modal-header-row">
+                <div>
+                    <h3><i class="fa-solid fa-compass"></i> Cari Tahu Levelmu</h3>
+                    <p>Jawab 2 pertanyaan kilat (20 detik) untuk menentukan apakah kamu B1 atau B2.</p>
+                </div>
+                <button class="btn-close-modal" id="btnCloseQuizModal">&times;</button>
+            </div>
+
+            <!-- Quiz Questions Form -->
+            <form id="quizForm">
+                <!-- Q1 -->
+                <div class="quiz-question-card">
+                    <div class="quiz-question-title">1. Bagaimana kemampuan berbicaramu saat ini?</div>
+                    <div class="quiz-options-group">
+                        <label class="quiz-option-label">
+                            <input type="radio" name="q1" value="B1" checked required>
+                            <span>Saya bisa berbicara kalimat umum, tetapi masih butuh waktu berpikir dan mencari kosakata (Pilih B1)</span>
+                        </label>
+                        <label class="quiz-option-label">
+                            <input type="radio" name="q1" value="B2">
+                            <span>Saya sudah cukup lancar dan ingin mengasah diskusi spontan, argumen kritis, dan profesional (Pilih B2)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="quiz-question-card">
+                    <div class="quiz-question-title">2. Apa fokus latihan utamamu bersama MILO?</div>
+                    <div class="quiz-options-group">
+                        <label class="quiz-option-label">
+                            <input type="radio" name="q2" value="B1" checked required>
+                            <span>Membangun kelancaran berbicara sehari-hari dan mengurangi rasa gugup (Rekomendasi B1)</span>
+                        </label>
+                        <label class="quiz-option-label">
+                            <input type="radio" name="q2" value="B2">
+                            <span>Mempersiapkan wawancara kerja profesional, presentasi, dan diskusi mendalam (Rekomendasi B2)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+                    <button type="button" class="btn-cta-secondary" id="btnCancelQuiz">Tutup</button>
+                    <button type="submit" class="btn-cta-next" id="btnSubmitQuiz" style="padding: 10px 24px;">
+                        <span>Terapkan Rekomendasi Level</span>
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/ui/js/common.js"></script>
+    <script src="/ui/js/setup.js"></script>
+</body>
+</html>

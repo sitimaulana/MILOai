@@ -1,0 +1,50 @@
+{
+  "collections": [
+    {
+      "name": "cefr",
+      "path": "01_cefr",
+      "purpose": "proficiency targets"
+    },
+    {
+      "name": "grammar",
+      "path": "02_grammar",
+      "purpose": "grammar learning and correction"
+    },
+    {
+      "name": "vocabulary",
+      "path": "03_vocabulary",
+      "purpose": "topic vocabulary and functional language"
+    },
+    {
+      "name": "speaking",
+      "path": "04_speaking",
+      "purpose": "speaking task and interaction support"
+    },
+    {
+      "name": "pronunciation",
+      "path": "05_pronunciation",
+      "purpose": "intelligibility and ASR-aware feedback"
+    },
+    {
+      "name": "feedback",
+      "path": "06_feedback",
+      "purpose": "feedback generation rules"
+    },
+    {
+      "name": "scenarios",
+      "path": "07_scenarios",
+      "purpose": "conversation practice"
+    },
+    {
+      "name": "rag",
+      "path": "08_rag",
+      "purpose": "retrieval configuration"
+    },
+    {
+      "name": "assessment",
+      "path": "09_assessment",
+      "purpose": "observation and engagement measurement"
+    }
+  ],
+  "record_count": 204
+}

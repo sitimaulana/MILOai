@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MILO — AI English Speaking Tutor & Real-Time Evaluator</title>
+    <meta name="description" content="Master English speaking with MILO. Get real-time speech evaluation on Grammar, Vocabulary, and Fluency powered by AI and CEFR standards.">
+    <link rel="stylesheet" href="/ui/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation Bar -->
+    <header class="milo-navbar">
+        <a href="/ui/index.html" class="nav-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <div>
+                <span class="brand-title">MILO</span>
+                <span class="brand-tag">AI Tutor</span>
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a href="/ui/index.html" class="nav-link active"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="/ui/setup.html" class="nav-link"><i class="fa-solid fa-microphone"></i> Practice</a>
+            <a href="/ui/dashboard.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+        </nav>
+        <div>
+            <a href="/ui/setup.html" class="nav-cta-btn">
+                <i class="fa-solid fa-play"></i> Start Practice
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+        <section class="hero-wrapper">
+            <div class="hero-pill-badge">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Powered by Whisper ASR & GPT-4o Mini
+            </div>
+            <h1 class="hero-heading">
+                Speak Confident English with <span class="gradient-text">Instant AI Evaluation</span>
+            </h1>
+            <p class="hero-subtitle">
+                Practice conversational English with a personalized AI tutor that listens, responds naturally, 
+                and evaluates your <strong>Grammar</strong>, <strong>Vocabulary</strong>, and <strong>Fluency</strong> in real-time.
+            </p>
+            <div class="hero-actions">
+                <a href="/ui/setup.html" class="btn-primary">
+                    <i class="fa-solid fa-rocket"></i> Start Practice Session
+                </a>
+                <a href="/ui/dashboard.html" class="btn-secondary">
+                    <i class="fa-solid fa-chart-pie"></i> View My Progress
+                </a>
+            </div>
+
+            <!-- Features Showcase -->
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon-box grammar">
+                        <i class="fa-solid fa-spell-check"></i>
+                    </div>
+                    <h3>Live Grammar Analysis</h3>
+                    <p>Instant detection of tense errors, prepositions, and sentence structures with friendly explanations and corrections.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box vocab">
+                        <i class="fa-solid fa-book-sparkles"></i>
+                    </div>
+                    <h3>Vocabulary Enhancement</h3>
+                    <p>Get upgraded word suggestions mapped from B1 to B2 level to elevate your vocabulary richness naturally.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon-box fluency">
+                        <i class="fa-solid fa-wave-pulse"></i>
+                    </div>
+                    <h3>Fluency & Speech Rhythm</h3>
+                    <p>Measure sentence flow, connector variety, and coherence with responsive radial score meters as you speak.</p>
+                </div>
+            </div>
+
+            <!-- How It Works Timeline -->
+            <div style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 48px 36px; max-width: 1000px; margin: 0 auto; backdrop-filter: var(--glass-blur);">
+                <h2 style="font-size: 28px; margin-bottom: 32px; text-align: center;">How MILO Accelerates Your Speaking</h2>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: left;">
+                    <div>
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(99, 102, 241, 0.2); color: var(--primary-light); display: flex; align-items: center; justify-content: center; font-weight: 800; margin-bottom: 14px;">1</div>
+                        <h4 style="font-size: 17px; margin-bottom: 8px;">Choose Your Focus</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">Select your level (A2, B1, B2) and targeted mode: Job Interview, Academic, or Daily Conversation.</p>
+                    </div>
+                    <div>
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(249, 115, 22, 0.2); color: var(--accent-orange); display: flex; align-items: center; justify-content: center; font-weight: 800; margin-bottom: 14px;">2</div>
+                        <h4 style="font-size: 17px; margin-bottom: 8px;">Speak or Chat with MILO</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">Engage in dynamic dialogue. MILO adapts its tutor persona and speaks back with natural voice audio.</p>
+                    </div>
+                    <div>
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); color: var(--grammar-color); display: flex; align-items: center; justify-content: center; font-weight: 800; margin-bottom: 14px;">3</div>
+                        <h4 style="font-size: 17px; margin-bottom: 8px;">Review CEFR Scores</h4>
+                        <p style="font-size: 13px; color: var(--text-muted);">Get a comprehensive summary, CEFR outcome, overall performance score, and targeted improvement points.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 40px 20px; color: var(--text-subtle); font-size: 13px; border-top: 1px solid var(--glass-border);">
+        <p>&copy; 2026 MILO — Multimodal Interactive Learning Companion. Empowered by Deep Learning & CEFR Framework.</p>
+    </footer>
+
+</body>
+</html>
