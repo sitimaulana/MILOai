@@ -64,8 +64,21 @@ class WhisperASR:
         model_size = settings.whisper_model_size
         device = settings.whisper_device
 
+        if device == "cuda":
+            import torch
+            if not torch.cuda.is_available():
+                logger.warning(
+                    "⚠️  CUDA requested for Whisper but torch.cuda.is_available() is False. "
+                    "Falling back to CPU."
+                )
+                device = "cpu"
+            else:
+                gpu_name = torch.cuda.get_device_name(0)
+                logger.info(f"⚡ GPU acceleration active for Whisper: {gpu_name}")
+
         logger.info(f"Loading Whisper model '{model_size}' on device '{device}'...")
-        self._model = whisper.load_model(model_size, device=device)
+        download_root = "D:/.whisper_cache" if os.path.exists("D:/") else None
+        self._model = whisper.load_model(model_size, device=device, download_root=download_root)
         logger.info("✅ Whisper model loaded successfully.")
 
     @property
@@ -94,7 +107,8 @@ class WhisperASR:
             RuntimeError: If the Whisper model is not loaded.
         """
         if self._model is None:
-            raise RuntimeError("Whisper model is not loaded. Call load() first.")
+            logger.info("Whisper model not pre-loaded; auto-loading now...")
+            self.load()
 
         # Validate format
         ext = Path(filename).suffix.lower()
@@ -130,12 +144,29 @@ class WhisperASR:
         language: str | None,
     ) -> TranscriptionResult:
         """Synchronous transcription (runs in thread pool executor)."""
+        is_cuda = False
+        try:
+            if hasattr(self._model, "device"):
+                is_cuda = self._model.device.type == "cuda"
+        except Exception:
+            pass
+
         options: dict = {
-            "language": language,
             "task": "transcribe",
-            "fp16": False,  # Disable FP16 for CPU compatibility
+            "fp16": is_cuda,  # Enable FP16 acceleration on CUDA GPU
             "verbose": None,  # In Whisper, verbose=None disables tqdm (verbose=False enables it!)
+            "temperature": (0.0, 0.2),  # Dynamic temperature escape fallback against repetitive loops
+            "condition_on_previous_text": False,
+            "no_speech_threshold": 0.6,
+            "initial_prompt": (
+                "Hello, I'm Lana. My MBTI is INTJ, INTP, INFJ, ENFP. "
+                "Let's practice English speaking, IELTS, TOEFL, daily life, hobbies, anime, manga, and job interviews."
+            ),
         }
+
+        # English-only models (like small.en or base.en) reject or don't need a language arg
+        if getattr(self._model, "is_multilingual", True):
+            options["language"] = language or "en"
 
         # Redirect stderr and stdout to prevent OSError [Errno 22] Invalid argument on Windows consoles
         with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):
@@ -143,13 +174,30 @@ class WhisperASR:
 
         # Calculate average log probability as confidence indicator
         segments = result.get("segments", [])
+        text = result.get("text", "").strip()
+
+        # If no speech segments survived the silence threshold, treat as silence
+        if not segments:
+            text = ""
+        else:
+            # Filter known Whisper hallucination artifacts on silence or quiet background noise
+            clean_check = text.lower().rstrip(".!,?")
+            if clean_check in (
+                "thanks for watching",
+                "thank you for watching",
+                "subtitles by",
+                "subscribe",
+                "please subscribe",
+            ) and segments[0].get("no_speech_prob", 0.0) > 0.4:
+                text = ""
+
         if segments:
             avg_logprob = sum(s.get("avg_logprob", 0.0) for s in segments) / len(segments)
         else:
             avg_logprob = 0.0
 
         return TranscriptionResult(
-            text=result["text"].strip(),
+            text=text,
             language=result.get("language", "en"),
             confidence=avg_logprob,
             segments=segments,

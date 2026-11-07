@@ -25,7 +25,15 @@ class FastTranslator:
                 api_key="ollama",
                 base_url=settings.ollama_base_url,
             )
-            self._model = settings.local_llm_model
+        elif settings.ai_provider == "bifrost":
+            self._client = AsyncOpenAI(
+                api_key=settings.bifrost_api_key or "bk-milo-token-gateway",
+                base_url=settings.bifrost_base_url,
+                default_headers={
+                    "X-Bifrost-App": "MILO-AI-Backend",
+                },
+            )
+            self._model = settings.bifrost_model
         elif settings.ai_provider == "openrouter":
             self._client = AsyncOpenAI(
                 api_key=settings.openrouter_api_key or "missing_key",

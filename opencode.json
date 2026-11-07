@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/schema.json",
+  "name": "AI-MILO",
+  "instructions": [
+    "AI-MILO is a Multimodal Interactive Learning Companion for CEFR English speaking practice.",
+    "Technology Stack: FastAPI + Uvicorn, Whisper ASR (local), ChromaDB (RAG), OpenAI/OpenRouter/Ollama via Bifrost LLM Gateway, Edge/OpenAI TTS, SQLite/PostgreSQL.",
+    "Knowledge Base: Managed as an Obsidian Vault under 'Knowledge Base MILO'. Ingest with 'python knowledge_base/ingest.py'.",
+    "Bifrost LLM Gateway: Configured in docker-compose.bifrost.yml on http://localhost:8080/v1 for token budgeting and rate-limiting.",
+    "Always run tests and verify imports with 'uv run' after modifications."
+  ],
+  "ignore": [
+    "ffmpeg.exe",
+    "milo_dev.db",
+    "knowledge_base/chroma_db/**",
+    ".venv/**",
+    "bifrost_data/**",
+    "*.mp3",
+    "*.ogg",
+    "*.webm"
+  ]
+}

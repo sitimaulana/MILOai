@@ -96,6 +96,7 @@ async def chat(
         audio_base64=result.audio_base64,
         feedback=feedback_response,
         rag_sources=result.rag_sources,
+        avatar_emotion=getattr(result, "avatar_emotion", "friendly"),
     )
 
 

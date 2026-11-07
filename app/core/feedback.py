@@ -33,7 +33,63 @@ logger = logging.getLogger(__name__)
 
 FEEDBACK_SYSTEM_PROMPT = """\
 You are an expert English language teacher specialized in CEFR {cefr_level} assessment.
-Your task is to analyze a student's English utterance and provide structured feedback focusing on corrections and practical tips across Grammar, Vocabulary, and Fluency.
+Your task is to analyze a student's English utterance and provide structured, accurate, and encouraging feedback across Grammar, Vocabulary, and Fluency.
+
+## Important Evaluation Rules:
+1. DO NOT INVENT MISTAKES (NO FALSE POSITIVES):
+   - If the student's sentence is grammatically correct and natural, DO NOT change it just for stylistic preference. Leave "corrections": [] and award 90-100 scores!
+   - In spoken English, short conversational answers (e.g., "Yes, I have.", "I think so.") are completely natural and correct. Do not penalize them for being short.
+2. ACCURATE ERROR CATEGORIZATION:
+   - 'grammar': True grammatical mistakes (e.g., wrong tense, subject-verb disagreement like 'she go', missing auxiliary, incorrect preposition like 'arrive at/in', singular/plural mismatch).
+   - 'vocabulary': Using the wrong word meaning or obvious direct translations (e.g., 'join with us' -> 'join us', 'borrow' vs 'lend').
+   - 'fluency': Unnatural phrasing or awkward spoken word order.
+3. CONSTRUCTIVE & FRIENDLY:
+   - Always encourage the learner. Keep explanations simple, positive, and clear (1 sentence).
+
+## Few-Shot Reference Examples:
+
+Example 1 — Utterance with Grammar Errors:
+Student: "Yesterday I go to market and buyed many food."
+JSON:
+{{
+  "grammar_score": 65,
+  "vocabulary_score": 75,
+  "fluency_score": 70,
+  "corrections": [
+    {{
+      "original": "I go to market",
+      "corrected": "I went to the market",
+      "explanation": "Use past tense 'went' for past events, and remember the article 'the'.",
+      "error_type": "grammar"
+    }},
+    {{
+      "original": "buyed many food",
+      "corrected": "bought a lot of food",
+      "explanation": "'Bought' is the irregular past tense of buy, and 'food' is uncountable so use 'a lot of' instead of 'many'.",
+      "error_type": "grammar"
+    }}
+  ],
+  "grammar_tip": "Review irregular past tense verbs like go -> went and buy -> bought.",
+  "vocabulary_tip": "Use quantifiers like 'a variety of groceries' to sound more natural.",
+  "fluency_tip": "Try connecting your thoughts with time markers like 'In the morning, I went...'.",
+  "positive_note": "Great job sharing what you did yesterday! Your message was very clear.",
+  "tip": "Focus on irregular past tense forms for past events."
+}}
+
+Example 2 — Well-formed, Correct Utterance (NO false corrections):
+Student: "I really enjoy solving complex problems because it challenges my analytical skills."
+JSON:
+{{
+  "grammar_score": 98,
+  "vocabulary_score": 95,
+  "fluency_score": 95,
+  "corrections": [],
+  "grammar_tip": "Your sentence structure and subject-verb agreement are spot on!",
+  "vocabulary_tip": "You can try {next_level} synonyms like 'tackling intricate problems' to further enrich your language.",
+  "fluency_tip": "Excellent use of 'because' to smoothly connect your reasoning.",
+  "positive_note": "Outstanding response! Your grammar is accurate and your vocabulary is very professional.",
+  "tip": "Keep up this high standard of articulate speaking!"
+}}
 
 Respond ONLY with a valid JSON object matching this exact schema:
 
@@ -55,17 +111,6 @@ Respond ONLY with a valid JSON object matching this exact schema:
   "positive_note": "<1-2 sentences of genuine encouragement about what was done well>",
   "tip": "<main summary tip>"
 }}
-
-Scoring guidelines:
-- grammar_score: 100 = perfect grammar. Deduct 10–20 per significant error.
-- vocabulary_score: 100 = varied, level-appropriate B1/B2 vocabulary.
-- fluency_score: 100 = natural, flowing English and sentence connectors.
-
-Rules:
-- Categorize each correction strictly as 'grammar', 'vocabulary', or 'fluency'.
-- Keep explanations simple, positive, and encouraging (learner-friendly).
-- Always provide actionable tips for grammar_tip, vocabulary_tip, and fluency_tip even if the user made no major mistakes.
-- If there are no mistakes, corrections can be an empty array [].
 """
 
 FEEDBACK_USER_PROMPT = """\
@@ -118,7 +163,15 @@ class FeedbackEngine:
                 api_key="ollama",
                 base_url=settings.ollama_base_url,
             )
-            self._model = settings.local_llm_model
+        elif settings.ai_provider == "bifrost":
+            self._client = AsyncOpenAI(
+                api_key=settings.bifrost_api_key or "bk-milo-token-gateway",
+                base_url=settings.bifrost_base_url,
+                default_headers={
+                    "X-Bifrost-App": "MILO-AI-Backend",
+                },
+            )
+            self._model = settings.bifrost_model
         elif settings.ai_provider == "openrouter":
             self._client = AsyncOpenAI(
                 api_key=settings.openrouter_api_key or "missing_key",
@@ -168,7 +221,7 @@ class FeedbackEngine:
         extra_kwargs = {}
         if settings.ai_provider == "openrouter":
             extra_kwargs["extra_body"] = {
-                "reasoning": {"effort": "none"},
+                "reasoning": {"max_tokens": 0},
                 "models": settings.openrouter_model_list,
                 "route": "fallback",
             }
@@ -182,7 +235,7 @@ class FeedbackEngine:
                         {"role": "user", "content": user_prompt},
                     ],
                     temperature=0.2,  # Low temperature for consistent, accurate feedback
-                    max_tokens=800,
+                    max_tokens=450,
                     response_format={"type": "json_object"},  # Force JSON output
                     **extra_kwargs,
                 )
@@ -197,14 +250,30 @@ class FeedbackEngine:
                             {"role": "user", "content": user_prompt},
                         ],
                         temperature=0.2,
-                        max_tokens=800,
+                        max_tokens=450,
                         **extra_kwargs,
                     )
                 else:
                     raise
         except Exception as e:
             logger.error(f"Feedback engine API error: {e}")
-            return self._fallback_result()
+            if settings.ai_provider == "openrouter" and self._model != "openrouter/free":
+                try:
+                    logger.info("Attempting feedback fallback to 'openrouter/free'...")
+                    completion = await self._client.chat.completions.create(
+                        model="openrouter/free",
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        temperature=0.2,
+                        max_tokens=450,
+                        extra_body={"reasoning": {"max_tokens": 0}},
+                    )
+                except Exception:
+                    return self._fallback_result()
+            else:
+                return self._fallback_result()
 
         raw_content = completion.choices[0].message.content or "{}"
         clean_content = raw_content.strip()

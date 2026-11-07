@@ -521,3 +521,110 @@ The summary should: mention the topic discussed, highlight progress, and give on
             f"Your grammar score was {avg_grammar:.0f}/100 and vocabulary score was {avg_vocab:.0f}/100. "
             "Keep practicing — consistency is the key to improvement!"
         )
+
+
+# ─── Obsidian Markdown Export ────────────────────────────────────────────────
+
+@router.get(
+    "/session/{session_id}/export/obsidian",
+    summary="Export session learning log as Obsidian Markdown",
+    description="Generates an Obsidian-compatible Markdown note with frontmatter, callouts, and wikilinks.",
+)
+async def export_session_obsidian(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    from fastapi.responses import Response
+
+    conv = ConversationService(db)
+    session = await conv.get_session(session_id)
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Session '{session_id}' not found.",
+        )
+
+    summary_data = await conv.get_session_feedback_summary(session_id)
+    history = await conv.get_history(session_id, max_turns=100)
+
+    topic_label = TOPIC_LABELS.get(session.topic or "", session.topic or "English Practice")
+    created_str = session.created_at.strftime("%Y-%m-%d %H:%M") if session.created_at else "Unknown"
+    date_iso = session.created_at.strftime("%Y-%m-%d") if session.created_at else "2026-10-27"
+
+    # Frontmatter
+    md = [
+        "---",
+        f"title: MILO Practice - {topic_label}",
+        f"date: {date_iso}",
+        "tags:",
+        "  - milo/session",
+        f"  - cefr/{session.cefr_level or 'B1'}",
+        f"  - topic/{session.topic or 'general'}",
+        f"grammar_score: {session.avg_grammar_score or 0:.1f}",
+        f"vocabulary_score: {session.avg_vocabulary_score or 0:.1f}",
+        f"fluency_score: {session.avg_fluency_score or 0:.1f}",
+        f"overall_score: {session.overall_score or 0:.1f}",
+        f"cefr_level: {session.cefr_result or session.cefr_level or 'B1'}",
+        "---",
+        "",
+        f"# 🎙️ MILO Practice Session: {topic_label}",
+        f"**Date**: {created_str} | **Level**: `{session.cefr_level or 'B1'}` | **Goal**: *{session.learning_goal or 'Speaking practice'}*",
+        "",
+        "## 📊 Assessment Scores",
+        "| Metric | Score | Rating |",
+        "| :--- | :--- | :--- |",
+        f"| **Grammar Accuracy** | `{session.avg_grammar_score or 0:.1f}/100` | {'🟢 Solid' if (session.avg_grammar_score or 0) >= 80 else '🟡 Needs practice'} |",
+        f"| **Vocabulary Richness** | `{session.avg_vocabulary_score or 0:.1f}/100` | {'🟢 Diverse' if (session.avg_vocabulary_score or 0) >= 80 else '🟡 Basic'} |",
+        f"| **Fluency & Confidence** | `{session.avg_fluency_score or 0:.1f}/100` | {'🟢 Fluent' if (session.avg_fluency_score or 0) >= 80 else '🟡 Developing'} |",
+        f"| **Overall CEFR Result** | **`{session.cefr_result or session.cefr_level or 'B1'}`** | `{session.overall_score or 0:.1f}/100` |",
+        "",
+        "> [!NOTE] Tutor Summary",
+        f"> {session.session_summary or 'Great effort during this speaking practice session!'}",
+        "",
+        "## 🛠️ Key Corrections & Upgrades",
+    ]
+
+    all_corrections = summary_data.get("all_corrections", [])
+    if all_corrections:
+        for idx, c in enumerate(all_corrections[:15], 1):
+            orig = c.get("original", "").strip()
+            corr = c.get("corrected", "").strip()
+            expl = c.get("explanation", "").strip()
+            etype = c.get("error_type", "grammar")
+            md.append(f"{idx}. **[{etype.upper()}]** ~~{orig}~~ ➔ **`{corr}`**")
+            if expl:
+                md.append(f"   - *Note*: {expl}")
+    else:
+        md.append("- *No major errors recorded. Outstanding accuracy!*")
+
+    md.extend([
+        "",
+        "## 💬 Conversation Transcript",
+        "",
+    ])
+
+    for turn in history:
+        role = turn.get("role", "user")
+        content = turn.get("content", "").strip()
+        if role == "user":
+            md.append(f"- 👤 **Learner**: {content}")
+        else:
+            md.append(f"- 🤖 **MILO**: {content}")
+
+    md.extend([
+        "",
+        "---",
+        "*Exported from AI-MILO Companion — Connected with [[00_Home_MOC|CEFR Knowledge Base]]*",
+    ])
+
+    content_str = "\n".join(md)
+    filename = f"milo_session_{session_id[:8]}.md"
+
+    return Response(
+        content=content_str,
+        media_type="text/markdown",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+        },
+    )
+

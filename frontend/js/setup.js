@@ -117,22 +117,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Header Back button
+    // Header Back button
     if (btnHeaderBack) {
         btnHeaderBack.addEventListener('click', (e) => {
             e.preventDefault();
             if (currentStep > 1) {
                 goToStep(currentStep - 1);
             } else {
-                // If on step 1, go back or home
-                window.location.href = '/ui/welcome.html';
+                // If on step 1, go back to home
+                window.location.href = '/ui/index.html';
             }
         });
+    }
+
+    // Check URL parameter for initial level
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramLevel = urlParams.get('level');
+    if (paramLevel && (paramLevel.toUpperCase() === 'B1' || paramLevel.toUpperCase() === 'B2')) {
+        selectedLevel = paramLevel.toUpperCase();
     }
 
     // ─── 1. Level Selection Handling (Step 1) ──────────────────────────────────
     const levelCards = document.querySelectorAll('#step1LevelContainer .level-selection-card[data-level]');
 
     levelCards.forEach(card => {
+        const cardLevel = card.getAttribute('data-level');
+        if (cardLevel === selectedLevel) {
+            card.classList.add('selected');
+        } else {
+            card.classList.remove('selected');
+        }
+
         card.addEventListener('click', () => {
             levelCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');

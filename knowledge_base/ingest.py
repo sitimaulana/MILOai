@@ -90,9 +90,10 @@ def load_documents(docs_dir: Path) -> list[Document]:
         except Exception as e:
             logger.warning(f"  ⚠️  Failed to load {docx_path.name}: {e}")
 
-    # Load TXT and MD
-    text_files = list(docs_dir.rglob("*.txt")) + list(docs_dir.rglob("*.md"))
-    logger.info(f"Found {len(text_files)} TXT/MD file(s)")
+    # Load TXT and MD (excluding hidden folders like .obsidian, .git)
+    raw_text_files = list(docs_dir.rglob("*.txt")) + list(docs_dir.rglob("*.md"))
+    text_files = [f for f in raw_text_files if not any(part.startswith(".") for part in f.parts)]
+    logger.info(f"Found {len(text_files)} TXT/MD file(s) (ignoring hidden files/folders)")
     for txt_path in text_files:
         try:
             loader = TextLoader(str(txt_path), encoding="utf-8")
@@ -182,7 +183,9 @@ def ingest_to_chroma(
     collection_name: str,
 ) -> Chroma:
     """Embed chunks and store in ChromaDB."""
-    if settings.ai_provider in ("local", "openrouter"):
+    if settings.ai_provider in ("local", "openrouter") or (
+        settings.ai_provider == "bifrost" and (not settings.openai_api_key or settings.openai_api_key.startswith("sk-your"))
+    ):
         logger.info("Generating embeddings using local 'all-MiniLM-L6-v2' (HuggingFace)...")
         embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     else:
@@ -206,12 +209,17 @@ def ingest_to_chroma(
 
 
 def main() -> None:
+    # Auto-detect default directory (prefer 'Knowledge Base MILO' Obsidian Vault if exists)
+    repo_root = Path(__file__).parent.parent
+    candidate_kb = repo_root / "Knowledge Base MILO"
+    default_docs = candidate_kb if candidate_kb.exists() else Path(__file__).parent / "documents"
+
     parser = argparse.ArgumentParser(description="MILO Knowledge Base Ingestion")
     parser.add_argument(
         "--docs-dir",
         type=Path,
-        default=Path(__file__).parent / "documents",
-        help="Directory containing CEFR learning materials",
+        default=default_docs,
+        help="Directory containing CEFR learning materials (Obsidian Vault)",
     )
     parser.add_argument(
         "--reset",

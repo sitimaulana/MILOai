@@ -30,6 +30,7 @@ Usage:
 
 import asyncio
 import logging
+import time
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -58,6 +59,7 @@ class PipelineResult:
     feedback: Optional[FeedbackResult] = None
     rag_sources: list[str] = field(default_factory=list)
     transcript: Optional[str] = None  # Only set for voice input
+    avatar_emotion: str = "friendly"
 
 
 class MILOPipeline:
@@ -115,21 +117,33 @@ class MILOPipeline:
             if persona_ctx:
                 effective_learning_goal = f"{persona_ctx}\n\nAdditional goal: {effective_learning_goal}".strip()
 
-        # 3. Get conversation history
-        history = await self._conv.get_history(
-            actual_session_id,
-            max_turns=settings.max_conversation_history,
+        t_start = time.perf_counter()
+
+        # 3. Concurrently kick off feedback analysis immediately!
+        # analyze_utterance only depends on user_message and effective_cefr_level,
+        # so it runs in parallel with history retrieval, RAG, and LLM generation.
+        feedback_task = asyncio.create_task(
+            analyze_utterance(user_message, effective_cefr_level)
         )
 
-        # 4. RAG retrieval
-        rag_contexts = await retrieve_context(
-            query=user_message,
-            cefr_level=effective_cefr_level,
+        # 4. Fetch conversation history and RAG context concurrently
+        t_rag_start = time.perf_counter()
+        history, rag_contexts = await asyncio.gather(
+            self._conv.get_history(
+                actual_session_id,
+                max_turns=settings.max_conversation_history,
+            ),
+            retrieve_context(
+                query=user_message,
+                cefr_level=effective_cefr_level,
+            ),
         )
+        t_rag = time.perf_counter() - t_rag_start
         rag_context_str = rag_retriever.format_context_for_prompt(rag_contexts)
         rag_sources = [ctx.source for ctx in rag_contexts]
 
-        # 5. LLM response generation
+        # 5. LLM response generation (runs while feedback_task is already computing!)
+        t_llm_start = time.perf_counter()
         llm_response: LLMResponse = await generate_response(
             user_message=user_message,
             history=history,
@@ -137,32 +151,50 @@ class MILOPipeline:
             learning_goal=effective_learning_goal,
             cefr_level=effective_cefr_level,
         )
+        t_llm = time.perf_counter() - t_llm_start
 
-        # 6 & 7. Feedback analysis + TTS + Translation in parallel
-        feedback_task = asyncio.create_task(
-            analyze_utterance(user_message, effective_cefr_level)
-        )
+        # 6. Concurrently start TTS synthesis (and optional translation only if enabled)
+        t_tts_fb_start = time.perf_counter()
         tts_task = asyncio.create_task(
             synthesize_speech(llm_response.content) if return_audio else _noop()
         )
-        translation_task = asyncio.create_task(
-            translate_to_indonesian(llm_response.content)
+        translation_task = (
+            asyncio.create_task(translate_to_indonesian(llm_response.content))
+            if getattr(settings, "auto_translate_responses", False)
+            else None
         )
 
-        feedback_result: FeedbackResult = await feedback_task
-        try:
-            audio_b64: Optional[str] = await tts_task
-        except Exception as tts_err:
-            logger.warning(f"TTS synthesis failed (falling back to text): {tts_err}")
-            audio_b64 = None
+        # 7. Await feedback and TTS (and optional translation) in parallel
+        tasks = [feedback_task, tts_task]
+        if translation_task:
+            tasks.append(translation_task)
 
-        try:
-            translation_id: str = await translation_task
-        except Exception as tr_err:
-            logger.warning(f"Translation failed: {tr_err}")
-            translation_id = ""
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        t_tts_fb = time.perf_counter() - t_tts_fb_start
 
-        # 7. Persist to database
+        feedback_raw = results[0]
+        if isinstance(feedback_raw, Exception):
+            logger.warning(f"Feedback analysis encountered an error: {feedback_raw}")
+            feedback_result: Optional[FeedbackResult] = None
+        else:
+            feedback_result = feedback_raw
+
+        audio_raw = results[1]
+        if isinstance(audio_raw, Exception):
+            logger.warning(f"TTS synthesis failed (falling back to text): {audio_raw}")
+            audio_b64: Optional[str] = None
+        else:
+            audio_b64 = audio_raw
+
+        translation_id: Optional[str] = None
+        if translation_task:
+            tr_raw = results[2]
+            if isinstance(tr_raw, Exception):
+                logger.warning(f"Translation failed: {tr_raw}")
+            else:
+                translation_id = tr_raw
+
+        # 8. Persist to database
         user_msg = await self._conv.add_message(
             session_id=actual_session_id,
             role="user",
@@ -176,11 +208,20 @@ class MILOPipeline:
             content=llm_response.content,
         )
 
+        t_total = time.perf_counter() - t_start
         logger.info(
-            f"Pipeline complete — session={actual_session_id}, "
-            f"tokens={llm_response.prompt_tokens}+{llm_response.completion_tokens}, "
-            f"rag_chunks={len(rag_contexts)}"
+            f"⚡ [PIPELINE TIMINGS] RAG={t_rag:.2f}s | LLM={t_llm:.2f}s | TTS/Feedback={t_tts_fb:.2f}s | TurnTotal={t_total:.2f}s"
         )
+
+        # Contextual emotion state for avatar animation (Three.js blendshapes / visemes)
+        avatar_emotion = "friendly"
+        if feedback_result:
+            if feedback_result.overall_score >= 88:
+                avatar_emotion = "happy"
+            elif feedback_result.corrections:
+                avatar_emotion = "supportive"
+        if "?" in llm_response.content and avatar_emotion == "friendly":
+            avatar_emotion = "curious"
 
         return PipelineResult(
             session_id=actual_session_id,
@@ -190,6 +231,7 @@ class MILOPipeline:
             audio_base64=audio_b64,
             feedback=feedback_result,
             rag_sources=rag_sources,
+            avatar_emotion=avatar_emotion,
         )
 
     async def process_voice(
@@ -211,11 +253,14 @@ class MILOPipeline:
           3. Include transcript in the result
         """
         # 1. Transcribe audio
-        logger.info(f"ASR: transcribing '{audio_filename}'...")
+        t_asr_start = time.perf_counter()
+        logger.info(f"🎙️ ASR: transcribing '{audio_filename}'...")
         asr_result: TranscriptionResult = await transcribe_audio(
             audio_bytes, audio_filename, language="en"
         )
+        t_asr = time.perf_counter() - t_asr_start
         transcript = (asr_result.text or "").strip()
+        logger.info(f"🎙️ ASR complete in {t_asr:.2f}s: '{transcript[:60]}...'")
 
         if not transcript:
             logger.info("ASR: No speech detected or audio inaudible. Providing polite fallback.")

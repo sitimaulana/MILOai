@@ -1,46 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Session Evaluation & CEFR Summary — MILO AI</title>
-    <link rel="stylesheet" href="/ui/style.css">
+    <title>Evaluasi Sesi & Ringkasan CEFR — MILO AI</title>
+    <!-- Google Fonts & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css, practice.css & dashboard.css) -->
+    <link rel="stylesheet" href="/ui/css/summary.css?v=2">
 </head>
-<body>
+<body class="summary-body">
 
-    <!-- Navigation Bar -->
-    <header class="milo-navbar">
-        <a href="/ui/index.html" class="nav-brand">
-            <div class="brand-icon">
-                <i class="fa-solid fa-brain"></i>
-            </div>
-            <div>
-                <span class="brand-title">MILO</span>
-                <span class="brand-tag">Evaluation</span>
-            </div>
-        </a>
-        <nav class="nav-links">
-            <a href="/ui/index.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="/ui/setup.html" class="nav-link"><i class="fa-solid fa-microphone"></i> Practice</a>
-            <a href="/ui/dashboard.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-        </nav>
-        <div>
-            <a href="/ui/setup.html" class="nav-cta-btn">
-                <i class="fa-solid fa-rotate-right"></i> Practice Again
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         1. TOP FLOATING NAVBAR (Senada dengan index & dashboard)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="home-nav-wrapper">
+        <header class="home-navbar">
+            <a href="/ui/index.html" class="nav-brand-group">
+                <div class="nav-brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <span class="nav-brand-title">MILO</span>
+                    <span class="nav-brand-badge">Evaluation</span>
+                </div>
             </a>
-        </div>
-    </header>
 
+            <nav>
+                <ul class="nav-center-menu">
+                    <li><a href="/ui/index.html" class="nav-menu-link"><i class="fa-solid fa-house"></i> Beranda</a></li>
+                    <li><a href="/ui/setup.html" class="nav-menu-link"><i class="fa-solid fa-microphone"></i> Latihan</a></li>
+                    <li><a href="/ui/dashboard.html" class="nav-menu-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                </ul>
+            </nav>
+
+            <div>
+                <a href="/ui/setup.html" class="nav-cta-btn">
+                    <i class="fa-solid fa-rotate-right"></i> Latihan Lagi
+                </a>
+            </div>
+        </header>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         2. MAIN SUMMARY CONTENT
+         ═══════════════════════════════════════════════════════════════════════ -->
     <main class="summary-page-wrapper">
         <!-- Main Score Card -->
         <section class="summary-hero-card">
             <div class="summary-trophy">
                 <i class="fa-solid fa-award"></i>
             </div>
-            <h2>Session Completed!</h2>
-            <p style="color: var(--text-muted); font-size: 15px; margin-top: 6px;" id="summaryTopicMeta">
-                Job Interview Practice &bull; Duration: 5.2 mins &bull; 8 Turns
+            <h2>Sesi Latihan Selesai!</h2>
+            <p id="summaryTopicMeta">
+                Latihan Speaking &bull; Durasi: 5 menit &bull; 8 Putaran Percakapan
             </p>
 
             <!-- Overall Dial -->
@@ -48,31 +61,31 @@
                 <svg viewBox="0 0 120 120">
                     <circle class="gauge-bg-circle" cx="60" cy="60" r="52" style="stroke-width: 8;"/>
                     <circle id="summaryOverallDial" class="gauge-fill-circle" cx="60" cy="60" r="52" 
-                            style="stroke: var(--primary); stroke-width: 8; stroke-dasharray: 0, 327;"/>
+                            style="stroke: var(--orange-primary); stroke-width: 8; stroke-dasharray: 0, 327;"/>
                 </svg>
                 <div class="overall-dial-score">
                     <span class="overall-score-num" id="summaryOverallScore">--</span>
-                    <span class="overall-score-lbl">Overall</span>
+                    <span class="overall-score-lbl">Skor Akhir</span>
                 </div>
             </div>
 
             <!-- CEFR Match Box -->
             <div class="cefr-match-row">
                 <span>Target: <strong id="summaryCefrTarget">B1</strong></span>
-                <span style="opacity: 0.4;">&bull;</span>
-                <span>Evaluated Level: <strong id="summaryCefrResult" style="color: var(--grammar-color); font-size: 16px;">B2</strong></span>
+                <span style="opacity: 0.35;">&bull;</span>
+                <span>Evaluasi CEFR: <strong id="summaryCefrResult" style="color: var(--grammar-green); font-size: 15px;">B2</strong></span>
             </div>
         </section>
 
         <!-- Skill Breakdown Progress Bars -->
         <section class="breakdown-bars-card">
-            <h3 style="font-size: 18px; margin-bottom: 8px;">Competency Breakdown</h3>
+            <h3><i class="fa-solid fa-chart-simple" style="color: var(--orange-primary); margin-right: 8px;"></i> Rincian Kompetensi Bicara</h3>
 
             <!-- Grammar Bar -->
             <div class="bar-row">
                 <div class="bar-header">
-                    <span><i class="fa-solid fa-spell-check" style="color: var(--grammar-color); margin-right: 6px;"></i> Grammar Accuracy</span>
-                    <span id="summaryGrammarVal" style="color: var(--grammar-color);">-- / 100</span>
+                    <span><i class="fa-solid fa-spell-check" style="color: var(--grammar-green); margin-right: 6px;"></i> Akurasi Grammar</span>
+                    <span id="summaryGrammarVal" style="color: var(--grammar-green);">-- / 100</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill grammar" id="grammarBarFill" style="width: 0%;"></div>
@@ -82,8 +95,8 @@
             <!-- Vocabulary Bar -->
             <div class="bar-row">
                 <div class="bar-header">
-                    <span><i class="fa-solid fa-book" style="color: var(--vocab-color); margin-right: 6px;"></i> Vocabulary Richness</span>
-                    <span id="summaryVocabVal" style="color: var(--vocab-color);">-- / 100</span>
+                    <span><i class="fa-solid fa-book-bookmark" style="color: var(--vocab-cyan); margin-right: 6px;"></i> Kekayaan Vocabulary</span>
+                    <span id="summaryVocabVal" style="color: var(--vocab-cyan);">-- / 100</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill vocab" id="vocabBarFill" style="width: 0%;"></div>
@@ -93,8 +106,8 @@
             <!-- Fluency Bar -->
             <div class="bar-row">
                 <div class="bar-header">
-                    <span><i class="fa-solid fa-wave-pulse" style="color: var(--fluency-color); margin-right: 6px;"></i> Conversational Fluency</span>
-                    <span id="summaryFluencyVal" style="color: var(--fluency-color);">-- / 100</span>
+                    <span><i class="fa-solid fa-wave-pulse" style="color: var(--orange-primary); margin-right: 6px;"></i> Kelancaran (Fluency)</span>
+                    <span id="summaryFluencyVal" style="color: var(--orange-primary);">-- / 100</span>
                 </div>
                 <div class="progress-track">
                     <div class="progress-fill fluency" id="fluencyBarFill" style="width: 0%;"></div>
@@ -104,31 +117,31 @@
 
         <!-- AI Coach Qualitative Assessment -->
         <section class="breakdown-bars-card">
-            <h3 style="font-size: 18px; margin-bottom: 8px;">
-                <i class="fa-solid fa-robot" style="color: var(--primary-light); margin-right: 8px;"></i>
-                AI Coach Assessment
+            <h3>
+                <i class="fa-solid fa-robot" style="color: var(--blue-accent); margin-right: 8px;"></i>
+                Catatan Evaluasi Tutor MILO
             </h3>
-            <p id="summaryCoachAssessment" style="color: #CBD5E1; font-size: 15px; line-height: 1.7;">
-                Analyzing your speaking responses...
+            <p id="summaryCoachAssessment">
+                Menganalisis performa percakapan Anda...
             </p>
         </section>
 
         <!-- Target Recommendations -->
         <section class="breakdown-bars-card" id="improvementBox" style="display: none;">
-            <h3 style="font-size: 18px; margin-bottom: 12px; color: var(--accent-orange);">
+            <h3 style="color: var(--orange-primary);">
                 <i class="fa-solid fa-bullseye" style="margin-right: 8px;"></i>
-                Targeted Areas for Improvement
+                Saran Peningkatan
             </h3>
-            <ul id="improvementList" style="padding-left: 20px; color: var(--text-muted); font-size: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <ul id="improvementList" style="padding-left: 20px; color: var(--text-slate); font-size: 14.5px; display: flex; flex-direction: column; gap: 8px;">
                 <!-- Generated items -->
             </ul>
         </section>
 
         <!-- Session Corrections Review -->
         <section class="breakdown-bars-card" id="allCorrectionsCard">
-            <h3 style="font-size: 18px; margin-bottom: 14px;">
-                <i class="fa-solid fa-list-check" style="color: var(--error-color); margin-right: 8px;"></i>
-                Session Mistake Log & Fixes
+            <h3>
+                <i class="fa-solid fa-list-check" style="color: var(--error-red); margin-right: 8px;"></i>
+                Daftar Pembetulan & Catatan Kalimat
             </h3>
             <div id="allCorrectionsList" style="display: flex; flex-direction: column; gap: 10px;">
                 <!-- Injected via script -->
@@ -137,17 +150,17 @@
 
         <!-- Footer Actions -->
         <div class="summary-actions-row">
-            <a href="/ui/setup.html" class="btn-primary">
-                <i class="fa-solid fa-rotate-right"></i> Start Another Session
+            <a href="/ui/setup.html" class="btn-primary-summary">
+                <i class="fa-solid fa-rotate-right"></i> Mulai Sesi Baru
             </a>
-            <a href="/ui/dashboard.html" class="btn-secondary">
-                <i class="fa-solid fa-chart-pie"></i> View Full Dashboard
+            <a href="/ui/dashboard.html" class="btn-secondary-summary">
+                <i class="fa-solid fa-chart-line"></i> Lihat Seluruh Dashboard
             </a>
         </div>
     </main>
 
     <!-- Scripts -->
-    <script src="/ui/js/common.js"></script>
-    <script src="/ui/js/summary.js"></script>
+    <script src="/ui/js/common.js?v=2"></script>
+    <script src="/ui/js/summary.js?v=2"></script>
 </body>
 </html>

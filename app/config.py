@@ -22,13 +22,19 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = False
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
+    auto_translate_responses: bool = False  # Set to False for low latency (translate on-demand via UI button)
 
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]
 
     # ── AI Provider Mode ────────────────────────────────────────────────────────
-    ai_provider: str = "local"  # "openai", "local" (Ollama), or "openrouter"
+    ai_provider: str = "local"  # "openai", "local" (Ollama), "openrouter", or "bifrost"
+
+    # ── Bifrost Gateway (LLM Token & Rate-Limit Gateway) ───────────────────────
+    bifrost_base_url: str = "http://localhost:8080/v1"
+    bifrost_api_key: str = "bk-milo-token-gateway"
+    bifrost_model: str = "openai/gpt-4o-mini"
 
     # ── OpenAI ─────────────────────────────────────────────────────────────────
     openai_api_key: str = ""  # Required only when AI_PROVIDER=openai
@@ -36,9 +42,9 @@ class Settings(BaseSettings):
     # ── OpenRouter ─────────────────────────────────────────────────────────────
     openrouter_api_key: str = ""  # Required when AI_PROVIDER=openrouter
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
-    openrouter_model: str = "google/gemma-4-26b-a4b-it:free"
+    openrouter_model: str = "nvidia/nemotron-3.5-lightning:free"
     # Fallback models: if primary model is rate-limited, try these in order
-    openrouter_fallback_models: str = "google/gemma-4-31b-it:free,nvidia/nemotron-3-super-120b-a12b:free,nvidia/nemotron-3-ultra-550b-a55b:free"
+    openrouter_fallback_models: str = "nvidia/nemotron-3-ultra-550b-a55b:free,google/gemma-4-26b-a4b-it:free,google/gemma-4-31b-it:free"
 
     @property
     def openrouter_model_list(self) -> list[str]:

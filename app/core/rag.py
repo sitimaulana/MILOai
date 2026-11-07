@@ -12,6 +12,7 @@ Usage:
         print(doc.page_content, doc.metadata)
 """
 
+import asyncio
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -57,7 +58,9 @@ class RAGRetriever:
         """Initialize embeddings and load ChromaDB vector store."""
         logger.info("Initializing RAG retriever...")
 
-        if settings.ai_provider in ("local", "openrouter"):
+        if settings.ai_provider in ("local", "openrouter") or (
+            settings.ai_provider == "bifrost" and (not settings.openai_api_key or settings.openai_api_key.startswith("sk-your"))
+        ):
             # Use local HuggingFace embeddings (all-MiniLM-L6-v2)
             self._embeddings = HuggingFaceEmbeddings(
                 model_name="all-MiniLM-L6-v2"
@@ -131,7 +134,8 @@ class RAGRetriever:
                 where_filter = {"$and": conditions}
 
         try:
-            results = self._vectorstore.similarity_search_with_relevance_scores(
+            results = await asyncio.to_thread(
+                self._vectorstore.similarity_search_with_relevance_scores,
                 query=query,
                 k=k,
                 filter=where_filter,
@@ -142,6 +146,9 @@ class RAGRetriever:
 
         contexts = []
         for doc, score in results:
+            # Filter out low-relevance noise so casual dialogue isn't hijacked by random textbook chunks
+            if float(score) < 0.55:
+                continue
             ctx = RetrievedContext(
                 content=doc.page_content,
                 source=doc.metadata.get("source", "unknown"),
@@ -161,7 +168,10 @@ class RAGRetriever:
         if not contexts:
             return ""
 
-        parts = ["[RELEVANT CEFR LEARNING MATERIALS]"]
+        parts = [
+            "[OPTIONAL CEFR REFERENCE NOTES]",
+            "Note for MILO: Use the notes below ONLY if relevant to what the student is discussing or asking. Do NOT force these topics into the conversation or lecture about them unnecessarily:"
+        ]
         for i, ctx in enumerate(contexts, 1):
             parts.append(
                 f"\n--- Material {i} ({ctx.skill_type.upper()}, CEFR {ctx.cefr_level}) ---\n"

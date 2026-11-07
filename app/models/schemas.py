@@ -52,6 +52,7 @@ class ChatResponse(BaseModel):
     audio_base64: Optional[str] = Field(None, description="Base64-encoded MP3 audio of response")
     feedback: Optional[FeedbackResponse] = None
     rag_sources: list[str] = Field(default_factory=list, description="Source CEFR material chunks used")
+    avatar_emotion: Optional[str] = Field("friendly", description="Recommended avatar emotion: friendly, happy, thoughtful, supportive")
 
 
 # ─── Voice Endpoint ───────────────────────────────────────────────────────────
@@ -65,6 +66,7 @@ class VoiceResponse(BaseModel):
     audio_base64: Optional[str] = Field(None, description="Base64-encoded MP3 audio of response")
     feedback: Optional[FeedbackResponse] = None
     rag_sources: list[str] = Field(default_factory=list)
+    avatar_emotion: Optional[str] = Field("friendly", description="Recommended avatar emotion: friendly, happy, thoughtful, supportive")
 
 
 # ─── Translation Endpoint ─────────────────────────────────────────────────────

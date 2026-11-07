@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  bifrost:
+    image: maximhq/bifrost:latest
+    container_name: milo-bifrost-gateway
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./bifrost_data:/app/data
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - BIFROST_PORT=8080
+      - BIFROST_ENCRYPTION_KEY=${BIFROST_ENCRYPTION_KEY:-milo-bifrost-token-gateway-key-32b!}
+    # Enable host networking mapping on Windows/Mac to access local services like Ollama (host.docker.internal)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

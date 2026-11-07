@@ -1,88 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Dashboard & History — MILO AI</title>
-    <link rel="stylesheet" href="/ui/style.css">
+    <title>Dashboard Kemajuan & Riwayat Sesi — MILO AI English Tutor</title>
+    <meta name="description" content="Pantau progres speaking Bahasa Inggris, skor kompetensi Grammar, Vocabulary, Fluency, dan riwayat sesi latihan bersama MILO.">
+    <!-- Google Fonts & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css & practice.css) -->
+    <link rel="stylesheet" href="/ui/css/dashboard.css?v=2">
 </head>
-<body>
+<body class="dashboard-body">
 
-    <!-- Navigation Bar -->
-    <header class="milo-navbar">
-        <a href="/ui/index.html" class="nav-brand">
-            <div class="brand-icon">
-                <i class="fa-solid fa-brain"></i>
-            </div>
-            <div>
-                <span class="brand-title">MILO</span>
-                <span class="brand-tag">Dashboard</span>
-            </div>
-        </a>
-        <nav class="nav-links">
-            <a href="/ui/index.html" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="/ui/setup.html" class="nav-link"><i class="fa-solid fa-microphone"></i> Practice</a>
-            <a href="/ui/dashboard.html" class="nav-link active"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
-        </nav>
-        <div>
-            <a href="/ui/setup.html" class="nav-cta-btn">
-                <i class="fa-solid fa-play"></i> New Session
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         1. TOP FLOATING NAVBAR (Senada dengan index.html)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="home-nav-wrapper">
+        <header class="home-navbar">
+            <a href="/ui/index.html" class="nav-brand-group">
+                <div class="nav-brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <span class="nav-brand-title">MILO</span>
+                    <span class="nav-brand-badge">Dashboard</span>
+                </div>
             </a>
-        </div>
-    </header>
 
+            <nav>
+                <ul class="nav-center-menu">
+                    <li><a href="/ui/index.html" class="nav-menu-link"><i class="fa-solid fa-house"></i> Beranda</a></li>
+                    <li><a href="/ui/setup.html" class="nav-menu-link"><i class="fa-solid fa-microphone"></i> Latihan</a></li>
+                    <li><a href="/ui/dashboard.html" class="nav-menu-link active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                </ul>
+            </nav>
+
+            <div>
+                <a href="/ui/setup.html" class="nav-cta-btn">
+                    <i class="fa-solid fa-play"></i> Mulai Latihan
+                </a>
+            </div>
+        </header>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         2. DASHBOARD MAIN CONTENT
+         ═══════════════════════════════════════════════════════════════════════ -->
     <main class="dashboard-page-wrapper">
-        <!-- Dashboard Header -->
+        <!-- Floating Speech Bubble Header -->
+        <div class="dash-speech-bubble">
+            <i class="fa-solid fa-chart-pie dash-bubble-icon"></i>
+            <span>Ringkasan Kemajuan & Riwayat Evaluasi Bicara</span>
+            <span class="dash-bubble-badge">CEFR Track</span>
+        </div>
+
+        <!-- Dashboard Header Row -->
         <div class="dash-header-row">
-            <div>
-                <h2>Your Speaking Progress</h2>
-                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Track competency improvements and previous practice transcripts.</p>
+            <div class="dash-header-title-box">
+                <h1>Progres Speaking & Evaluasi CEFR</h1>
+                <p class="dash-header-subtitle">
+                    Pantau peningkatan kompetensi Grammar, Vocabulary, dan Fluency Anda dari setiap sesi percakapan interaktif bersama MILO.
+                </p>
             </div>
-            <a href="/ui/setup.html" class="btn-primary">
-                <i class="fa-solid fa-plus"></i> Start Practice Session
+            <a href="/ui/setup.html" class="btn-dash-primary">
+                <i class="fa-solid fa-plus"></i> Sesi Latihan Baru
             </a>
         </div>
 
-        <!-- Metric Summary Cards -->
+        <!-- CEFR Progression & Target Focus Banner -->
+        <section class="cefr-track-banner">
+            <div class="cefr-track-info">
+                <div class="cefr-track-icon">
+                    <i class="fa-solid fa-bullseye"></i>
+                </div>
+                <div>
+                    <div class="cefr-track-title">Jalur Pembelajaran: Level B1 & B2</div>
+                    <div class="cefr-track-desc">Fokus penguasaan kelancaran berbicara sehari-hari dan profesional hingga tingkat expert.</div>
+                </div>
+            </div>
+            <div class="cefr-badges-group">
+                <span class="cefr-pill-tag b1"><i class="fa-solid fa-check"></i> B1 Intermediate</span>
+                <span class="cefr-pill-tag b2"><i class="fa-solid fa-arrow-trend-up"></i> B2 Upper-Int.</span>
+            </div>
+        </section>
+
+        <!-- Metric Summary Cards Grid (5 Cards: Total, Overall, Grammar, Vocab, Fluency) -->
         <section class="stats-summary-grid">
+            <!-- 1. Total Sesi -->
             <div class="stat-metric-card">
                 <div class="stat-icon-wrapper total">
                     <i class="fa-solid fa-layer-group"></i>
                 </div>
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statTotalSessions">0</span>
-                    <span class="stat-label-text">Total Sessions</span>
+                    <span class="stat-label-text">Total Sesi</span>
+                    <span class="stat-sub-text">Sesi percakapan selesai</span>
                 </div>
             </div>
 
+            <!-- 2. Rata-rata Skor -->
             <div class="stat-metric-card">
                 <div class="stat-icon-wrapper overall">
                     <i class="fa-solid fa-star"></i>
                 </div>
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statOverallScore">0</span>
-                    <span class="stat-label-text">Avg Overall Score</span>
+                    <span class="stat-label-text">Rata-rata Skor</span>
+                    <span class="stat-sub-text">Skor agregat / 100</span>
                 </div>
             </div>
 
+            <!-- 3. Akurasi Grammar -->
             <div class="stat-metric-card">
                 <div class="stat-icon-wrapper grammar">
                     <i class="fa-solid fa-spell-check"></i>
                 </div>
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statGrammarScore">0</span>
-                    <span class="stat-label-text">Grammar Score</span>
+                    <span class="stat-label-text">Grammar</span>
+                    <span class="stat-sub-text">Akurasi tata bahasa</span>
                 </div>
             </div>
 
+            <!-- 4. Kekayaan Kosakata -->
             <div class="stat-metric-card">
                 <div class="stat-icon-wrapper vocab">
-                    <i class="fa-solid fa-book-sparkles"></i>
+                    <i class="fa-solid fa-book-bookmark"></i>
                 </div>
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statVocabScore">0</span>
-                    <span class="stat-label-text">Vocabulary Score</span>
+                    <span class="stat-label-text">Vocabulary</span>
+                    <span class="stat-sub-text">Variasi kata & frasa</span>
+                </div>
+            </div>
+
+            <!-- 5. Kelancaran Berbicara (Fluency) -->
+            <div class="stat-metric-card">
+                <div class="stat-icon-wrapper fluency">
+                    <i class="fa-solid fa-microphone-lines"></i>
+                </div>
+                <div class="stat-info-box">
+                    <span class="stat-big-val" id="statFluencyScore">0</span>
+                    <span class="stat-label-text">Fluency</span>
+                    <span class="stat-sub-text">Kelancaran & tempo</span>
                 </div>
             </div>
         </section>
@@ -90,21 +150,26 @@
         <!-- Recent Sessions History -->
         <section class="history-table-card">
             <div class="table-header-flex">
-                <h3>Recent Practice Sessions</h3>
-                <span id="sessionCountBadge" style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Showing latest sessions</span>
+                <div class="table-title-group">
+                    <div class="table-title-icon">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h3>Riwayat Sesi Latihan</h3>
+                </div>
+                <span id="sessionCountBadge">Menampilkan sesi terbaru</span>
             </div>
 
             <div class="history-items-list" id="historySessionsContainer">
-                <div style="text-align: center; padding: 40px; color: var(--text-muted);">
-                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 12px;"></i>
-                    <p>Loading your session history...</p>
+                <div style="text-align: center; padding: 48px 20px; color: var(--text-slate);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color: var(--orange-primary); margin-bottom: 12px;"></i>
+                    <p style="font-weight: 600;">Memuat riwayat sesi latihan Anda...</p>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Scripts -->
-    <script src="/ui/js/common.js"></script>
-    <script src="/ui/js/dashboard.js"></script>
+    <script src="/ui/js/common.js?v=2"></script>
+    <script src="/ui/js/dashboard.js?v=2"></script>
 </body>
 </html>

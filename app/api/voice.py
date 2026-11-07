@@ -11,6 +11,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_db
+from app.core.asr import transcribe_audio
 from app.models.schemas import (
     FeedbackResponse,
     GrammarCorrection,
@@ -132,4 +133,30 @@ async def voice(
         audio_base64=result.audio_base64,
         feedback=feedback_response,
         rag_sources=result.rag_sources,
+        avatar_emotion=getattr(result, "avatar_emotion", "friendly"),
     )
+
+
+@router.post(
+    "/voice/transcribe",
+    summary="Fast speech-to-text only (ASR)",
+    description="Quickly transcribes user audio in ~0.3s on CUDA without waiting for LLM or TTS.",
+)
+async def transcribe_only(
+    audio: UploadFile = File(..., description="Audio file to transcribe"),
+    language: Optional[str] = Form("en", description="Target language code (default 'en')"),
+) -> dict:
+    audio_bytes = await audio.read()
+    if not audio_bytes:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Audio file is empty.",
+        )
+    filename = audio.filename or "audio.wav"
+    result = await transcribe_audio(audio_bytes, filename=filename, language=language or "en")
+    return {
+        "transcript": (result.text or "").strip(),
+        "confidence": result.confidence,
+        "language": result.language,
+    }
+

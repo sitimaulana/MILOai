@@ -27,6 +27,7 @@ knowledge_base/chroma_db/
 # IDE
 .idea/
 .vscode/
+
 *.swp
 *.swo
 
@@ -45,3 +46,17 @@ htmlcov/
 # Uploaded audio files (temporary)
 uploads/
 temp/
+
+# Bifrost Gateway Data
+bifrost_data/
+
+# SQLite Database
+*.db
+*.sqlite
+*.sqlite3
+milo_dev.db
+
+# Obsidian local settings
+.obsidian/
+**/.obsidian/
+

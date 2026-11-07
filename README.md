@@ -46,7 +46,8 @@ User Audio/Text
 |-----------|-----------|
 | **Web Framework** | FastAPI + Uvicorn |
 | **ASR** | Whisper (local, `openai-whisper`) |
-| **LLM** | GPT-4o Mini (OpenAI API) |
+| **LLM** | GPT-4o Mini / OpenRouter / Ollama |
+| **AI Gateway** | Bifrost (Token Budgeting, Rate Limiting, Caching) |
 | **RAG** | LangChain + ChromaDB |
 | **Embeddings** | `text-embedding-3-small` |
 | **TTS** | OpenAI TTS (`tts-1`, voice: nova) |

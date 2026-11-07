@@ -44,8 +44,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('summaryTopicMeta').textContent = 
         `${topicLabel} • Duration: ${duration} mins • ${turns} Speaking Turns`;
 
+    // 4. Competency Breakdown
+    const grammar = Math.round(data.avg_grammar_score || 0);
+    const vocab = Math.round(data.avg_vocabulary_score || 0);
+    const fluency = Math.round(data.avg_fluency_score || 0);
+
     // 2. Overall Dial (Circumference of r=52 is 2 * PI * 52 ≈ 327)
-    const overallScore = Math.round(data.overall_score || 0);
+    let overallScore = Math.round(data.overall_score || 0);
+    if (!overallScore && (grammar || vocab || fluency)) {
+        overallScore = Math.round((grammar + vocab + fluency) / 3);
+    }
     document.getElementById('summaryOverallScore').textContent = overallScore;
     const circumference = 327;
     const dashLength = (overallScore / 100) * circumference;
@@ -60,9 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('summaryCefrTarget').textContent = data.cefr_target || 'B1';
     const resultEl = document.getElementById('summaryCefrResult');
     resultEl.textContent = data.cefr_result || 'B1';
-
-    // 4. Competency Breakdown
-    const grammar = Math.round(data.avg_grammar_score || 0);
     const vocab = Math.round(data.avg_vocabulary_score || 0);
     const fluency = Math.round(data.avg_fluency_score || 0);
 

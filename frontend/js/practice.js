@@ -350,7 +350,14 @@ async function toggleRecording() {
 
 async function startRecording() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                channelCount: 1, // Clean mono audio for Whisper
+                echoCancellation: true,
+                noiseSuppression: false, // Turn off aggressive WebRTC gating so Whisper gets clear, unclipped speech
+                autoGainControl: true,
+            }
+        });
         audioChunks = [];
 
         let chosenMime = 'audio/webm';
@@ -366,7 +373,8 @@ async function startRecording() {
             }
         }
 
-        mediaRecorder = new MediaRecorder(stream, chosenMime ? { mimeType: chosenMime } : undefined);
+        const recorderOptions = chosenMime ? { mimeType: chosenMime, audioBitsPerSecond: 128000 } : undefined;
+        mediaRecorder = new MediaRecorder(stream, recorderOptions);
 
         mediaRecorder.ondataavailable = (event) => {
             if (event.data.size > 0) audioChunks.push(event.data);
@@ -404,7 +412,20 @@ function stopRecording() {
 }
 
 async function sendVoiceMessage(audioBlob) {
-    const userMsgId = appendMessage('(Transcribing speech...)', 'user');
+    const userMsgId = appendMessage('(Listening...)', 'user');
+
+    // Visual indicator that MILO is processing
+    const thinkingRow = document.createElement('div');
+    thinkingRow.className = 'chat-message-row milo-row thinking-indicator-row';
+    thinkingRow.id = 'miloVoiceThinking';
+    thinkingRow.innerHTML = `
+        <div class="milo-avatar-icon"><i class="fa-solid fa-robot"></i></div>
+        <div class="message-bubble milo-bubble thinking-bubble" style="opacity: 0.85; font-style: italic;">
+            <i class="fa-solid fa-spinner fa-spin"></i> <span id="miloThinkingStatus">MILO is listening...</span>
+        </div>
+    `;
+    messagesContainer.appendChild(thinkingRow);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
         let ext = 'webm';
@@ -412,6 +433,67 @@ async function sendVoiceMessage(audioBlob) {
         else if (audioBlob.type.includes('mp4')) ext = 'm4a';
         else if (audioBlob.type.includes('wav')) ext = 'wav';
 
+        // ── Phase 1: Ultra-fast local Whisper ASR (~0.3s on RTX 3050 CUDA) ──
+        const asrFormData = new FormData();
+        asrFormData.append('audio', audioBlob, `speech.${ext}`);
+
+        let transcriptText = '';
+        try {
+            const asrResponse = await fetch('/api/v1/voice/transcribe', {
+                method: 'POST',
+                body: asrFormData,
+            });
+            if (asrResponse.ok) {
+                const asrData = await asrResponse.json();
+                transcriptText = (asrData.transcript || '').trim();
+            }
+        } catch (asrErr) {
+            console.warn('Fast ASR endpoint unreachable, will fallback to full voice pipeline:', asrErr);
+        }
+
+        // If fast ASR returned text:
+        if (transcriptText) {
+            // INSTANT UI UPDATE: User sees what they said within 0.3s!
+            const userTextElem = document.getElementById(`userText-${userMsgId}`);
+            if (userTextElem) userTextElem.textContent = transcriptText;
+            const msgObj = messageStore.get(userMsgId);
+            if (msgObj) msgObj.text = transcriptText;
+
+            const statusSpan = document.getElementById('miloThinkingStatus');
+            if (statusSpan) statusSpan.textContent = 'MILO is preparing a response...';
+
+            // ── Phase 2: Query Tutor & TTS with recognized text ──
+            const chatResponse = await fetch('/api/v1/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    message: transcriptText,
+                    return_audio: true,
+                    cefr_level: currentLevel,
+                })
+            });
+
+            thinkingRow.remove();
+
+            if (!chatResponse.ok) {
+                const errText = await chatResponse.text();
+                throw new Error(`Chat error ${chatResponse.status}: ${errText}`);
+            }
+
+            const data = await chatResponse.json();
+
+            // Render MILO's reply with audio and Indonesian translation
+            appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
+
+            // Update real-time Speech Evaluation HUD
+            if (data.feedback) {
+                updateEvaluationHUD(data.feedback);
+            }
+            return;
+        }
+
+        // Fallback / standard route if fast ASR gave empty string or failed
         const formData = new FormData();
         formData.append('audio', audioBlob, `speech.${ext}`);
         formData.append('session_id', sessionId);
@@ -422,6 +504,8 @@ async function sendVoiceMessage(audioBlob) {
             method: 'POST',
             body: formData,
         });
+
+        thinkingRow.remove();
 
         if (!response.ok) {
             const errText = await response.text();
@@ -436,11 +520,11 @@ async function sendVoiceMessage(audioBlob) {
         const data = await response.json();
 
         // Update placeholder user bubble with actual transcript
-        const transcriptText = data.transcript || '(Inaudible speech)';
+        const finalTranscript = data.transcript || '(Inaudible speech)';
         const userTextElem = document.getElementById(`userText-${userMsgId}`);
-        if (userTextElem) userTextElem.textContent = transcriptText;
+        if (userTextElem) userTextElem.textContent = finalTranscript;
         const msgObj = messageStore.get(userMsgId);
-        if (msgObj) msgObj.text = transcriptText;
+        if (msgObj) msgObj.text = finalTranscript;
 
         // Render MILO's reply with audio and Indonesian translation
         appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
@@ -450,6 +534,8 @@ async function sendVoiceMessage(audioBlob) {
             updateEvaluationHUD(data.feedback);
         }
     } catch (err) {
+        const ind = document.getElementById('miloVoiceThinking');
+        if (ind) ind.remove();
         console.error('Voice processing error:', err);
         appendMessage('Sorry, error processing voice: ' + err.message, 'milo');
     }

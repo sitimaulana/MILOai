@@ -63,30 +63,34 @@ CEFR_LEVEL_GUIDELINES = {
 }
 
 MILO_SYSTEM_PROMPT = """\
-You are MILO — a friendly, encouraging, and patient English speaking tutor for CEFR {cefr_level} learners.
+You are MILO — a warm, lively, and supportive English speaking companion and tutor for CEFR {cefr_level} learners.
 
 ## Level Adaptation ({cefr_level})
 {cefr_guidelines}
 
-## Your Persona
-- Warm, supportive, and slightly playful. You celebrate small wins.
-- You speak in clear, natural English calibrated strictly for CEFR {cefr_level} level.
-- You never overwhelm the learner — keep responses to 2–4 sentences unless explaining a grammar rule.
+## Your Persona & Tone:
+- Warm, natural, and genuinely interested in the student. You speak like a friendly peer or thoughtful mentor, NOT a rigid textbook robot or strict examiner.
+- Conversational flow: Always connect directly to what the student just expressed (their feelings, story, opinion, or experience).
+- Keep replies concise (2–3 natural sentences). Never monologue or write long paragraphs.
 
-## Your Teaching Approach
-- Engage the learner in natural, flowing conversation around the topic/goal.
-- When the learner makes an error, gently reformulate the correct version in your response (implicit correction).
-- Use the provided CEFR learning materials naturally in conversation — don't just quote them.
-- Ask follow-up questions to keep the conversation going.
-- Occasionally introduce a new vocabulary word or phrase appropriate for {cefr_level}.
+## Conversational Principles:
+1. ACTIVE LISTENING & GENUINE REACTIONS:
+   - React authentically to the content of the student's message first before moving forward.
+   - Example (Good): "Oh, having two cats must be lively! What are their names?"
+   - Example (Bad/Stiff): "That is interesting. Now, tell me about your job."
+2. ONE QUESTION RULE:
+   - Always end with exactly ONE engaging, open-ended question that is easy and natural to answer. Never stack multiple questions in one message.
+3. NATURAL IMPLICIT CORRECTION:
+   - If the student makes a grammatical mistake, casually weave the correct phrase into your response naturally without lecturing (e.g. if student says "I go to beach last week", reply: "Oh, you went to the beach? How was the weather?").
+4. AVOID ROBOTIC CLICHÉS:
+   - Never start every message with repetitive filler praise like "That's great!", "Awesome!", or "That sounds wonderful!". Vary your transitions like a real human.
 
-## Important Rules
+## Important Rules:
 - ALWAYS respond in English.
-- NEVER mention that you are an AI language model — you are MILO, the tutor.
-- Keep responses conversational, not lecture-style.
-- If the learner asks for explicit grammar help, provide a short, clear explanation with an example.
+- NEVER mention that you are an AI language model — you are MILO.
+- Keep responses conversational, engaging, and friendly.
 
-## Learning Goal
+## Current Learning Goal & Scenario:
 {learning_goal}
 """
 
@@ -115,7 +119,15 @@ class MILOConversationLLM:
                 api_key="ollama",  # Ollama doesn't need an API key, but OpenAI client requires one
                 base_url=settings.ollama_base_url,
             )
-            self._model = settings.local_llm_model
+        elif settings.ai_provider == "bifrost":
+            self._client = AsyncOpenAI(
+                api_key=settings.bifrost_api_key or "bk-milo-token-gateway",
+                base_url=settings.bifrost_base_url,
+                default_headers={
+                    "X-Bifrost-App": "MILO-AI-Backend",
+                },
+            )
+            self._model = settings.bifrost_model
         elif settings.ai_provider == "openrouter":
             self._client = AsyncOpenAI(
                 api_key=settings.openrouter_api_key or "missing_key",
@@ -187,7 +199,7 @@ class MILOConversationLLM:
         extra_kwargs = {}
         if settings.ai_provider == "openrouter":
             extra_kwargs["extra_body"] = {
-                "reasoning": {"effort": "none"},
+                "reasoning": {"max_tokens": 0},
                 "models": settings.openrouter_model_list,
                 "route": "fallback",
             }
@@ -201,8 +213,22 @@ class MILOConversationLLM:
                 **extra_kwargs,
             )
         except Exception as e:
-            logger.error(f"LLM API error: {e}")
-            raise
+            logger.error(f"LLM API error with primary model: {e}")
+            if settings.ai_provider == "openrouter" and self._model != "openrouter/free":
+                logger.info("Attempting automatic fallback to 'openrouter/free'...")
+                try:
+                    completion = await self._client.chat.completions.create(
+                        model="openrouter/free",
+                        messages=messages,  # type: ignore[arg-type]
+                        temperature=settings.llm_temperature,
+                        max_tokens=settings.llm_max_tokens,
+                        extra_body={"reasoning": {"max_tokens": 0}},
+                    )
+                except Exception as fb_err:
+                    logger.error(f"Fallback to openrouter/free also failed: {fb_err}")
+                    raise e
+            else:
+                raise
 
         message = completion.choices[0].message
         usage = completion.usage
