@@ -60,3 +60,6 @@ milo_dev.db
 .obsidian/
 **/.obsidian/
 
+# DeepEval Cache
+.deepeval/
+

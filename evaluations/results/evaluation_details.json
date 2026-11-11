@@ -1,0 +1,19 @@
+{
+  "rag": [
+    {
+      "id": "RAG-01",
+      "category": "grammar",
+      "cefr_level": "B1",
+      "input": "Can you explain when I should use Present Perfect tense instead of Past Simple?",
+      "actual_output": "Use the Present Perfect for actions connected to the present, unfinished time periods, or life experiences without a specific time. Use the Past Simple for finished actions at a specific time in the past.",
+      "faithfulness_score": 1.0,
+      "faithfulness_passed": true,
+      "faithfulness_reason": "The score is 1.00 because there are no contradictions, meaning the actual output is fully faithful and perfectly aligned with the retrieval context.",
+      "relevancy_score": 1.0,
+      "relevancy_passed": true,
+      "relevancy_reason": "Excellent! The response scores 1.00 because it directly and accurately answers the question about when to use Present Perfect versus Past Simple, with zero irrelevant content, making it fully relevant and helpful.",
+      "contextual_precision_score": 1.0,
+      "contextual_precision_passed": true
+    }
+  ]
+}

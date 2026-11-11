@@ -28,7 +28,7 @@ try:
 except ImportError:
     pass
 
-from app.api import chat, feedback, voice
+from app.api import chat, evaluation, feedback, voice
 from app.config import settings
 from app.core.asr import whisper_asr
 from app.core.rag import rag_retriever
@@ -128,6 +128,7 @@ app.add_middleware(
 app.include_router(chat.router)
 app.include_router(voice.router)
 app.include_router(feedback.router)
+app.include_router(evaluation.router)
 
 from app.models.schemas import TranslateRequest, TranslateResponse
 from app.core.translator import translate_to_indonesian

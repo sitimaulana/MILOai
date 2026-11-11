@@ -54,14 +54,16 @@ def test_unsupported_format_raises():
 
 
 def test_not_loaded_raises():
-    """Test that calling transcribe before load() raises RuntimeError."""
+    """Test that calling transcribe when load() fails raises RuntimeError."""
     import asyncio
+    from unittest.mock import patch
     from app.core.asr import WhisperASR
 
     asr = WhisperASR.__new__(WhisperASR)
     asr._model = None
 
-    with pytest.raises(RuntimeError, match="not loaded"):
-        asyncio.get_event_loop().run_until_complete(
-            asr.transcribe(b"fake_bytes", "audio.wav")
-        )
+    with patch.object(asr, "load"):
+        with pytest.raises(RuntimeError, match="not loaded"):
+            asyncio.get_event_loop().run_until_complete(
+                asr.transcribe(b"fake_bytes", "audio.wav")
+            )

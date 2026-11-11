@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor — Practice Room Logic (Exact Mockup Theme)
+// MILO AI English Tutor: Practice Room Logic (Exact Mockup Theme)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Session State
@@ -25,6 +25,23 @@ const btnMicAction = document.getElementById('btnMicAction');
 const btnEndSession = document.getElementById('btnEndSession');
 const waveformBox = document.getElementById('waveformBox');
 const progressBarFill = document.getElementById('progressBarFill');
+
+// 2D Companion Stage Elements
+const miloCompanionStage = document.getElementById('miloCompanionStage');
+const miloStatusText = document.getElementById('miloStatusText');
+
+function setCompanionState(state, text) {
+    if (miloCompanionStage) {
+        miloCompanionStage.classList.remove('listening', 'thinking', 'speaking');
+        if (state && state !== 'idle') {
+            miloCompanionStage.classList.add(state);
+        }
+    }
+    if (miloStatusText && text) {
+        miloStatusText.textContent = text;
+    }
+}
+window.setCompanionState = setCompanionState;
 
 // HUD Elements & Pillars
 const evalInitialPlaceholder = document.getElementById('evalInitialPlaceholder');
@@ -53,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Show initial greeting from MILO
     const initialGreeting = sessionStorage.getItem('milo_initial_greeting') ||
-        "Good morning! Thank you for coming in today. Please have a seat. Let's start — could you tell me a little bit about yourself?";
+        "Good morning! Thank you for coming in today. Please have a seat. Let's start: could you tell me a little bit about yourself?";
     const initialAudio = sessionStorage.getItem('milo_initial_audio');
     const initialTranslation = sessionStorage.getItem('milo_initial_translation');
 
@@ -133,7 +150,6 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
                     </button>
                     <div class="milo-translation-body" id="transBox-${msgId}" style="display: none;">
                         <div class="milo-translation-text">
-                            <i class="fa-solid fa-language"></i>
                             <span id="transText-${msgId}">${escapeHtml(translation || '')}</span>
                         </div>
                     </div>
@@ -146,7 +162,7 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
                 <div class="user-bubble-top">
                     <div class="user-text-main" id="userText-${msgId}">${escapeHtml(text)}</div>
                     <div class="user-avatar-badge" title="Anda">
-                        <i class="fa-solid fa-user"></i>
+                        <span style="font-weight: 700; font-size: 11px;">You</span>
                     </div>
                 </div>
                 <div class="user-bubble-actions">
@@ -161,7 +177,6 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
                 </div>
                 <div class="user-translation-body" id="transBox-${msgId}" style="display: none;">
                     <div class="user-translation-text">
-                        <i class="fa-solid fa-language"></i>
                         <span id="transText-${msgId}">${escapeHtml(translation || '')}</span>
                     </div>
                 </div>
@@ -303,6 +318,7 @@ async function sendTextMessage() {
     appendMessage(text, 'user');
 
     if (waveformBox) waveformBox.classList.add('active-recording');
+    setCompanionState('thinking', 'Milo sedang berpikir...');
 
     try {
         const response = await fetch('/api/v1/chat', {
@@ -326,7 +342,9 @@ async function sendTextMessage() {
         const data = await response.json();
 
         // Render MILO's reply with audio and Indonesian translation
+        setCompanionState('speaking', 'Milo menjawab...');
         appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
+        setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
         // Update real-time Speech Evaluation HUD
         if (data.feedback) {
@@ -334,6 +352,7 @@ async function sendTextMessage() {
         }
     } catch (err) {
         if (waveformBox) waveformBox.classList.remove('active-recording');
+        setCompanionState('idle', 'Milo siap berlatih');
         console.error('Chat error:', err);
         appendMessage('Sorry, a connection error occurred: ' + err.message, 'milo');
     }
@@ -396,8 +415,10 @@ async function startRecording() {
         isRecording = true;
         btnMicAction.classList.add('recording');
         if (waveformBox) waveformBox.classList.add('active-recording');
+        setCompanionState('listening', 'Milo mendengarkan kamu...');
     } catch (err) {
         console.error('Mic access error:', err);
+        setCompanionState('idle', 'Milo siap berlatih');
         alert('Please allow microphone permissions in your browser to speak with MILO!');
     }
 }
@@ -408,6 +429,7 @@ function stopRecording() {
         isRecording = false;
         btnMicAction.classList.remove('recording');
         if (waveformBox) waveformBox.classList.remove('active-recording');
+        setCompanionState('thinking', 'Milo memproses suara...');
     }
 }
 
@@ -419,7 +441,7 @@ async function sendVoiceMessage(audioBlob) {
     thinkingRow.className = 'chat-message-row milo-row thinking-indicator-row';
     thinkingRow.id = 'miloVoiceThinking';
     thinkingRow.innerHTML = `
-        <div class="milo-avatar-icon"><i class="fa-solid fa-robot"></i></div>
+        <div class="milo-avatar-icon"><span style="font-weight: 800; font-size: 14px; color: #FFFFFF;">M</span></div>
         <div class="message-bubble milo-bubble thinking-bubble" style="opacity: 0.85; font-style: italic;">
             <i class="fa-solid fa-spinner fa-spin"></i> <span id="miloThinkingStatus">MILO is listening...</span>
         </div>
@@ -484,7 +506,9 @@ async function sendVoiceMessage(audioBlob) {
             const data = await chatResponse.json();
 
             // Render MILO's reply with audio and Indonesian translation
+            setCompanionState('speaking', 'Milo menjawab...');
             appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
+            setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
             // Update real-time Speech Evaluation HUD
             if (data.feedback) {
@@ -527,7 +551,9 @@ async function sendVoiceMessage(audioBlob) {
         if (msgObj) msgObj.text = finalTranscript;
 
         // Render MILO's reply with audio and Indonesian translation
+        setCompanionState('speaking', 'Milo menjawab...');
         appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
+        setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
         // Update real-time Speech Evaluation HUD
         if (data.feedback) {
@@ -536,6 +562,7 @@ async function sendVoiceMessage(audioBlob) {
     } catch (err) {
         const ind = document.getElementById('miloVoiceThinking');
         if (ind) ind.remove();
+        setCompanionState('idle', 'Milo siap berlatih');
         console.error('Voice processing error:', err);
         appendMessage('Sorry, error processing voice: ' + err.message, 'milo');
     }

@@ -1,28 +1,49 @@
 /* ═══════════════════════════════════════════════════════════════════════════════
-   MILO AI English Tutor — Pre-Session Briefing ("Jaring Pengaman")
-   Aesthetic: Warm Sand + Modern Floating Cards + Playful Cyan Accents
+   MILO AI English Tutor: Pre-Session Briefing ("Jaring Pengaman")
+   Anti-Slop Craftsmanship Standard:
+   - Primary: #7A9A82 (Sage Botanical Green)
+   - Secondary: #8C6239 (Warm Earth Brown / Cinnamon)
+   - Neutral: #FBF9F5 (Warm Cream / Alabaster Linen)
+   - High Contrast Text: #1F2E24 (Deep Forest Charcoal, WCAG AAA)
+   - Natural organic shadows: rgba(31, 46, 36, 0.05)
    ═══════════════════════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --sand-bg: #EFE4CC;
-    --sand-grad: linear-gradient(180deg, #F9F5EC 0%, #EFE1C7 60%, #F5E9D5 100%);
-    --card-bg: #FFFFFF;
-    --tint-blue: #EEF4FF;
-    --blue-accent: #0066FF;
-    --blue-hover: #0052CC;
-    --orange-primary: #FF5E36;
-    --orange-hover: #E04823;
-    --text-navy: #1B254B;
-    --text-slate: #64748B;
-    --border-subtle: rgba(0, 0, 0, 0.05);
+    --primary: #7A9A82;
+    --primary-hover: #67876E;
+    --primary-tint: #EFF5F1;
+    --primary-border: #C2D6C7;
+    --primary-dark: #24472F;
 
-    /* Playful Cyan Tokens */
-    --cyan-soft-bg: rgba(6, 182, 212, 0.12);
-    --cyan-soft-border: rgba(6, 182, 212, 0.32);
-    --cyan-text: #0E7490;
-    --cyan-hover-bg: rgba(6, 182, 212, 0.22);
+    --secondary: #8C6239;
+    --secondary-hover: #75512D;
+    --secondary-tint: #F8F3EC;
+    --secondary-border: #DFCDBD;
+    --secondary-dark: #4E341B;
+
+    --neutral-bg: #FBF9F5;
+    --sand-grad: linear-gradient(180deg, #FBF9F5 0%, #F4EFE6 60%, #F8F5EE 100%);
+    --card-bg: #FFFFFF;
+    --card-subtle: #FAF7F2;
+
+    --text-navy: #1F2E24;
+    --text-slate: #526658;
+    --text-muted: #6C7F72;
+    --border-subtle: #E5E0D4;
+    --border-card: #E5E0D4;
+
+    --shadow-sm: 0 2px 8px rgba(31, 46, 36, 0.04);
+    --shadow-card: 0 8px 24px rgba(31, 46, 36, 0.05);
+    --shadow-hover: 0 12px 28px rgba(31, 46, 36, 0.08);
+    --shadow-primary: 0 4px 16px rgba(122, 154, 130, 0.28);
+    --shadow-secondary: 0 4px 18px rgba(140, 98, 57, 0.25);
+}
+
+:focus-visible {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
 }
 
 *, *::before, *::after {
@@ -39,6 +60,7 @@ body.briefing-body {
     flex-direction: column;
     color: var(--text-navy);
     overflow-x: hidden;
+    letter-spacing: -0.01em;
 }
 
 /* ─── Top Header Navigation ─────────────────────────────────────────────────── */
@@ -47,6 +69,9 @@ body.briefing-body {
     align-items: center;
     justify-content: space-between;
     padding: 24px 48px 12px;
+    max-width: 960px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .btn-header-back {
@@ -58,18 +83,20 @@ body.briefing-body {
     border-radius: 50%;
     background: #FFFFFF;
     color: var(--text-navy);
-    font-size: 18px;
+    font-size: 16px;
     text-decoration: none;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-subtle);
     transition: all 0.2s ease;
-    border: none;
     cursor: pointer;
 }
 
 .btn-header-back:hover {
     transform: translateX(-3px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    background: #F8FAFC;
+    box-shadow: var(--shadow-hover);
+    background: var(--primary-tint);
+    color: var(--primary-dark);
+    border-color: var(--primary-border);
 }
 
 .header-badges-group {
@@ -81,19 +108,21 @@ body.briefing-body {
 .header-badge-pill {
     background: #FFFFFF;
     padding: 6px 16px;
-    border-radius: 999px;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 700;
     color: var(--text-navy);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-subtle);
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
 .header-badge-pill.level {
-    background: var(--orange-primary);
+    background: var(--primary);
     color: #FFFFFF;
+    border-color: var(--primary);
 }
 
 /* ─── Main Content Container ─────────────────────────────────────────────────── */
@@ -110,26 +139,27 @@ body.briefing-body {
 
 /* ─── Safety Net Warm Banner (Speaking Anxiety Reducer) ──────────────────────── */
 .safety-net-banner {
-    background: linear-gradient(135deg, #FFFFFF 0%, #F6F9FF 100%);
-    border-radius: 24px;
-    padding: 22px 28px;
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.04);
-    border: 1.5px solid rgba(0, 102, 255, 0.12);
+    background: #FFFFFF;
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-subtle);
     display: flex;
     align-items: center;
     gap: 20px;
 }
 
 .safety-icon-wrapper {
-    width: 56px;
-    height: 56px;
-    border-radius: 18px;
-    background: #EFF6FF;
-    color: var(--blue-accent);
+    width: 54px;
+    height: 54px;
+    border-radius: 14px;
+    background: var(--secondary-tint);
+    color: var(--secondary);
+    border: 1px solid var(--secondary-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 24px;
     flex-shrink: 0;
 }
 
@@ -138,7 +168,7 @@ body.briefing-body {
     font-weight: 800;
     color: var(--text-navy);
     margin-bottom: 4px;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.02em;
 }
 
 .safety-text-block p {
@@ -151,10 +181,10 @@ body.briefing-body {
 /* ─── Scenario Context Card ──────────────────────────────────────────────────── */
 .briefing-card {
     background: #FFFFFF;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 24px 28px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-subtle);
 }
 
 .card-section-header {
@@ -165,58 +195,64 @@ body.briefing-body {
 }
 
 .section-icon-dot {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
-    background: var(--tint-blue);
-    color: var(--blue-accent);
+    background: var(--primary-tint);
+    color: var(--primary);
+    border: 1px solid var(--primary-border);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 15px;
 }
 
-.section-icon-dot.cyan {
-    background: var(--cyan-soft-bg);
-    color: var(--cyan-text);
+.section-icon-dot.secondary-icon {
+    background: var(--secondary-tint);
+    color: var(--secondary);
+    border-color: var(--secondary-border);
 }
 
 .section-icon-dot.mic {
-    background: #FEF3C7;
-    color: #D97706;
+    background: var(--primary-tint);
+    color: var(--primary);
 }
 
 .card-section-header h2 {
-    font-size: 16px;
+    font-size: 16.5px;
     font-weight: 800;
     color: var(--text-navy);
 }
 
 .scenario-context-text {
     font-size: 14.5px;
-    color: #334155;
+    color: var(--text-navy);
     line-height: 1.6;
-    background: #F8FAFC;
+    background: var(--card-subtle);
     padding: 16px 20px;
-    border-radius: 16px;
-    border-left: 4px solid var(--blue-accent);
+    border-radius: 14px;
+    border-left: 4px solid var(--primary);
+    border-top: 1px solid var(--border-subtle);
+    border-right: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
     margin-bottom: 8px;
 }
 
 .scenario-roleplay-tag {
     display: inline-block;
-    background: var(--tint-blue);
-    color: var(--blue-accent);
+    background: var(--primary-tint);
+    color: var(--primary-dark);
     font-size: 11px;
     font-weight: 800;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: 6px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    border: 1px solid var(--primary-border);
     margin-bottom: 8px;
 }
 
-/* ─── Target Vocabulary (Playful Cyan Chips) ─────────────────────────────────── */
+/* ─── Target Vocabulary (Sage & Cinnamon Chips) ──────────────────────────────── */
 .vocab-subtext {
     font-size: 13px;
     color: var(--text-slate);
@@ -230,19 +266,19 @@ body.briefing-body {
 }
 
 .vocab-chip {
-    background: var(--cyan-soft-bg);
-    border: 1.5px solid var(--cyan-soft-border);
-    color: var(--cyan-text);
-    padding: 8px 16px;
-    border-radius: 999px;
+    background: var(--primary-tint);
+    border: 1.5px solid var(--primary-border);
+    color: var(--primary-dark);
+    padding: 7px 14px;
+    border-radius: 8px;
     font-size: 13.5px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .vocab-chip i {
@@ -252,14 +288,14 @@ body.briefing-body {
 }
 
 .vocab-chip:hover {
-    background: var(--cyan-hover-bg);
-    border-color: #06B6D4;
+    background: #FFFFFF;
+    border-color: var(--primary);
     transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.18);
+    box-shadow: var(--shadow-sm);
 }
 
 .vocab-chip:hover i {
-    transform: scale(1.2);
+    transform: scale(1.15);
     opacity: 1;
 }
 
@@ -270,10 +306,10 @@ body.briefing-body {
 /* ─── Mic Check Component (Interactive Box) ──────────────────────────────────── */
 .mic-check-card {
     background: #FFFFFF;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 26px 28px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
-    border: 2px dashed #CBD5E1;
+    box-shadow: var(--shadow-card);
+    border: 2px dashed var(--border-subtle);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -282,9 +318,10 @@ body.briefing-body {
 }
 
 .mic-check-card.tested {
-    border-color: #10B981;
-    background: linear-gradient(180deg, #FFFFFF 0%, #F0FDF4 100%);
-    box-shadow: 0 8px 28px rgba(16, 185, 129, 0.12);
+    border-color: var(--primary);
+    border-style: solid;
+    background: var(--card-subtle);
+    box-shadow: 0 8px 24px rgba(122, 154, 130, 0.15);
 }
 
 .mic-check-title {
@@ -306,14 +343,14 @@ body.briefing-body {
     width: 100%;
     max-width: 420px;
     height: 60px;
-    background: #F8FAFC;
-    border-radius: 14px;
+    background: var(--card-subtle);
+    border-radius: 12px;
     overflow: hidden;
     margin-bottom: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #E2E8F0;
+    border: 1px solid var(--border-subtle);
     position: relative;
 }
 
@@ -334,12 +371,12 @@ body.briefing-body {
     width: 58px;
     height: 58px;
     border-radius: 50%;
-    background: var(--blue-accent);
+    background: var(--primary);
     color: #FFFFFF;
     border: none;
     font-size: 20px;
     cursor: pointer;
-    box-shadow: 0 4px 18px rgba(0, 102, 255, 0.3);
+    box-shadow: var(--shadow-primary);
     transition: all 0.22s ease;
     display: flex;
     align-items: center;
@@ -348,21 +385,21 @@ body.briefing-body {
 }
 
 .btn-test-mic:hover {
-    background: var(--blue-hover);
+    background: var(--primary-hover);
     transform: scale(1.06);
-    box-shadow: 0 8px 24px rgba(0, 102, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(122, 154, 130, 0.4);
 }
 
 .btn-test-mic.listening {
-    background: var(--orange-primary);
-    box-shadow: 0 0 0 10px rgba(255, 94, 54, 0.2);
-    animation: micPulse 1.4s infinite;
+    background: var(--secondary);
+    box-shadow: 0 0 0 8px rgba(140, 98, 57, 0.2);
+    animation: micPulseWarm 1.4s infinite;
 }
 
-@keyframes micPulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 94, 54, 0.4); }
-    70% { box-shadow: 0 0 0 16px rgba(255, 94, 54, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 94, 54, 0); }
+@keyframes micPulseWarm {
+    0% { box-shadow: 0 0 0 0 rgba(140, 98, 57, 0.35); }
+    70% { box-shadow: 0 0 0 16px rgba(140, 98, 57, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(140, 98, 57, 0); }
 }
 
 .mic-status-badge {
@@ -373,15 +410,16 @@ body.briefing-body {
 }
 
 .mic-status-badge.success {
-    color: #059669;
+    color: var(--primary-dark);
 }
 
 /* ─── Bottom CTA Bar ("Start Session") ────────────────────────────────────────── */
 .briefing-bottom-shelf {
     background: #FFFFFF;
-    border-radius: 36px 36px 0 0;
+    border-radius: 28px 28px 0 0;
     padding: 18px 48px 22px;
-    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 -4px 24px rgba(31, 46, 36, 0.05);
+    border-top: 1px solid var(--border-subtle);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -401,34 +439,34 @@ body.briefing-body {
 }
 
 .shelf-reminder-note i {
-    color: var(--blue-accent);
+    color: var(--secondary);
 }
 
 .btn-start-session {
-    background: var(--orange-primary);
+    background: var(--secondary);
     color: #FFFFFF;
     border: none;
-    padding: 14px 38px;
-    border-radius: 999px;
-    font-size: 15px;
+    padding: 13px 34px;
+    border-radius: 12px;
+    font-size: 14.5px;
     font-weight: 800;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    box-shadow: 0 4px 18px rgba(255, 94, 54, 0.32);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-secondary);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-start-session:hover:not(:disabled) {
-    background: var(--orange-hover);
+    background: var(--secondary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(255, 94, 54, 0.42);
+    box-shadow: 0 6px 20px rgba(140, 98, 57, 0.35);
 }
 
 .btn-start-session:disabled {
-    background: #CBD5E1;
-    color: #64748B;
+    background: #CBD5CD;
+    color: #7E9084;
     box-shadow: none;
     cursor: not-allowed;
     opacity: 0.7;
@@ -443,11 +481,11 @@ body.briefing-body {
     transform: translateX(-50%) translateY(20px);
     background: var(--text-navy);
     color: #FFFFFF;
-    padding: 10px 22px;
-    border-radius: 999px;
+    padding: 10px 20px;
+    border-radius: 8px;
     font-size: 13px;
     font-weight: 700;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 24px rgba(31, 46, 36, 0.2);
     opacity: 0;
     pointer-events: none;
     transition: all 0.25s ease;
@@ -457,4 +495,23 @@ body.briefing-body {
 .audio-toast.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .briefing-header {
+        padding: 16px 20px;
+    }
+    .briefing-main-container {
+        width: calc(100% - 40px);
+    }
+    .briefing-bottom-shelf {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .btn-start-session {
+        width: 100%;
+        justify-content: center;
+    }
 }

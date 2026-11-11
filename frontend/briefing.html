@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre-Session Briefing — MILO AI English Tutor</title>
+    <title>Pre-Session Briefing: MILO English Speaking Practice</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/ui/css/briefing.css">
+    <link rel="stylesheet" href="css/briefing.css?v=20261112c">
 </head>
 <body class="briefing-body">
 
@@ -28,9 +28,6 @@
              1. SAFETY NET BANNER (Anxiety Reducer)
              ═══════════════════════════════════════════════════════════════════════ -->
         <div class="safety-net-banner">
-            <div class="safety-icon-wrapper">
-                <i class="fa-solid fa-shield-heart"></i>
-            </div>
             <div class="safety-text-block">
                 <h1>Jaring Pengaman: Ruang Aman Latihanmu</h1>
                 <p>Tarik napas santai! Di sini tidak ada nilai yang menghakimi kesalahanmu. MILO adalah AI tutor yang sabar dan siap mendampingimu untuk membangun rasa percaya diri berbicara bahasa Inggris.</p>
@@ -42,9 +39,6 @@
              ═══════════════════════════════════════════════════════════════════════ -->
         <section class="briefing-card">
             <div class="card-section-header">
-                <div class="section-icon-dot">
-                    <i class="fa-solid fa-masks-theater"></i>
-                </div>
                 <h2>Skenario & Peran Kamu Hari Ini</h2>
             </div>
             <span class="scenario-roleplay-tag" id="scenarioRoleplayTag">Roleplay: Job Candidate</span>
@@ -58,9 +52,6 @@
              ═══════════════════════════════════════════════════════════════════════ -->
         <section class="briefing-card">
             <div class="card-section-header">
-                <div class="section-icon-dot cyan">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                </div>
                 <h2>Target Vocabulary & Frasa Rekomendasi</h2>
             </div>
             <p class="vocab-subtext">
@@ -75,7 +66,7 @@
              4. MIC CHECK COMPONENT (Interactive Real-Time Waveform)
              ═══════════════════════════════════════════════════════════════════════ -->
         <section class="mic-check-card" id="micCheckCard">
-            <h2 class="mic-check-title"><i class="fa-solid fa-microphone-lines" style="color: var(--blue-accent); margin-right: 6px;"></i> Uji Mikrofon (Mic Check)</h2>
+            <h2 class="mic-check-title">Uji Mikrofon (Mic Check)</h2>
             <p class="mic-check-desc">
                 Tekan tombol mikrofon di bawah dan bicaralah selama 2 detik (misal: <em>"Hello MILO, I am ready"</em>) untuk memvalidasi bahwa suara terdengar jernih.
             </p>
@@ -94,7 +85,7 @@
 
             <!-- Status Indicator -->
             <div class="mic-status-badge" id="micStatusBadge">
-                <i class="fa-solid fa-circle-info"></i> Mikrofon belum diuji. Klik tombol di atas untuk memulai tes.
+                Mikrofon belum diuji. Klik tombol di atas untuk memulai tes.
             </div>
         </section>
 
@@ -105,12 +96,10 @@
          ═══════════════════════════════════════════════════════════════════════ -->
     <footer class="briefing-bottom-shelf">
         <div class="shelf-reminder-note" id="shelfReminderNote">
-            <i class="fa-solid fa-lock"></i>
             <span>Selesaikan <strong>Mic Check</strong> terlebih dahulu untuk membuka sesi latihan.</span>
         </div>
         <button type="button" class="btn-start-session" id="btnStartSession" disabled>
             <span>Mulai Sesi Latihan</span>
-            <i class="fa-solid fa-arrow-right"></i>
         </button>
     </footer>
 
@@ -118,7 +107,7 @@
     <div class="audio-toast" id="audioToast">Pronunciation playing...</div>
 
     <!-- Scripts -->
-    <script src="/ui/js/common.js"></script>
-    <script src="/ui/js/briefing.js"></script>
+    <script src="js/common.js?v=20261112b"></script>
+    <script src="js/briefing.js?v=20261112b"></script>
 </body>
 </html>

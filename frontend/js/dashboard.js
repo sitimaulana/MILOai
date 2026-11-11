@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor — Dashboard Logic (Warm Sand Cohesive Theme)
+// MILO AI English Tutor: Dashboard Logic (Warm Sand Cohesive Theme)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -46,26 +46,17 @@ async function fetchDashboardMetrics() {
         if (sessions.length === 0) {
             container.innerHTML = `
                 <div class="empty-history-box">
-                    <div class="empty-history-icon">
-                        <i class="fa-solid fa-folder-open"></i>
-                    </div>
                     <div class="empty-history-title">Belum ada riwayat latihan</div>
                     <p class="empty-history-desc">
                         Mulai percakapan pertamamu bersama MILO untuk memantau kelancaran, akurasi grammar, dan evaluasi CEFR.
                     </p>
                     <a href="/ui/setup.html" class="btn-dash-primary" style="font-size: 13.5px; padding: 10px 22px;">
-                        <i class="fa-solid fa-play"></i> Mulai Sesi Pertama
+                        Mulai Sesi Pertama
                     </a>
                 </div>
             `;
             return;
         }
-
-        const topicIcons = {
-            job_interview: 'fa-briefcase',
-            academic_discussion: 'fa-graduation-cap',
-            daily_conversation: 'fa-comments'
-        };
 
         const topicLabelsIndo = {
             job_interview: 'Simulasi Wawancara Kerja',
@@ -74,7 +65,6 @@ async function fetchDashboardMetrics() {
         };
 
         container.innerHTML = sessions.map(s => {
-            const iconClass = topicIcons[s.topic] || 'fa-comments';
             const displayTitle = topicLabelsIndo[s.topic] || s.topic_label || 'Latihan Percakapan';
             
             const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID', {
@@ -92,15 +82,12 @@ async function fetchDashboardMetrics() {
             return `
                 <div class="history-item-row">
                     <div class="history-item-left">
-                        <div class="history-item-icon ${escapeHtml(s.topic)}">
-                            <i class="fa-solid ${iconClass}"></i>
-                        </div>
                         <div>
                             <div class="history-topic-name">${escapeHtml(displayTitle)}</div>
                             <div class="history-meta-date">
-                                <span><i class="fa-regular fa-calendar" style="font-size: 11px;"></i> ${dateStr}</span>
+                                <span>${dateStr}</span>
                                 <span>&bull;</span>
-                                <span><i class="fa-regular fa-clock" style="font-size: 11px;"></i> ${duration} menit</span>
+                                <span>${duration} menit</span>
                             </div>
                         </div>
                     </div>

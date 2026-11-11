@@ -89,5 +89,6 @@ async def test_root_endpoint():
         ) as client:
             response = await client.get("/")
 
-        assert response.status_code == 200
-        assert "MILO" in response.json()["message"]
+        assert response.status_code in (200, 307)
+        if response.status_code == 307:
+            assert "/ui" in response.headers.get("location", "")

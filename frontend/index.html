@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MILO — AI English Speaking Tutor & Real-Time Evaluator</title>
-    <meta name="description" content="Kuasai speaking Bahasa Inggris bersama MILO. Dapatkan evaluasi langsung pada Grammar, Vocabulary, dan Fluency berbasis standar CEFR dan AI Whisper.">
+    <title>MILO: Companion Latihan Speaking Bahasa Inggris Interaktif</title>
+    <meta name="description" content="Kuasai speaking Bahasa Inggris bersama MILO, asisten virtual 2D yang mendengarkan, menjawab dengan audio alami, dan memberikan evaluasi CEFR langsung.">
     <!-- Google Fonts & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dedicated Warm Sand Theme CSS (Matching setup.css, briefing.css & practice.css) -->
-    <link rel="stylesheet" href="/ui/css/index.css">
+    <!-- Dedicated Theme CSS -->
+    <link rel="stylesheet" href="css/index.css?v=20261112c">
 </head>
 <body class="home-body">
 
@@ -17,267 +17,381 @@
          ═══════════════════════════════════════════════════════════════════════ -->
     <div class="home-nav-wrapper">
         <header class="home-navbar">
-            <a href="/ui/index.html" class="nav-brand-group">
+            <a href="index.html" class="nav-brand-group">
                 <div class="nav-brand-icon">
-                    <i class="fa-solid fa-brain"></i>
+                    <span>M</span>
                 </div>
                 <div>
                     <span class="nav-brand-title">MILO</span>
-                    <span class="nav-brand-badge">AI Tutor</span>
+                    <span class="nav-brand-badge">Speaking Companion</span>
                 </div>
             </a>
 
-            <nav>
+            <nav aria-label="Navigasi Utama">
                 <ul class="nav-center-menu">
-                    <li><a href="/ui/index.html" class="nav-menu-link active"><i class="fa-solid fa-house"></i> Beranda</a></li>
-                    <li><a href="/ui/setup.html" class="nav-menu-link"><i class="fa-solid fa-microphone"></i> Latihan</a></li>
-                    <li><a href="/ui/dashboard.html" class="nav-menu-link"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="index.html" class="nav-menu-link active">Beranda</a></li>
+                    <li><a href="#studio-tour" class="nav-menu-link">Ruang Latihan</a></li>
+                    <li><a href="#scenarios" class="nav-menu-link">Skenario</a></li>
+                    <li><a href="#cefr-framework" class="nav-menu-link">Level CEFR</a></li>
+                    <li><a href="dashboard.html" class="nav-menu-link">Dashboard</a></li>
                 </ul>
             </nav>
 
-            <div>
-                <a href="/ui/setup.html" class="nav-cta-btn">
-                    <i class="fa-solid fa-play"></i> Mulai Latihan
-                </a>
+            <div class="nav-action-wrapper">
+                <a href="setup.html" class="nav-cta-btn">Mulai Latihan</a>
             </div>
         </header>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
-         2. HERO SECTION (Warm Sand + Floating Speech Bubble)
+         2. HERO SECTION (Asymmetric Composition: Narrative + Live Studio Preview)
          ═══════════════════════════════════════════════════════════════════════ -->
     <main>
         <section class="home-hero-section">
-            <!-- Floating Speech Bubble Prompt (Consistent with setup.html & briefing.html) -->
-            <div class="hero-speech-bubble">
-                <i class="fa-solid fa-wand-magic-sparkles hero-speech-bubble-icon"></i>
-                <span class="hero-speech-bubble-text">Ruang Aman Latihan Bahasa Inggris Interaktif</span>
-                <span class="hero-speech-bubble-badge">CEFR B1 &bull; B2</span>
-            </div>
+            <div class="hero-split-container">
+                <!-- Left Column: Editorial Value Proposition -->
+                <div class="hero-text-column">
+                    <div class="hero-speech-bubble">
+                        <span class="hero-bubble-dot"></span>
+                        <span class="hero-speech-bubble-text">Ruang Belajar Ramah Tanpa Rasa Takut Dihakimi</span>
+                    </div>
 
-            <!-- Main Heading with Warm Accents -->
-            <h1 class="hero-main-title">
-                Bicara Bahasa Inggris dengan Percaya Diri lewat <span class="hero-highlight-orange">Evaluasi AI Real-Time</span>
-            </h1>
+                    <h1 class="hero-main-title">
+                        Latihan Berbicara Bahasa Inggris <span class="hero-highlight-sage">Kapan Saja</span>, Tanpa Rasa Gugup.
+                    </h1>
 
-            <!-- Subtitle -->
-            <p class="hero-description">
-                Latih percakapan bahasa Inggris bersama tutor AI yang ramah, mendengarkan pelafalanmu, berbicara dengan suara alami, serta memberikan umpan balik langsung pada <strong>Grammar</strong>, <strong>Vocabulary</strong>, dan <strong>Fluency</strong> tanpa rasa takut dihakimi.
-            </p>
+                    <p class="hero-description">
+                        Berlatihlah bersama <strong>MILO</strong>, asisten virtual 2D yang mendengarkan suaramu dengan sabar, merespons dengan audio alami, dan memberikan umpan balik tata bahasa serta kelancaran secara langsung berbasis standar CEFR.
+                    </p>
 
-            <!-- Action Buttons -->
-            <div class="hero-actions-group">
-                <a href="/ui/setup.html" class="btn-hero-primary">
-                    <i class="fa-solid fa-microphone"></i> Mulai Sesi Latihan
-                </a>
-                <a href="/ui/dashboard.html" class="btn-hero-secondary">
-                    <i class="fa-solid fa-chart-pie"></i> Lihat Progress Saya
-                </a>
-            </div>
+                    <div class="hero-actions-group">
+                        <a href="setup.html" class="btn-hero-primary">
+                            <span>Mulai Percakapan Pertama</span>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                        <a href="dashboard.html" class="btn-hero-secondary">
+                            <span>Lihat Riwayat Latihan</span>
+                        </a>
+                    </div>
 
-            <!-- Mini Trust Badges Row -->
-            <div class="hero-badges-row">
-                <span class="hero-mini-badge">
-                    <i class="fa-solid fa-shield-heart" style="color: #FF5E36;"></i> Ruang Aman Tanpa Beban Nilai
-                </span>
-                <span class="hero-mini-badge">
-                    <i class="fa-solid fa-volume-high"></i> Suara Alami Native Speaker (TTS)
-                </span>
-                <span class="hero-mini-badge">
-                    <i class="fa-solid fa-bolt" style="color: #10B981;"></i> Whisper Speech Recognition
-                </span>
-                <span class="hero-mini-badge">
-                    <i class="fa-solid fa-language" style="color: #0066FF;"></i> Fitur Terjemahan Dwibahasa
-                </span>
-            </div>
-        </section>
+                    <div class="hero-trust-strip">
+                        <div class="trust-item">
+                            <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
+                            <span>Bebas dari kecemasan berbicara</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+                            <span>Whisper Speech Recognition</span>
+                        </div>
+                        <div class="trust-item">
+                            <i class="fa-solid fa-language" aria-hidden="true"></i>
+                            <span>Jaring pengaman terjemahan ID</span>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- ═══════════════════════════════════════════════════════════════════════
-             3. LEVEL SELECTION PREVIEW (Matching setup.html exact format)
-             ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="section-wrapper">
-            <div class="section-header-centered">
-                <span class="section-tag-pill">Target Pembelajaran</span>
-                <h2 class="section-title">Pilih Level & Mulai Latihanmu</h2>
-                <p class="section-desc">Pilih level yang paling sesuai dengan kemampuan dan target berbicara kamu hari ini.</p>
-            </div>
+                <!-- Right Column: Interactive Studio Showcase (Featuring Milo) -->
+                <div class="hero-showcase-column">
+                    <div class="studio-preview-card">
+                        <!-- Top Mini Header -->
+                        <div class="studio-preview-header">
+                            <span class="preview-brand-label">MILO PRACTICE STUDIO</span>
+                            <span class="preview-cefr-pill">Level B1</span>
+                        </div>
 
-            <div class="levels-preview-grid">
-                <!-- Level B1 Card -->
-                <a href="/ui/setup.html?level=B1" class="level-preview-card" title="Mulai Latihan Level B1">
-                    <span class="recommended-mini-pill">Rekomendasi</span>
-                    <div class="level-card-top-row">
-                        <div class="signal-icon-box">
-                            <div class="signal-bars">
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar"></span>
-                                <span class="signal-bar"></span>
+                        <!-- Progress Bar Preview -->
+                        <div class="preview-progress-track">
+                            <div class="preview-progress-fill"></div>
+                        </div>
+
+                        <!-- Studio Stage Mockup -->
+                        <div class="studio-stage-mockup">
+                            <!-- Left Mini HUD -->
+                            <div class="preview-mini-hud">
+                                <span class="mini-hud-label">Topik Sesi</span>
+                                <span class="mini-hud-topic">Job Interview</span>
+                                <div class="mini-hud-eval">
+                                    <span class="eval-chip grammar">Grammar ✓</span>
+                                    <span class="eval-chip vocab">Vocab B1+</span>
+                                </div>
+                            </div>
+
+                            <!-- Center 2D Milo Preview -->
+                            <div class="preview-milo-stage">
+                                <img src="assets/milo_companion.png" alt="Milo 2D Companion" class="preview-milo-img" width="180" height="240">
+                                <div class="preview-milo-shadow"></div>
+                                <div class="preview-status-pill">
+                                    <span class="status-live-dot"></span>
+                                    <span>Milo siap mendengarkan</span>
+                                </div>
+                            </div>
+
+                            <!-- Right Chat Preview -->
+                            <div class="preview-chat-column">
+                                <div class="preview-bubble milo">
+                                    <span>Good morning! Please have a seat. Could you tell me a little bit about yourself?</span>
+                                    <div class="bubble-sound-icon">
+                                        <i class="fa-solid fa-volume-high" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-bubble user">
+                                    <span>Thank you for having me. I have three years of experience in project management.</span>
+                                </div>
+                                <div class="preview-waveform-box">
+                                    <div class="waveform-bar-sample"></div>
+                                    <div class="waveform-bar-sample tall"></div>
+                                    <div class="waveform-bar-sample medium"></div>
+                                    <div class="waveform-bar-sample tall"></div>
+                                    <div class="waveform-bar-sample short"></div>
+                                    <div class="waveform-bar-sample medium"></div>
+                                    <div class="waveform-bar-sample tall"></div>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <div class="card-title-text">Intermediate (B1)</div>
-                            <div class="card-desc-text">Membangun kelancaran berbicara & kosakata profesional untuk percakapan sehari-hari dan kerja.</div>
-                        </div>
-                    </div>
-                    <div class="level-action-hint">
-                        <span>Pilih Level B1 & Mulai Skenario</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </a>
 
-                <!-- Level B2 Card -->
-                <a href="/ui/setup.html?level=B2" class="level-preview-card" title="Mulai Latihan Level B2">
-                    <div class="level-card-top-row">
-                        <div class="signal-icon-box">
-                            <div class="signal-bars">
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar active"></span>
-                                <span class="signal-bar"></span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="card-title-text">Upper-Intermediate (B2)</div>
-                            <div class="card-desc-text">Percakapan lancar, spontan, dan mendalam menuju penguasaan level mahir & argumen kritis.</div>
+                        <!-- Bottom Dock Preview -->
+                        <div class="studio-dock-mockup">
+                            <span class="dock-btn-mock keyboard"><i class="fa-solid fa-keyboard" aria-hidden="true"></i></span>
+                            <span class="dock-btn-mock mic"><i class="fa-solid fa-microphone" aria-hidden="true"></i></span>
+                            <span class="dock-btn-mock hangup"><i class="fa-solid fa-phone-slash" aria-hidden="true"></i></span>
                         </div>
                     </div>
-                    <div class="level-action-hint">
-                        <span>Pilih Level B2 & Mulai Skenario</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </div>
-                </a>
+                </div>
             </div>
         </section>
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             4. 3 PILAR EVALUASI AI (Grammar, Vocab, Fluency HUD)
+             3. SECTION: THE 3-ZONE PRACTICE ARCHITECTURE
              ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="section-wrapper">
+        <section class="section-wrapper" id="studio-tour">
             <div class="section-header-centered">
-                <span class="section-tag-pill">AI Speech Evaluation</span>
-                <h2 class="section-title">3 Pilar Pembetulan & Tips Berbicara</h2>
-                <p class="section-desc">Evaluasi komprehensif pada setiap kalimat yang kamu ucapkan saat berlatih.</p>
+                <span class="section-tag-pill">Arsitektur Pembelajaran</span>
+                <h2 class="section-title">Bagaimana Ruang Latihan MILO Bekerja?</h2>
+                <p class="section-desc">Tiga komponen utama yang dirancang untuk mendukung kelancaran berbicaramu secara bertahap.</p>
             </div>
 
-            <div class="pillars-grid">
-                <!-- Grammar Pillar -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box grammar">
-                        <i class="fa-solid fa-spell-check"></i>
+            <div class="studio-zones-grid">
+                <!-- Zone 1 -->
+                <div class="zone-card">
+                    <div class="zone-card-top">
+                        <span class="zone-number-tag">Zona 01</span>
+                        <div class="zone-icon-box">
+                            <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                        </div>
                     </div>
-                    <h3>Grammar Accuracy</h3>
-                    <p>Deteksi kekeliruan tata bahasa (tenses, prepositions, subject-verb agreement) secara halus dengan perbaikan langsung dan penjelasan ramah.</p>
-                    <div class="pillar-card-footer">
-                        <i class="fa-solid fa-circle-check" style="color: #10B981;"></i>
-                        <span>Pembetulan Instan per Giliran Bicara</span>
-                    </div>
+                    <h3>Live Evaluation HUD</h3>
+                    <p>Menganalisis kalimatmu secara langsung. Memberikan perbaikan akurasi grammar, saran variasi kosakata, serta tips kelancaran tanpa sistem skor yang mengintimidasi.</p>
+                    <ul class="zone-feature-list">
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i> Deteksi tenses dan struktur kalimat seketika</li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i> Rekomendasi kata yang lebih profesional</li>
+                    </ul>
                 </div>
 
-                <!-- Vocab Pillar -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box vocab">
-                        <i class="fa-solid fa-book-open"></i>
+                <!-- Zone 2 -->
+                <div class="zone-card highlight-zone">
+                    <div class="zone-card-top">
+                        <span class="zone-number-tag special">Zona 02</span>
+                        <div class="zone-icon-box companion">
+                            <i class="fa-solid fa-user-astronaut" aria-hidden="true"></i>
+                        </div>
                     </div>
-                    <h3>Vocabulary Upgrade</h3>
-                    <p>Rekomendasi peningkatan kata dari level B1 menuju variasi kosakata B2 yang lebih kaya, formal, dan variatif agar terdengar lebih profesional.</p>
-                    <div class="pillar-card-footer">
-                        <i class="fa-solid fa-wand-sparkles" style="color: #0E7490;"></i>
-                        <span>Saran Sinonim & Frasa Alami</span>
-                    </div>
+                    <h3>2D Virtual Companion</h3>
+                    <p>Milo hadir di tengah panggung dengan animasi alami dan status responsif (mendengarkan, berpikir, berbicara), menghadirkan interaksi visual yang hangat layaknya rekan berlatih nyata.</p>
+                    <ul class="zone-feature-list">
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i> Respons visual reaktif saat suara terdeteksi</li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i> Menghilangkan kecemasan bicara di depan umum</li>
+                    </ul>
                 </div>
 
-                <!-- Fluency Pillar -->
-                <div class="pillar-card">
-                    <div class="pillar-icon-box fluency">
-                        <i class="fa-solid fa-comments"></i>
+                <!-- Zone 3 -->
+                <div class="zone-card">
+                    <div class="zone-card-top">
+                        <span class="zone-number-tag">Zona 03</span>
+                        <div class="zone-icon-box">
+                            <i class="fa-solid fa-comments" aria-hidden="true"></i>
+                        </div>
                     </div>
-                    <h3>Fluency & Natural Flow</h3>
-                    <p>Membiasakan penggunaan kata penghubung (linking words), respon spontan, dan ritme berbicara tanpa jeda cemas atau ragu-ragu.</p>
-                    <div class="pillar-card-footer">
-                        <i class="fa-solid fa-chart-simple" style="color: #FF5E36;"></i>
-                        <span>Konektor Kalimat & Confidence Tips</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════════════════════════════
-             5. SAFETY NET BANNER (Jaring Pengaman — Aligned with briefing.html)
-             ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="section-wrapper">
-            <div class="safety-net-banner">
-                <div class="safety-icon-wrapper">
-                    <i class="fa-solid fa-shield-heart"></i>
-                </div>
-                <div class="safety-text-block">
-                    <h3>Jaring Pengaman: Ruang Aman Latihanmu</h3>
-                    <p>Tarik napas santai! Di MILO tidak ada angka yang menghakimi kesalahanmu. Tutor AI siap menjadi kawan bicara yang sabar untuk mendampingimu membangun rasa percaya diri berbicara bahasa Inggris selangkah demi selangkah.</p>
+                    <h3>Bilingual Safety Net</h3>
+                    <p>Aliran percakapan dilengkapi audio pelafalan asli dan tombol terjemahan dwibahasa ke Bahasa Indonesia. Jika bingung dengan suatu kosakata, bantuan selalu tersedia dalam satu klik.</p>
+                    <ul class="zone-feature-list">
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i> Audio TTS native dapat diputar ulang kapan saja</li>
+                        <li><i class="fa-solid fa-check" aria-hidden="true"></i> Terjemahan instan tanpa memutus alur latihan</li>
+                    </ul>
                 </div>
             </div>
         </section>
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             6. HOW IT WORKS (3 Rangkaian Langkah)
+             4. SECTION: SCENARIOS / ROLEPLAY TRACKS
              ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="section-wrapper">
+        <section class="section-wrapper" id="scenarios">
             <div class="section-header-centered">
-                <span class="section-tag-pill">Alur Mudah</span>
-                <h2 class="section-title">Bagaimana Cara Kerja Latihan MILO?</h2>
-                <p class="section-desc">Tiga langkah sederhana dari persiapan hingga evaluasi lengkap.</p>
+                <span class="section-tag-pill">Pilihan Skenario Praktik</span>
+                <h2 class="section-title">Berlatih untuk Kebutuhan Nyata</h2>
+                <p class="section-desc">Pilih topik simulasi yang sesuai dengan tantangan akademik maupun karier profesionalmu.</p>
             </div>
 
-            <div class="how-it-works-grid">
-                <div class="step-card">
-                    <div class="step-number-badge">1</div>
-                    <h4>Pilih Skenario & Waktu</h4>
-                    <p>Tentukan level CEFR (B1/B2), durasi target harian (5, 15, atau 30 menit), dan skenario roleplay seperti <em>Job Interview</em>, <em>Academic Discussion</em>, atau <em>Daily Conversation</em>.</p>
+            <div class="scenarios-grid">
+                <!-- Scenario 1 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon-wrapper interview">
+                        <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+                    </div>
+                    <div class="scenario-content">
+                        <h3>Simulasi Wawancara Kerja</h3>
+                        <p>Latih jawaban untuk pertanyaan klasik seperti perkenalan diri, kelebihan dan kekurangan, serta studi kasus pengalaman kerja menggunakan metode STAR.</p>
+                        <div class="scenario-tags-row">
+                            <span class="scenario-mini-tag">STAR Method</span>
+                            <span class="scenario-mini-tag">Professional English</span>
+                            <span class="scenario-mini-tag">Formal Tone</span>
+                        </div>
+                    </div>
+                    <a href="setup.html?topic=job_interview" class="scenario-card-cta">
+                        <span>Pilih Skenario</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
                 </div>
 
-                <div class="step-card">
-                    <div class="step-number-badge">2</div>
-                    <h4>Briefing & Kosakata Kunci</h4>
-                    <p>Dapatkan penjelasan peranmu, konteks simulasi, serta kartu kosakata rekomendasi (*target vocabulary chips*) sebelum sesi dimulai agar kamu siap berbicara.</p>
+                <!-- Scenario 2 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon-wrapper academic">
+                        <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+                    </div>
+                    <div class="scenario-content">
+                        <h3>Diskusi Akademik & Skripsi</h3>
+                        <p>Pertajam kemampuan memaparkan argumen ilmiah, menjelaskan metode penelitian, serta menjawab pertanyaan kritis dosen atau audiens seminar.</p>
+                        <div class="scenario-tags-row">
+                            <span class="scenario-mini-tag">Thesis Defense</span>
+                            <span class="scenario-mini-tag">Academic Vocabulary</span>
+                            <span class="scenario-mini-tag">Critical Reasoning</span>
+                        </div>
+                    </div>
+                    <a href="setup.html?topic=academic_discussion" class="scenario-card-cta">
+                        <span>Pilih Skenario</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
                 </div>
 
-                <div class="step-card">
-                    <div class="step-number-badge">3</div>
-                    <h4>Praktik Berbicara Interaktif</h4>
-                    <p>Gunakan mikrofon untuk berbicara. MILO mendengarkan, menjawab dengan audio suara alami, dan menampilkan koreksi tata bahasa serta tips kosakata seketika.</p>
+                <!-- Scenario 3 -->
+                <div class="scenario-card">
+                    <div class="scenario-icon-wrapper daily">
+                        <i class="fa-solid fa-mug-saucer" aria-hidden="true"></i>
+                    </div>
+                    <div class="scenario-content">
+                        <h3>Percakapan Sehari-hari</h3>
+                        <p>Mengobrol santai seputar hobi, musik, rencana liburan, atau memesan makanan di kafe untuk melatih spontanitas berbicara tanpa rasa canggung.</p>
+                        <div class="scenario-tags-row">
+                            <span class="scenario-mini-tag">Small Talk</span>
+                            <span class="scenario-mini-tag">Natural Expressions</span>
+                            <span class="scenario-mini-tag">Casual Fluency</span>
+                        </div>
+                    </div>
+                    <a href="setup.html?topic=daily_conversation" class="scenario-card-cta">
+                        <span>Pilih Skenario</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
         </section>
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             7. BOTTOM CALL-TO-ACTION BANNER
+             5. SECTION: CEFR LEVEL DUAL TRACKS (Strictly B1 & B2)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="section-wrapper" id="cefr-framework">
+            <div class="section-header-centered">
+                <span class="section-tag-pill">Fokus Kompetensi CEFR</span>
+                <h2 class="section-title">Spesialisasi Tingkat B1 & B2</h2>
+                <p class="section-desc">MILO dirancang khusus untuk menjembatani lompatan kelancaran dari percakapan umum (B1) menuju kemahiran profesional dan akademik (B2).</p>
+            </div>
+
+            <div class="cefr-dual-tracks-grid">
+                <!-- Track 1: Intermediate (B1) -->
+                <div class="cefr-track-card track-b1">
+                    <div class="cefr-track-header">
+                        <div class="cefr-code-box">
+                            <span class="cefr-code">B1</span>
+                            <span class="cefr-level-badge">Intermediate</span>
+                        </div>
+                        <span class="cefr-badge-rec">Rekomendasi Awal</span>
+                    </div>
+                    <div class="cefr-track-body">
+                        <h3>Fondasi Kelancaran Berbicara</h3>
+                        <p class="cefr-track-summary">Mampu mengekspresikan gagasan utama, menceritakan pengalaman pribadi, serta berdiskusi tentang minat dan kegiatan harian tanpa rasa canggung.</p>
+                        <ul class="cefr-skills-list">
+                            <li><i class="fa-solid fa-check" aria-hidden="true"></i> Mengurangi jeda berpikir (*hesitation*) saat menyusun kalimat</li>
+                            <li><i class="fa-solid fa-check" aria-hidden="true"></i> Penguasaan tenses dasar dan penghubung kalimat (*connectors*)</li>
+                            <li><i class="fa-solid fa-check" aria-hidden="true"></i> Kosakata percakapan harian dan situasi kerja umum</li>
+                        </ul>
+                    </div>
+                    <div class="cefr-track-footer">
+                        <a href="setup.html?level=B1" class="cefr-track-cta">
+                            <span>Mulai Latihan Level B1</span>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Track 2: Upper-Intermediate (B2) -->
+                <div class="cefr-track-card track-b2">
+                    <div class="cefr-track-header">
+                        <div class="cefr-code-box">
+                            <span class="cefr-code">B2</span>
+                            <span class="cefr-level-badge">Upper-Intermediate</span>
+                        </div>
+                        <span class="cefr-badge-pro">Profesional & Akademik</span>
+                    </div>
+                    <div class="cefr-track-body">
+                        <h3>Kemahiran Argumen & Karier</h3>
+                        <p class="cefr-track-summary">Mampu mengutarakan pandangan kritis, menyusun argumen terstruktur dengan metode STAR pada wawancara kerja, dan mempertahankan pendapat akademik.</p>
+                        <ul class="cefr-skills-list">
+                            <li><i class="fa-solid fa-check" aria-hidden="true"></i> Simulasi wawancara kerja teknis dan studi kasus</li>
+                            <li><i class="fa-solid fa-check" aria-hidden="true"></i> Kosakata akademik dan kolokasi profesional (*idiomatic expressions*)</li>
+                            <li><i class="fa-solid fa-check" aria-hidden="true"></i> Respons spontan dengan intonasi natural dan tata bahasa presisi</li>
+                        </ul>
+                    </div>
+                    <div class="cefr-track-footer">
+                        <a href="setup.html?level=B2" class="cefr-track-cta">
+                            <span>Mulai Latihan Level B2</span>
+                            <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             6. BOTTOM INVITATION BANNER
              ═══════════════════════════════════════════════════════════════════════ -->
         <section class="section-wrapper">
-            <div class="bottom-cta-banner">
-                <h2>Siap Berbicara Bahasa Inggris Tanpa Rasa Takut?</h2>
-                <p>Mulai sesi latihan interaktif pertamamu sekarang. Pilih skenario favoritmu dan rasakan kemajuan speaking nyata bersama MILO AI.</p>
-                <a href="/ui/setup.html" class="bottom-cta-btn">
-                    <i class="fa-solid fa-rocket"></i> Mulai Latihan Sekarang
-                </a>
+            <div class="bottom-invitation-card">
+                <div class="invitation-text-content">
+                    <h2>Siap Memulai Latihan Pertamamu?</h2>
+                    <p>Luangkan 10 sampai 15 menit hari ini untuk melatih kelancaran berbicaramu bersama Milo.</p>
+                </div>
+                <div class="invitation-action-box">
+                    <a href="setup.html" class="btn-invitation-cta">
+                        <span>Pilih Level & Mulai Latihan</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
             </div>
         </section>
     </main>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
-         8. FOOTER
+         7. FOOTER
          ═══════════════════════════════════════════════════════════════════════ -->
     <footer class="home-footer">
         <div class="footer-links-row">
-            <a href="/ui/index.html">Beranda</a>
-            <span>&bull;</span>
-            <a href="/ui/setup.html">Mulai Latihan</a>
-            <span>&bull;</span>
-            <a href="/ui/dashboard.html">Dashboard Progres</a>
-            <span>&bull;</span>
-            <a href="/docs" target="_blank">API Docs</a>
+            <a href="index.html">Beranda</a>
+            <span aria-hidden="true">&bull;</span>
+            <a href="setup.html">Mulai Latihan</a>
+            <span aria-hidden="true">&bull;</span>
+            <a href="dashboard.html">Dashboard Progres</a>
+            <span aria-hidden="true">&bull;</span>
+            <a href="/docs" target="_blank" rel="noopener">Dokumentasi API</a>
         </div>
-        <p>&copy; 2026 MILO — Multimodal Interactive Learning Companion. Berbasis Standar CEFR & Whisper AI Speech Recognition.</p>
+        <p>&copy; 2026 MILO: Multimodal Interactive Learning Companion. Berbasis Standar CEFR & Whisper AI Speech Recognition.</p>
     </footer>
 
 </body>

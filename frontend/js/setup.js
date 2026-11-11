@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor — 3-Step Setup Flow Logic (Warm Sand Mockup Theme)
+// MILO AI English Tutor: 3-Step Setup Flow Logic (Warm Sand Mockup Theme)
 // Step 1: Select CEFR Level -> Step 2: Select Daily Goal -> Step 3: Select Topic
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -137,34 +137,52 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedLevel = paramLevel.toUpperCase();
     }
 
-    // ─── 1. Level Selection Handling (Step 1) ──────────────────────────────────
+    // ─── 1. Level Selection Handling (Step 1 - Strictly B1 & B2) ──────────────
     const levelCards = document.querySelectorAll('#step1LevelContainer .level-selection-card[data-level]');
+
+    function selectLevelCard(card) {
+        levelCards.forEach(c => {
+            c.classList.remove('selected');
+            c.setAttribute('aria-pressed', 'false');
+        });
+        card.classList.add('selected');
+        card.setAttribute('aria-pressed', 'true');
+        selectedLevel = card.getAttribute('data-level');
+
+        // Enable next button
+        if (btnGotoStep2) {
+            btnGotoStep2.disabled = false;
+        }
+
+        // Update bottom shelf
+        if (shelfLevelLabel) {
+            const labelText = LEVEL_NAMES[selectedLevel] || selectedLevel;
+            shelfLevelLabel.textContent = `Level Terpilih: ${labelText}`;
+        }
+        if (shelfFinalLevelBadge) {
+            shelfFinalLevelBadge.textContent = `Level ${selectedLevel}`;
+        }
+    }
 
     levelCards.forEach(card => {
         const cardLevel = card.getAttribute('data-level');
         if (cardLevel === selectedLevel) {
             card.classList.add('selected');
+            card.setAttribute('aria-pressed', 'true');
         } else {
             card.classList.remove('selected');
+            card.setAttribute('aria-pressed', 'false');
         }
 
         card.addEventListener('click', () => {
-            levelCards.forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-            selectedLevel = card.getAttribute('data-level');
+            selectLevelCard(card);
+        });
 
-            // Enable next button
-            if (btnGotoStep2) {
-                btnGotoStep2.disabled = false;
-            }
-
-            // Update bottom shelf
-            if (shelfLevelLabel) {
-                const labelText = LEVEL_NAMES[selectedLevel] || selectedLevel;
-                shelfLevelLabel.textContent = `Level Terpilih: ${labelText}`;
-            }
-            if (shelfFinalLevelBadge) {
-                shelfFinalLevelBadge.textContent = `Level ${selectedLevel}`;
+        // Keyboard selection with Enter or Space
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectLevelCard(card);
             }
         });
 
@@ -216,6 +234,12 @@ document.addEventListener('DOMContentLoaded', () => {
         btnOpenLevelQuiz.addEventListener('click', () => {
             quizModalOverlay.classList.add('active');
         });
+        btnOpenLevelQuiz.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                quizModalOverlay.classList.add('active');
+            }
+        });
     }
 
     function closeQuizModal() {
@@ -250,8 +274,10 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedLevel = recommended;
             levelCards.forEach(c => {
                 c.classList.remove('selected');
+                c.setAttribute('aria-pressed', 'false');
                 if (c.getAttribute('data-level') === recommended) {
                     c.classList.add('selected');
+                    c.setAttribute('aria-pressed', 'true');
                     c.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             });
@@ -319,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = `/ui/briefing.html?session_id=${encodeURIComponent(data.session_id)}`;
             } catch (error) {
                 btnLaunchPractice.disabled = false;
-                btnLaunchPractice.innerHTML = `<span>Lanjut ke Pre-Session Briefing</span> <i class="fa-solid fa-arrow-right"></i>`;
+                btnLaunchPractice.innerHTML = `<span>Lanjut ke Pre-Session Briefing</span>`;
                 alert('Gagal menyiapkan briefing sesi: ' + error.message);
                 console.error('Launch briefing error:', error);
             }

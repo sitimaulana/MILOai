@@ -1,0 +1,65 @@
+[
+  {
+    "id": "RAG-01",
+    "category": "grammar",
+    "cefr_level": "B1",
+    "input": "Can you explain when I should use Present Perfect tense instead of Past Simple?",
+    "expected_output": "Use the Present Perfect for actions connected to the present, unfinished time periods, or life experiences without a specific time. Use the Past Simple for finished actions at a specific time in the past.",
+    "retrieval_context": [
+      "Present Perfect tense connects the past with the present. It is used for life experiences (without specific time), ongoing states starting in the past, or past actions with a present result. Time expressions: ever, never, already, yet, since, for.",
+      "Past Simple is used for completed actions that happened at a definite time in the past. Time expressions: yesterday, last week, in 2010, two days ago."
+    ]
+  },
+  {
+    "id": "RAG-02",
+    "category": "grammar",
+    "cefr_level": "B2",
+    "input": "What is the difference between Second and Third Conditional sentences?",
+    "expected_output": "Second Conditional talks about hypothetical or unlikely situations in the present or future (If + past simple, would + base verb). Third Conditional talks about impossible past situations and regrets (If + past perfect, would have + past participle).",
+    "retrieval_context": [
+      "Second Conditional: Structure 'If + Past Simple, would + verb'. Used for unreal, imaginary, or unlikely situations in the present or future. Example: 'If I won the lottery, I would travel the world.'",
+      "Third Conditional: Structure 'If + Past Perfect, would have + past participle'. Used to discuss hypothetical past events that did not happen, often expressing regret or criticism. Example: 'If I had studied harder, I would have passed the exam.'"
+    ]
+  },
+  {
+    "id": "RAG-03",
+    "category": "grammar",
+    "cefr_level": "B1",
+    "input": "When should I use 'since' and when should I use 'for' with time?",
+    "expected_output": "Use 'since' with a specific starting point in time (e.g., since Monday, since 2018). Use 'for' with a duration or period of time (e.g., for three hours, for two years).",
+    "retrieval_context": [
+      "Prepositions of duration with Present Perfect: 'Since' refers to a specific starting point in the past (e.g., since 9 AM, since yesterday, since last year). 'For' refers to a duration or length of time (e.g., for ten minutes, for five days, for a long time)."
+    ]
+  },
+  {
+    "id": "RAG-04",
+    "category": "vocabulary",
+    "cefr_level": "B2",
+    "input": "How can I express strong disagreement politely in a business meeting?",
+    "expected_output": "You can use diplomatic phrasing like 'I see your point, but...', 'I'm afraid I have a different perspective on this', or 'With respect, I'm not convinced that will work'.",
+    "retrieval_context": [
+      "Professional English: Expressing polite disagreement in discussions and meetings. Techniques include acknowledging the other viewpoint before offering contrast ('I understand what you mean, however...', 'I see where you're coming from, but...'), using softeners ('I'm afraid I must disagree', 'I'm not entirely convinced'), and focusing on issues rather than individuals."
+    ]
+  },
+  {
+    "id": "RAG-05",
+    "category": "grammar",
+    "cefr_level": "B2",
+    "input": "Can you explain how Passive Voice is used in formal reports?",
+    "expected_output": "In formal reports, the passive voice is used to emphasize the action or the result rather than the person who performed it, creating an objective and impersonal tone.",
+    "retrieval_context": [
+      "Passive Voice: Formed with 'be + past participle'. In academic and formal professional writing, passive constructions emphasize objectivity, process, and findings over the actor (e.g., 'The survey was conducted among 500 respondents', 'Significant progress has been achieved')."
+    ]
+  },
+  {
+    "id": "RAG-06",
+    "category": "speaking",
+    "cefr_level": "B1",
+    "input": "What are common ways to ask for clarification during an English conversation?",
+    "expected_output": "You can say: 'Could you repeat that, please?', 'What do you mean by that?', or 'Could you clarify that last point?'",
+    "retrieval_context": [
+      "Conversational English - Clarification strategies: Phrases such as 'Could you say that again?', 'I didn't quite catch that', 'Could you explain what you mean by...?', and 'So, are you saying that...?' help maintain smooth dialogue and prevent misunderstandings."
+    ]
+  }
+]
+

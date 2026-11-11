@@ -1,0 +1,3 @@
+Module,Metric,Sample_Count,Mean_Score,Std_Dev,Min_Score,Max_Score,Pass_Rate_Pct
+RAG,Faithfulness,1,1.0,0.0,1.0,1.0,100.0
+RAG,Answer Relevancy,1,1.0,0.0,1.0,1.0,100.0

@@ -1,0 +1,75 @@
+[
+  {
+    "id": "FB-01",
+    "type": "error_present_past",
+    "cefr_level": "B1",
+    "user_text": "Yesterday I go to the store and buyed some foods.",
+    "has_error": true,
+    "expected_error_types": ["grammar"],
+    "expected_corrections_hint": ["went", "bought", "food"]
+  },
+  {
+    "id": "FB-02",
+    "type": "error_subject_verb",
+    "cefr_level": "B1",
+    "user_text": "She don't like drinking coffee in the morning.",
+    "has_error": true,
+    "expected_error_types": ["grammar"],
+    "expected_corrections_hint": ["doesn't like"]
+  },
+  {
+    "id": "FB-03",
+    "type": "error_preposition_duration",
+    "cefr_level": "B1",
+    "user_text": "I have been living in Jakarta since three years.",
+    "has_error": true,
+    "expected_error_types": ["grammar"],
+    "expected_corrections_hint": ["for three years"]
+  },
+  {
+    "id": "FB-04",
+    "type": "error_plural_uncountable",
+    "cefr_level": "B1",
+    "user_text": "He gave me many useful advices for my interview.",
+    "has_error": true,
+    "expected_error_types": ["grammar", "vocabulary"],
+    "expected_corrections_hint": ["pieces of advice", "a lot of advice"]
+  },
+  {
+    "id": "FB-05",
+    "type": "correct_natural_complex",
+    "cefr_level": "B2",
+    "user_text": "Although the project deadline was extremely tight, our team managed to deliver all the requirements successfully.",
+    "has_error": false,
+    "expected_error_types": [],
+    "expected_corrections_hint": []
+  },
+  {
+    "id": "FB-06",
+    "type": "correct_short_conversational",
+    "cefr_level": "B1",
+    "user_text": "Yes, I definitely agree with that point.",
+    "has_error": false,
+    "expected_error_types": [],
+    "expected_corrections_hint": []
+  },
+  {
+    "id": "FB-07",
+    "type": "correct_present_perfect",
+    "cefr_level": "B1",
+    "user_text": "I have already finished reviewing the presentation slides.",
+    "has_error": false,
+    "expected_error_types": [],
+    "expected_corrections_hint": []
+  },
+  {
+    "id": "FB-08",
+    "type": "vocab_upgrade_opportunity",
+    "cefr_level": "B1",
+    "user_text": "The movie was very good and I was very happy to watch it.",
+    "has_error": false,
+    "expected_error_types": ["vocabulary"],
+    "expected_corrections_hint": ["delighted", "fascinating", "thoroughly enjoyed"]
+  }
+]
+

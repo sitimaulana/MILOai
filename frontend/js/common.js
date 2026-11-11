@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor — Common Utilities
+// MILO AI English Tutor: Common Utilities
 // ═══════════════════════════════════════════════════════════════════════════════
 
 // Escape HTML for safe rendering
@@ -19,6 +19,9 @@ function playAudio(btnElement, audioId) {
     if (!base64Audio) return;
 
     const audio = new Audio("data:audio/mp3;base64," + base64Audio);
+    if (typeof window.setCompanionState === 'function') {
+        window.setCompanionState('speaking', 'Milo menjawab...');
+    }
     if (btnElement) {
         const icon = btnElement.querySelector('i');
         const origClass = icon ? icon.className : '';
@@ -27,12 +30,29 @@ function playAudio(btnElement, audioId) {
         }
         audio.onended = () => {
             if (icon) icon.className = origClass;
+            if (typeof window.setCompanionState === 'function') {
+                window.setCompanionState('idle', 'Milo siap berlatih');
+            }
         };
         audio.onerror = () => {
             if (icon) icon.className = origClass;
+            if (typeof window.setCompanionState === 'function') {
+                window.setCompanionState('idle', 'Milo siap berlatih');
+            }
+        };
+    } else {
+        audio.onended = () => {
+            if (typeof window.setCompanionState === 'function') {
+                window.setCompanionState('idle', 'Milo siap berlatih');
+            }
         };
     }
-    audio.play().catch(err => console.error("Audio playback error:", err));
+    audio.play().catch(err => {
+        console.error("Audio playback error:", err);
+        if (typeof window.setCompanionState === 'function') {
+            window.setCompanionState('idle', 'Milo siap berlatih');
+        }
+    });
     return audio;
 }
 
@@ -40,7 +60,25 @@ function autoPlayAudio(base64Audio) {
     if (!base64Audio) return;
     try {
         const audio = new Audio("data:audio/mp3;base64," + base64Audio);
-        audio.play().catch(err => console.log("Auto-play prevented by browser policy:", err));
+        if (typeof window.setCompanionState === 'function') {
+            window.setCompanionState('speaking', 'Milo menjawab...');
+        }
+        audio.onended = () => {
+            if (typeof window.setCompanionState === 'function') {
+                window.setCompanionState('idle', 'Milo siap berlatih');
+            }
+        };
+        audio.onerror = () => {
+            if (typeof window.setCompanionState === 'function') {
+                window.setCompanionState('idle', 'Milo siap berlatih');
+            }
+        };
+        audio.play().catch(err => {
+            console.log("Auto-play prevented by browser policy:", err);
+            if (typeof window.setCompanionState === 'function') {
+                window.setCompanionState('idle', 'Milo siap berlatih');
+            }
+        });
     } catch (e) {
         console.error("Audio autoplay failed:", e);
     }

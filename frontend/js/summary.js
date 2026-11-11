@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor — Summary & Evaluation Logic
+// MILO AI English Tutor: Summary & Evaluation Logic
 // ═══════════════════════════════════════════════════════════════════════════════
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -105,8 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
     } else {
         corrList.innerHTML = `
-            <div style="text-align: center; color: var(--grammar-color); padding: 16px; font-size: 14px;">
-                <i class="fa-solid fa-circle-check" style="margin-right: 6px;"></i> Excellent job! No major grammatical or vocabulary errors recorded.
+            <div style="text-align: center; color: var(--grammar-color); padding: 16px; font-size: 14px; font-weight: 600;">
+                Excellent job! No major grammatical or vocabulary errors recorded.
             </div>
         `;
     }

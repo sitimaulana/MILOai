@@ -43,4 +43,7 @@ docker compose -f docker-compose.bifrost.yml up -d
 
 # Run tests
 uv run pytest
+
+# Run DeepEval quantitative benchmarks (for thesis/PA data)
+uv run python -m evaluations.run_evaluation
 ```

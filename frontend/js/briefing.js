@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor — Pre-Session Briefing ("Jaring Pengaman" Logic)
+// MILO AI English Tutor: Pre-Session Briefing ("Jaring Pengaman" Logic)
 // Scenario Context + Playful Cyan Target Vocabulary + Interactive Mic Check
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -210,7 +210,7 @@ function initIdleVisualizer() {
 
         canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
         canvasCtx.lineWidth = 2.5;
-        canvasCtx.strokeStyle = isMicValidated ? '#10B981' : '#94A3B8';
+        canvasCtx.strokeStyle = isMicValidated ? '#7A9A82' : '#CBD5CD';
         canvasCtx.beginPath();
 
         const sliceWidth = canvas.width / 50;
@@ -249,7 +249,7 @@ async function toggleMicTest() {
         isTestingMic = true;
         btnTestMic.classList.add('listening');
         micStatus.className = 'mic-status-badge';
-        micStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--orange-primary);"></i> Mendengarkan suara... Ucapkan: <em>"Hello MILO, I am ready"</em>`;
+        micStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--secondary);"></i> Mendengarkan suara... Ucapkan: <em>"Hello MILO, I am ready"</em>`;
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         micStream = stream;
@@ -280,7 +280,7 @@ async function toggleMicTest() {
             // Draw dynamic frequency waveform
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
             canvasCtx.lineWidth = 3;
-            canvasCtx.strokeStyle = '#FF5E36';
+            canvasCtx.strokeStyle = '#8C6239';
             canvasCtx.beginPath();
 
             const sliceWidth = canvas.width / dataArray.length;
@@ -362,22 +362,22 @@ function validateMicSuccess() {
 
     if (micStatus) {
         micStatus.className = 'mic-status-badge success';
-        micStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 15px;"></i> <strong>Mikrofon Berhasil Tervalidasi!</strong> Suaramu terdengar jernih.`;
+        micStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #7A9A82; font-size: 15px;"></i> <strong>Mikrofon Berhasil Tervalidasi!</strong> Suaramu terdengar jernih.`;
     }
 
     // Unlock Start Session CTA
     if (btnStart) {
         btnStart.removeAttribute('disabled');
-        btnStart.innerHTML = `<span>Mulai Sesi Percakapan</span> <i class="fa-solid fa-play"></i>`;
+        btnStart.innerHTML = `<span>Mulai Sesi Percakapan</span>`;
     }
 
     if (shelfNote) {
-        shelfNote.innerHTML = `<i class="fa-solid fa-unlock" style="color: #10B981;"></i> <span style="color: #059669; font-weight: 700;">Mic Check berhasil! Kamu siap berbicara bersama MILO.</span>`;
+        shelfNote.innerHTML = `<span style="color: #24472F; font-weight: 700;">Mic Check berhasil! Kamu siap berbicara bersama MILO.</span>`;
     }
 
     // Play subtle pleasant chime
     playSuccessChime();
-    showToast('✅ Mikrofon siap digunakan!');
+    showToast('Mikrofon siap digunakan!');
 }
 
 function playSuccessChime() {

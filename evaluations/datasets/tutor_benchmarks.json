@@ -1,0 +1,31 @@
+[
+  {
+    "id": "TUTOR-A1",
+    "cefr_level": "A1",
+    "user_message": "Hello Milo! My name is Budi. I like soccer.",
+    "learning_goal": "Basic introductions and hobbies",
+    "expected_persona_criteria": "Short gentle sentences (5-8 words), simple vocabulary, warm tone, exactly ONE simple question."
+  },
+  {
+    "id": "TUTOR-A2",
+    "cefr_level": "A2",
+    "user_message": "Every morning I wake up at 6 AM and take my dog for a walk in the park.",
+    "learning_goal": "Daily routines and habits",
+    "expected_persona_criteria": "Straightforward sentences (8-12 words), everyday vocabulary, friendly reaction, exactly ONE clear follow-up question."
+  },
+  {
+    "id": "TUTOR-B1",
+    "cefr_level": "B1",
+    "user_message": "I think working remotely is better because I can save money on transportation and spend more time with my family.",
+    "learning_goal": "Expressing opinions and reasoning",
+    "expected_persona_criteria": "Natural conversational flow, connectors, supportive reaction, encouraging learner to expand with ONE engaging question."
+  },
+  {
+    "id": "TUTOR-B2",
+    "cefr_level": "B2",
+    "user_message": "While artificial intelligence enhances productivity, it also raises ethical concerns regarding data privacy and job displacement.",
+    "learning_goal": "Discussing complex topics and trade-offs",
+    "expected_persona_criteria": "Sophisticated vocabulary, engaging with nuances, professional yet friendly, ending with ONE thoughtful question."
+  }
+]
+

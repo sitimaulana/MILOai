@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Kemajuan & Riwayat Sesi — MILO AI English Tutor</title>
+    <title>Dashboard Kemajuan & Riwayat Sesi: MILO English Speaking Practice</title>
     <meta name="description" content="Pantau progres speaking Bahasa Inggris, skor kompetensi Grammar, Vocabulary, Fluency, dan riwayat sesi latihan bersama MILO.">
     <!-- Google Fonts & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css & practice.css) -->
-    <link rel="stylesheet" href="/ui/css/dashboard.css?v=2">
+    <link rel="stylesheet" href="css/dashboard.css?v=20261112c">
 </head>
 <body class="dashboard-body">
 
@@ -19,7 +19,7 @@
         <header class="home-navbar">
             <a href="/ui/index.html" class="nav-brand-group">
                 <div class="nav-brand-icon">
-                    <i class="fa-solid fa-brain"></i>
+                    <span style="font-weight: 800; font-size: 19px;">M</span>
                 </div>
                 <div>
                     <span class="nav-brand-title">MILO</span>
@@ -29,16 +29,14 @@
 
             <nav>
                 <ul class="nav-center-menu">
-                    <li><a href="/ui/index.html" class="nav-menu-link"><i class="fa-solid fa-house"></i> Beranda</a></li>
-                    <li><a href="/ui/setup.html" class="nav-menu-link"><i class="fa-solid fa-microphone"></i> Latihan</a></li>
-                    <li><a href="/ui/dashboard.html" class="nav-menu-link active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="/ui/index.html" class="nav-menu-link">Beranda</a></li>
+                    <li><a href="/ui/setup.html" class="nav-menu-link">Latihan</a></li>
+                    <li><a href="/ui/dashboard.html" class="nav-menu-link active">Dashboard</a></li>
                 </ul>
             </nav>
 
             <div>
-                <a href="/ui/setup.html" class="nav-cta-btn">
-                    <i class="fa-solid fa-play"></i> Mulai Latihan
-                </a>
+                <a href="/ui/setup.html" class="nav-cta-btn">Mulai Latihan</a>
             </div>
         </header>
     </div>
@@ -49,7 +47,6 @@
     <main class="dashboard-page-wrapper">
         <!-- Floating Speech Bubble Header -->
         <div class="dash-speech-bubble">
-            <i class="fa-solid fa-chart-pie dash-bubble-icon"></i>
             <span>Ringkasan Kemajuan & Riwayat Evaluasi Bicara</span>
             <span class="dash-bubble-badge">CEFR Track</span>
         </div>
@@ -62,35 +59,27 @@
                     Pantau peningkatan kompetensi Grammar, Vocabulary, dan Fluency Anda dari setiap sesi percakapan interaktif bersama MILO.
                 </p>
             </div>
-            <a href="/ui/setup.html" class="btn-dash-primary">
-                <i class="fa-solid fa-plus"></i> Sesi Latihan Baru
-            </a>
+            <a href="/ui/setup.html" class="btn-dash-primary">Sesi Latihan Baru</a>
         </div>
 
         <!-- CEFR Progression & Target Focus Banner -->
         <section class="cefr-track-banner">
             <div class="cefr-track-info">
-                <div class="cefr-track-icon">
-                    <i class="fa-solid fa-bullseye"></i>
-                </div>
                 <div>
                     <div class="cefr-track-title">Jalur Pembelajaran: Level B1 & B2</div>
                     <div class="cefr-track-desc">Fokus penguasaan kelancaran berbicara sehari-hari dan profesional hingga tingkat expert.</div>
                 </div>
             </div>
             <div class="cefr-badges-group">
-                <span class="cefr-pill-tag b1"><i class="fa-solid fa-check"></i> B1 Intermediate</span>
-                <span class="cefr-pill-tag b2"><i class="fa-solid fa-arrow-trend-up"></i> B2 Upper-Int.</span>
+                <span class="cefr-pill-tag b1">B1 Intermediate</span>
+                <span class="cefr-pill-tag b2">B2 Upper-Int.</span>
             </div>
         </section>
 
         <!-- Metric Summary Cards Grid (5 Cards: Total, Overall, Grammar, Vocab, Fluency) -->
         <section class="stats-summary-grid">
             <!-- 1. Total Sesi -->
-            <div class="stat-metric-card">
-                <div class="stat-icon-wrapper total">
-                    <i class="fa-solid fa-layer-group"></i>
-                </div>
+            <div class="stat-metric-card total">
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statTotalSessions">0</span>
                     <span class="stat-label-text">Total Sesi</span>
@@ -99,10 +88,7 @@
             </div>
 
             <!-- 2. Rata-rata Skor -->
-            <div class="stat-metric-card">
-                <div class="stat-icon-wrapper overall">
-                    <i class="fa-solid fa-star"></i>
-                </div>
+            <div class="stat-metric-card overall">
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statOverallScore">0</span>
                     <span class="stat-label-text">Rata-rata Skor</span>
@@ -111,10 +97,7 @@
             </div>
 
             <!-- 3. Akurasi Grammar -->
-            <div class="stat-metric-card">
-                <div class="stat-icon-wrapper grammar">
-                    <i class="fa-solid fa-spell-check"></i>
-                </div>
+            <div class="stat-metric-card grammar">
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statGrammarScore">0</span>
                     <span class="stat-label-text">Grammar</span>
@@ -123,10 +106,7 @@
             </div>
 
             <!-- 4. Kekayaan Kosakata -->
-            <div class="stat-metric-card">
-                <div class="stat-icon-wrapper vocab">
-                    <i class="fa-solid fa-book-bookmark"></i>
-                </div>
+            <div class="stat-metric-card vocab">
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statVocabScore">0</span>
                     <span class="stat-label-text">Vocabulary</span>
@@ -135,10 +115,7 @@
             </div>
 
             <!-- 5. Kelancaran Berbicara (Fluency) -->
-            <div class="stat-metric-card">
-                <div class="stat-icon-wrapper fluency">
-                    <i class="fa-solid fa-microphone-lines"></i>
-                </div>
+            <div class="stat-metric-card fluency">
                 <div class="stat-info-box">
                     <span class="stat-big-val" id="statFluencyScore">0</span>
                     <span class="stat-label-text">Fluency</span>
@@ -151,9 +128,6 @@
         <section class="history-table-card">
             <div class="table-header-flex">
                 <div class="table-title-group">
-                    <div class="table-title-icon">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                    </div>
                     <h3>Riwayat Sesi Latihan</h3>
                 </div>
                 <span id="sessionCountBadge">Menampilkan sesi terbaru</span>
@@ -161,15 +135,29 @@
 
             <div class="history-items-list" id="historySessionsContainer">
                 <div style="text-align: center; padding: 48px 20px; color: var(--text-slate);">
-                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color: var(--orange-primary); margin-bottom: 12px;"></i>
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color: var(--secondary); margin-bottom: 12px;"></i>
                     <p style="font-weight: 600;">Memuat riwayat sesi latihan Anda...</p>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Footer -->
+    <footer class="home-footer" style="border-top: 1px solid var(--border-subtle); padding: 32px 24px; text-align: center; margin-top: 60px;">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px;">
+            <a href="index.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Beranda</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="setup.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Mulai Latihan</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="dashboard.html" style="color: var(--text-navy); text-decoration: none; font-size: 13.5px; font-weight: 700;">Dashboard</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="/docs" target="_blank" rel="noopener" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Dokumentasi API</a>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted);">&copy; 2026 MILO: Multimodal Interactive Learning Companion.</p>
+    </footer>
+
     <!-- Scripts -->
-    <script src="/ui/js/common.js?v=2"></script>
-    <script src="/ui/js/dashboard.js?v=2"></script>
+    <script src="js/common.js?v=20261112b"></script>
+    <script src="js/dashboard.js?v=20261112b"></script>
 </body>
 </html>

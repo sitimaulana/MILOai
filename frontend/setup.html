@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pilih Level, Target & Topik — MILO AI English Tutor</title>
+    <title>Pilih Level, Target & Topik: MILO English Speaking Practice</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/ui/css/setup.css">
+    <link rel="stylesheet" href="css/setup.css?v=20261112c">
 </head>
 <body class="setup-body">
 
@@ -26,18 +26,19 @@
     <main class="setup-main-container">
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             STEP 1: LEVEL SELECTION (Exact Mockup Layout)
+             STEP 1: LEVEL SELECTION (Strictly B1 & B2 Tracks)
              ═══════════════════════════════════════════════════════════════════════ -->
         <section id="step1LevelContainer">
             <!-- Question Speech Bubble -->
             <div class="prompt-bubble-card">
-                <h2>Seberapa ahli kamu berbicara<br>Bahasa Inggris?</h2>
+                <h2>Pilih Level Latihanmu</h2>
+                <p class="prompt-bubble-desc">MILO dikhususkan untuk melatih kelancaran di tingkat B1 dan B2 agar siap menghadapi wawancara kerja dan diskusi akademik.</p>
             </div>
 
-            <!-- 2 Target Levels (B1 and B2) + Diagnostic Quiz -->
-            <div class="levels-grid-layout" style="grid-template-columns: 1fr 1fr;">
+            <!-- Dual CEFR Levels Grid (B1 & B2 Only) -->
+            <div class="levels-grid-layout dual-levels">
                 <!-- Card 1: Intermediate (B1) - Selected Default -->
-                <div class="level-selection-card selected" data-level="B1">
+                <div class="level-selection-card selected" data-level="B1" tabindex="0" role="button" aria-pressed="true" aria-label="Pilih Level Intermediate B1">
                     <span class="recommended-mini-pill">Rekomendasi</span>
                     <div class="signal-icon-box">
                         <div class="signal-bars">
@@ -50,12 +51,16 @@
                     </div>
                     <div class="card-text-block">
                         <div class="card-title-text">Intermediate (B1)</div>
-                        <div class="card-desc-text">Membangun kelancaran berbicara & kosakata profesional untuk percakapan sehari-hari dan kerja.</div>
+                        <div class="card-desc-text">Mampu bercerita tentang pengalaman, hobi, dan mengekspresikan opini dengan kalimat terhubung.</div>
+                        <div class="card-pills-row">
+                            <span class="card-pill">Percakapan Harian</span>
+                            <span class="card-pill">Kelancaran Dasar</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Card 2: Upper-Int. (B2) -->
-                <div class="level-selection-card" data-level="B2">
+                <div class="level-selection-card" data-level="B2" tabindex="0" role="button" aria-pressed="false" aria-label="Pilih Level Upper-Intermediate B2">
                     <div class="signal-icon-box">
                         <div class="signal-bars">
                             <span class="signal-bar active"></span>
@@ -67,19 +72,27 @@
                     </div>
                     <div class="card-text-block">
                         <div class="card-title-text">Upper-Int. (B2)</div>
-                        <div class="card-desc-text">Percakapan lancar, spontan, dan mendalam menuju penguasaan level expert.</div>
+                        <div class="card-desc-text">Mampu berdiskusi secara mendalam, wawancara kerja profesional, studi kasus, dan argumen terstruktur.</div>
+                        <div class="card-pills-row">
+                            <span class="card-pill">Wawancara Kerja</span>
+                            <span class="card-pill">Argumen Kritis</span>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Card 3: Bingung? Cari tahu levelmu disini! (Spanning 2 columns) -->
-                <div class="level-selection-card card-help-quiz" id="btnOpenLevelQuiz" style="grid-column: span 2;">
-                    <div class="help-icon-box">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </div>
-                    <div class="card-text-block" style="flex: 1;">
-                        <div class="card-title-text">Bingung memilih antara B1 atau B2?</div>
-                        <div class="card-desc-text">Cari tahu level yang paling tepat untukmu dalam 20 detik! <i class="fa-solid fa-arrow-right" style="font-size: 11px; margin-left: 4px;"></i></div>
-                    </div>
+            <!-- Diagnostic Quiz Helper Banner -->
+            <div class="diagnostic-helper-banner" id="btnOpenLevelQuiz" role="button" tabindex="0" aria-label="Buka kuis diagnostik penentuan level B1 atau B2">
+                <div class="diagnostic-banner-icon">
+                    <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                </div>
+                <div class="diagnostic-banner-content">
+                    <div class="diagnostic-banner-title">Bingung memilih antara B1 atau B2?</div>
+                    <div class="diagnostic-banner-desc">Jawab 2 pertanyaan singkat (20 detik) untuk menentukan level latihan yang paling tepat untukmu.</div>
+                </div>
+                <div class="diagnostic-banner-arrow">
+                    <span>Cari Tahu Levelmu</span>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
                 </div>
             </div>
         </section>
@@ -98,7 +111,7 @@
                 <!-- Goal 1: 5 Min / Day -->
                 <div class="goal-selection-card" data-goal="5_min">
                     <div class="goal-icon-box g5">
-                        <i class="fa-solid fa-bolt"></i>
+                        <span style="font-size: 14px; font-weight: 800;">5m</span>
                     </div>
                     <div class="card-text-block" style="flex: 1;">
                         <div style="display: flex; align-items: center;">
@@ -112,7 +125,7 @@
                 <!-- Goal 2: 15 Min / Day (Recommended Default) -->
                 <div class="goal-selection-card selected" data-goal="15_min">
                     <div class="goal-icon-box g15">
-                        <i class="fa-solid fa-bullseye"></i>
+                        <span style="font-size: 14px; font-weight: 800;">15m</span>
                     </div>
                     <div class="card-text-block" style="flex: 1;">
                         <div style="display: flex; align-items: center;">
@@ -126,7 +139,7 @@
                 <!-- Goal 3: 30 Min / Day -->
                 <div class="goal-selection-card" data-goal="30_min">
                     <div class="goal-icon-box g30">
-                        <i class="fa-solid fa-fire"></i>
+                        <span style="font-size: 14px; font-weight: 800;">30m</span>
                     </div>
                     <div class="card-text-block" style="flex: 1;">
                         <div style="display: flex; align-items: center;">
@@ -153,7 +166,7 @@
                 <!-- Topic 1: Job Interview -->
                 <div class="topic-selection-card selected" data-topic="job_interview">
                     <div class="topic-icon-box interview">
-                        <i class="fa-solid fa-briefcase"></i>
+                        <span style="font-weight: 800; font-size: 15px;">01</span>
                     </div>
                     <div class="card-text-block" style="flex: 1;">
                         <div class="card-title-text">Job Interview Practice</div>
@@ -169,7 +182,7 @@
                 <!-- Topic 2: Academic Discussion -->
                 <div class="topic-selection-card" data-topic="academic_discussion">
                     <div class="topic-icon-box academic">
-                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span style="font-weight: 800; font-size: 15px;">02</span>
                     </div>
                     <div class="card-text-block" style="flex: 1;">
                         <div class="card-title-text">Academic Discussion</div>
@@ -185,7 +198,7 @@
                 <!-- Topic 3: Daily Conversation -->
                 <div class="topic-selection-card" data-topic="daily_conversation">
                     <div class="topic-icon-box daily">
-                        <i class="fa-solid fa-comments"></i>
+                        <span style="font-weight: 800; font-size: 15px;">03</span>
                     </div>
                     <div class="card-text-block" style="flex: 1;">
                         <div class="card-title-text">Daily Conversation</div>
@@ -214,7 +227,6 @@
             </div>
             <button type="button" class="btn-cta-next" id="btnGotoStep2">
                 <span>Lanjut: Target Harian</span>
-                <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
 
@@ -230,7 +242,6 @@
             </div>
             <button type="button" class="btn-cta-next" id="btnGotoStep3">
                 <span>Lanjut: Pilih Topik</span>
-                <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
 
@@ -244,9 +255,8 @@
                 <span class="shelf-info-badge" id="shelfFinalLevelBadge">Level B1</span>
                 <span>Siap menuju briefing & cek audio</span>
             </div>
-            <button type="button" class="btn-cta-next" id="btnLaunchPractice" style="background: var(--blue-accent); box-shadow: 0 4px 18px rgba(0, 102, 255, 0.3);">
+            <button type="button" class="btn-cta-next" id="btnLaunchPractice">
                 <span>Lanjut ke Pre-Session Briefing</span>
-                <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
     </footer>
@@ -258,7 +268,7 @@
         <div class="modal-dialog-box">
             <div class="modal-header-row">
                 <div>
-                    <h3><i class="fa-solid fa-compass"></i> Cari Tahu Levelmu</h3>
+                    <h3>Cari Tahu Levelmu</h3>
                     <p>Jawab 2 pertanyaan kilat (20 detik) untuk menentukan apakah kamu B1 atau B2.</p>
                 </div>
                 <button class="btn-close-modal" id="btnCloseQuizModal">&times;</button>
@@ -300,7 +310,6 @@
                     <button type="button" class="btn-cta-secondary" id="btnCancelQuiz">Tutup</button>
                     <button type="submit" class="btn-cta-next" id="btnSubmitQuiz" style="padding: 10px 24px;">
                         <span>Terapkan Rekomendasi Level</span>
-                        <i class="fa-solid fa-check"></i>
                     </button>
                 </div>
             </form>
@@ -308,7 +317,7 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/ui/js/common.js"></script>
-    <script src="/ui/js/setup.js"></script>
+    <script src="js/common.js?v=20261112c"></script>
+    <script src="js/setup.js?v=20261112c"></script>
 </body>
 </html>

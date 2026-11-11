@@ -109,6 +109,8 @@ class WhisperASR:
         if self._model is None:
             logger.info("Whisper model not pre-loaded; auto-loading now...")
             self.load()
+            if self._model is None:
+                raise RuntimeError("Whisper model is not loaded. Call load() first.")
 
         # Validate format
         ext = Path(filename).suffix.lower()
