@@ -1,21 +1,18 @@
-// ═══════════════════════════════════════════════════════════════════════════════
-// MILO AI English Tutor: Practice Room Logic (Exact Mockup Theme)
-// ═══════════════════════════════════════════════════════════════════════════════
-
-// Session State
 let sessionId = null;
 let currentTopic = 'job_interview';
 let currentLevel = 'B1';
 let sessionStartTime = Date.now();
 let feedbackHistory = [];
 let turnCount = 0;
+let timerInterval = null;
+let targetMinutes = 15;
+let targetSeconds = 900;
+let goalModalShown = false;
 
-// Media Recording State
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
 
-// DOM Elements
 const messagesContainer = document.getElementById('messagesContainer');
 const userTextInput = document.getElementById('userTextInput');
 const btnSendText = document.getElementById('btnSendText');
@@ -68,6 +65,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const topicValue = document.getElementById('practiceTopicValue');
     if (topicValue) topicValue.textContent = topicLabel;
 
+    // Initialize Target Duration & Real-Time Sync Timer
+    initSessionDurationTimer();
+
     // Show initial greeting from MILO
     const initialGreeting = sessionStorage.getItem('milo_initial_greeting') ||
         "Good morning! Thank you for coming in today. Please have a seat. Let's start: could you tell me a little bit about yourself?";
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnMicAction.addEventListener('click', toggleRecording);
 
     // Bind End Session
-    btnEndSession.addEventListener('click', confirmEndSession);
+    btnEndSession.addEventListener('click', () => confirmEndSession());
 
     // Bind Pillar Tabs (Grammar, Vocab, Fluency)
     document.querySelectorAll('.eval-pillar-tab').forEach(btn => {
@@ -104,13 +104,39 @@ document.addEventListener('DOMContentLoaded', async () => {
             switchPillarTab(btn.dataset.pillar);
         });
     });
+
+    // Mobile view switcher between conversation and evaluation panels
+    const btnTabChat = document.getElementById('btnTabChat');
+    const btnTabEval = document.getElementById('btnTabEval');
+    const cardConversation = document.getElementById('cardConversation');
+    const cardProgressSesi = document.getElementById('cardProgressSesi');
+
+    if (btnTabChat && btnTabEval) {
+        btnTabChat.addEventListener('click', () => {
+            btnTabChat.classList.add('active');
+            btnTabChat.setAttribute('aria-selected', 'true');
+            btnTabEval.classList.remove('active');
+            btnTabEval.setAttribute('aria-selected', 'false');
+
+            if (cardConversation) cardConversation.classList.add('mobile-active');
+            if (cardProgressSesi) cardProgressSesi.classList.remove('mobile-active');
+        });
+
+        btnTabEval.addEventListener('click', () => {
+            btnTabEval.classList.add('active');
+            btnTabEval.setAttribute('aria-selected', 'true');
+            btnTabChat.classList.remove('active');
+            btnTabChat.setAttribute('aria-selected', 'false');
+
+            if (cardProgressSesi) cardProgressSesi.classList.add('mobile-active');
+            if (cardConversation) cardConversation.classList.remove('mobile-active');
+        });
+    }
 });
 
-// ─── Message Store & Tracking ───────────────────────────────────────────────
 const messageStore = new Map();
 let messageIdCounter = 0;
 
-// ─── Messaging ───────────────────────────────────────────────────────────────
 function appendMessage(text, sender, audioBase64 = null, translation = null) {
     const isMilo = sender === 'milo';
     const msgId = ++messageIdCounter;
@@ -180,6 +206,8 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
                         <span id="transText-${msgId}">${escapeHtml(translation || '')}</span>
                     </div>
                 </div>
+                <div class="user-bubble-feedback-row" id="userFeedbackRow-${msgId}"></div>
+                <div class="user-inline-corrections-box" id="userCorrBox-${msgId}" style="display: none;"></div>
             </div>
         `;
     }
@@ -187,12 +215,7 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
     messagesContainer.appendChild(row);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // Update Progress bar width slightly per turn
     turnCount++;
-    if (progressBarFill) {
-        const pct = Math.min(95, 20 + (turnCount * 12));
-        progressBarFill.style.width = `${pct}%`;
-    }
 
     // Auto play audio if from MILO
     if (isMilo && audioBase64) {
@@ -202,7 +225,6 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
     return msgId;
 }
 
-// ─── Audio Playback Handlers ────────────────────────────────────────────────
 function playMiloSpeech(msgId, btnElement) {
     const msg = messageStore.get(msgId);
     if (!msg) return;
@@ -253,7 +275,6 @@ function speakEnglishWithSynthesis(text, btnElement) {
 }
 window.speakEnglishWithSynthesis = speakEnglishWithSynthesis;
 
-// ─── Inline Translation Toggle ──────────────────────────────────────────────
 async function toggleBubbleTranslation(msgId, btnElement) {
     const msg = messageStore.get(msgId);
     if (!msg) return;
@@ -309,13 +330,12 @@ async function toggleBubbleTranslation(msgId, btnElement) {
 }
 window.toggleBubbleTranslation = toggleBubbleTranslation;
 
-// ─── Send Text ───────────────────────────────────────────────────────────────
 async function sendTextMessage() {
     const text = userTextInput.value.trim();
     if (!text) return;
 
     userTextInput.value = '';
-    appendMessage(text, 'user');
+    const userMsgId = appendMessage(text, 'user');
 
     if (waveformBox) waveformBox.classList.add('active-recording');
     setCompanionState('thinking', 'Milo sedang berpikir...');
@@ -329,6 +349,7 @@ async function sendTextMessage() {
                 message: text,
                 return_audio: true,
                 cefr_level: currentLevel,
+                input_type: 'text',
             })
         });
 
@@ -346,9 +367,10 @@ async function sendTextMessage() {
         appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
         setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
-        // Update real-time Speech Evaluation HUD
+        // Update real-time Speech Evaluation HUD and inline user bubble badge
         if (data.feedback) {
             updateEvaluationHUD(data.feedback);
+            attachUserFeedback(userMsgId, data.feedback);
         }
     } catch (err) {
         if (waveformBox) waveformBox.classList.remove('active-recording');
@@ -358,7 +380,6 @@ async function sendTextMessage() {
     }
 }
 
-// ─── Voice Recording ─────────────────────────────────────────────────────────
 async function toggleRecording() {
     if (!isRecording) {
         await startRecording();
@@ -371,9 +392,9 @@ async function startRecording() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             audio: {
-                channelCount: 1, // Clean mono audio for Whisper
+                channelCount: 1,
                 echoCancellation: true,
-                noiseSuppression: false, // Turn off aggressive WebRTC gating so Whisper gets clear, unclipped speech
+                noiseSuppression: true,
                 autoGainControl: true,
             }
         });
@@ -455,7 +476,7 @@ async function sendVoiceMessage(audioBlob) {
         else if (audioBlob.type.includes('mp4')) ext = 'm4a';
         else if (audioBlob.type.includes('wav')) ext = 'wav';
 
-        // ── Phase 1: Ultra-fast local Whisper ASR (~0.3s on RTX 3050 CUDA) ──
+        // Transcribe speech using fast local Whisper endpoint
         const asrFormData = new FormData();
         asrFormData.append('audio', audioBlob, `speech.${ext}`);
 
@@ -473,9 +494,7 @@ async function sendVoiceMessage(audioBlob) {
             console.warn('Fast ASR endpoint unreachable, will fallback to full voice pipeline:', asrErr);
         }
 
-        // If fast ASR returned text:
         if (transcriptText) {
-            // INSTANT UI UPDATE: User sees what they said within 0.3s!
             const userTextElem = document.getElementById(`userText-${userMsgId}`);
             if (userTextElem) userTextElem.textContent = transcriptText;
             const msgObj = messageStore.get(userMsgId);
@@ -484,7 +503,6 @@ async function sendVoiceMessage(audioBlob) {
             const statusSpan = document.getElementById('miloThinkingStatus');
             if (statusSpan) statusSpan.textContent = 'MILO is preparing a response...';
 
-            // ── Phase 2: Query Tutor & TTS with recognized text ──
             const chatResponse = await fetch('/api/v1/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -493,6 +511,8 @@ async function sendVoiceMessage(audioBlob) {
                     message: transcriptText,
                     return_audio: true,
                     cefr_level: currentLevel,
+                    input_type: 'voice',
+                    transcript: transcriptText,
                 })
             });
 
@@ -510,9 +530,10 @@ async function sendVoiceMessage(audioBlob) {
             appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
             setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
-            // Update real-time Speech Evaluation HUD
+            // Update real-time Speech Evaluation HUD and inline user bubble badge
             if (data.feedback) {
                 updateEvaluationHUD(data.feedback);
+                attachUserFeedback(userMsgId, data.feedback);
             }
             return;
         }
@@ -555,9 +576,10 @@ async function sendVoiceMessage(audioBlob) {
         appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
         setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
-        // Update real-time Speech Evaluation HUD
+        // Update real-time Speech Evaluation HUD and inline user bubble badge
         if (data.feedback) {
             updateEvaluationHUD(data.feedback);
+            attachUserFeedback(userMsgId, data.feedback);
         }
     } catch (err) {
         const ind = document.getElementById('miloVoiceThinking');
@@ -568,7 +590,6 @@ async function sendVoiceMessage(audioBlob) {
     }
 }
 
-// ─── Real-Time AI Speech Evaluation HUD (Tanpa Score, Fokus Pembetulan & Tips) ───
 let grammarCount = 0;
 let vocabCount = 0;
 let fluencyCount = 0;
@@ -632,9 +653,11 @@ function updateEvaluationHUD(feedback) {
     const badgeGrammar = document.getElementById('badgeGrammar');
     const badgeVocab = document.getElementById('badgeVocab');
     const badgeFluency = document.getElementById('badgeFluency');
+    const mobileEvalCounter = document.getElementById('mobileEvalCounter');
     if (badgeGrammar) badgeGrammar.textContent = grammarCount;
     if (badgeVocab) badgeVocab.textContent = vocabCount;
     if (badgeFluency) badgeFluency.textContent = fluencyCount;
+    if (mobileEvalCounter) mobileEvalCounter.textContent = grammarCount + vocabCount + fluencyCount;
 
     // Render streams for each pillar
     const streamGrammar = document.getElementById('streamGrammar');
@@ -702,13 +725,176 @@ function avg(nums) {
     return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
-// ─── End Session ─────────────────────────────────────────────────────────────
-async function confirmEndSession() {
-    if (!confirm('Apakah Anda ingin mengakhiri sesi latihan ini?')) {
+function attachUserFeedback(msgId, feedback) {
+    if (!feedback) return;
+    const row = document.getElementById(`userFeedbackRow-${msgId}`);
+    const corrBox = document.getElementById(`userCorrBox-${msgId}`);
+    if (!row || !corrBox) return;
+
+    const corrections = feedback.corrections || [];
+    if (corrections.length === 0) {
+        row.innerHTML = `
+            <span class="user-feedback-tag tag-accurate" title="Tata bahasa dan kosakata kalimat ini tepat">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Tepat & Akurat</span>
+            </span>
+        `;
+    } else {
+        row.innerHTML = `
+            <button type="button" class="user-feedback-tag tag-corrections" onclick="toggleUserCorrBox(${msgId})" title="Klik untuk membuka detail pembetulan">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${corrections.length} Pembetulan</span>
+            </button>
+        `;
+        corrBox.innerHTML = corrections.map(c => `
+            <div>
+                <div class="user-corr-item-orig">✗ "${escapeHtml(c.original)}"</div>
+                <div class="user-corr-item-fix">✓ "${escapeHtml(c.corrected)}"</div>
+                ${c.explanation ? `<div class="user-corr-item-expl">${escapeHtml(c.explanation)}</div>` : ''}
+            </div>
+        `).join('');
+    }
+}
+window.attachUserFeedback = attachUserFeedback;
+
+function toggleUserCorrBox(msgId) {
+    const box = document.getElementById(`userCorrBox-${msgId}`);
+    if (!box) return;
+    box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+}
+window.toggleUserCorrBox = toggleUserCorrBox;
+
+function initSessionDurationTimer() {
+    const dailyGoal = sessionStorage.getItem('milo_daily_goal') || '15_min';
+    if (dailyGoal === '5_min') {
+        targetMinutes = 5;
+    } else if (dailyGoal === '30_min') {
+        targetMinutes = 30;
+    } else {
+        targetMinutes = 15;
+    }
+    targetSeconds = targetMinutes * 60;
+
+    const practiceDurationValue = document.getElementById('practiceDurationValue');
+    if (practiceDurationValue) practiceDurationValue.textContent = `${targetMinutes} Menit`;
+
+    const timerGoalPill = document.getElementById('timerGoalPill');
+    if (timerGoalPill) timerGoalPill.textContent = `${targetMinutes} Mnt`;
+
+    const goalReachedMinutes = document.getElementById('goalReachedMinutes');
+    if (goalReachedMinutes) goalReachedMinutes.textContent = targetMinutes;
+
+    const startKey = `milo_start_time_${sessionId}`;
+    const storedStart = sessionStorage.getItem(startKey);
+    if (storedStart) {
+        sessionStartTime = parseInt(storedStart, 10);
+    } else {
+        sessionStartTime = Date.now();
+        sessionStorage.setItem(startKey, sessionStartTime.toString());
+    }
+
+    updateTimerDisplay();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(updateTimerDisplay, 1000);
+
+    const btnGoalFinish = document.getElementById('btnGoalFinish');
+    const btnGoalContinue = document.getElementById('btnGoalContinue');
+    const goalModalBackdrop = document.getElementById('goalModalBackdrop');
+    const durationGoalModal = document.getElementById('durationGoalModal');
+
+    if (btnGoalFinish) {
+        btnGoalFinish.addEventListener('click', () => {
+            if (durationGoalModal) durationGoalModal.style.display = 'none';
+            confirmEndSession(true);
+        });
+    }
+    if (btnGoalContinue) {
+        btnGoalContinue.addEventListener('click', () => {
+            if (durationGoalModal) durationGoalModal.style.display = 'none';
+        });
+    }
+    if (goalModalBackdrop) {
+        goalModalBackdrop.addEventListener('click', () => {
+            if (durationGoalModal) durationGoalModal.style.display = 'none';
+        });
+    }
+}
+
+function updateTimerDisplay() {
+    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - sessionStartTime) / 1000));
+    const elapsedFormatted = formatMinutesSeconds(elapsedSeconds);
+    const targetFormatted = formatMinutesSeconds(targetSeconds);
+
+    const sessionTimerText = document.getElementById('sessionTimerText');
+    const practiceDurationProgress = document.getElementById('practiceDurationProgress');
+    const sessionTimerBadge = document.getElementById('sessionTimerBadge');
+    const timerGoalPill = document.getElementById('timerGoalPill');
+    const durationGoalModal = document.getElementById('durationGoalModal');
+
+    if (sessionTimerText) {
+        sessionTimerText.textContent = `${elapsedFormatted} / ${targetFormatted}`;
+    }
+    if (practiceDurationProgress) {
+        practiceDurationProgress.textContent = elapsedFormatted;
+    }
+
+    if (progressBarFill) {
+        const pct = Math.min(100, (elapsedSeconds / targetSeconds) * 100);
+        progressBarFill.style.width = `${pct}%`;
+    }
+
+    if (elapsedSeconds >= targetSeconds) {
+        if (sessionTimerBadge && !sessionTimerBadge.classList.contains('completed')) {
+            sessionTimerBadge.classList.add('completed');
+        }
+        if (timerGoalPill) {
+            timerGoalPill.textContent = 'Selesai ✓';
+        }
+
+        if (!goalModalShown) {
+            goalModalShown = true;
+            if (durationGoalModal) {
+                durationGoalModal.style.display = 'flex';
+            }
+            playTargetCompletionChime();
+        }
+    }
+}
+
+function formatMinutesSeconds(totalSeconds) {
+    const m = Math.floor(totalSeconds / 60);
+    const s = totalSeconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+function playTargetCompletionChime() {
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+        const notes = [440, 554.37, 659.25, 880];
+        notes.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + (idx * 0.1));
+            gain.gain.setValueAtTime(0, now + (idx * 0.1));
+            gain.gain.linearRampToValueAtTime(0.12, now + (idx * 0.1) + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + (idx * 0.1) + 0.4);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + (idx * 0.1));
+            osc.stop(now + (idx * 0.1) + 0.42);
+        });
+    } catch (e) {}
+}
+
+async function confirmEndSession(skipConfirm = false) {
+    if (!skipConfirm && !confirm('Apakah Anda ingin mengakhiri sesi latihan ini?')) {
         return;
     }
 
-    showGlobalLoading('Menganalisis hasil percakapan & menghitung skor CEFR...');
+    if (timerInterval) clearInterval(timerInterval);
+    showGlobalLoading('Menganalisis performa percakapan & menyusun evaluasi CEFR...');
 
     try {
         const response = await fetch('/api/v1/session/end', {
@@ -723,11 +909,7 @@ async function confirmEndSession() {
         }
 
         const summaryData = await response.json();
-
-        // Store result for summary page
         sessionStorage.setItem('milo_summary_data', JSON.stringify(summaryData));
-
-        // Navigate to dedicated summary page
         window.location.href = `/ui/summary.html?session_id=${encodeURIComponent(sessionId)}`;
     } catch (err) {
         hideGlobalLoading();

@@ -100,6 +100,7 @@ class RAGRetriever:
         k: int | None = None,
         skill_filter: str | None = None,
         cefr_level: str | None = None,
+        min_score: float = 0.70,
     ) -> list[RetrievedContext]:
         """
         Retrieve the top-k most relevant CEFR chunks for a given query.
@@ -109,6 +110,7 @@ class RAGRetriever:
             k: Number of documents to retrieve (defaults to settings.rag_top_k)
             skill_filter: Optional filter by skill type ("grammar", "vocabulary", "speaking")
             cefr_level: Optional filter by CEFR level ("B1", "B2")
+            min_score: Minimum similarity score threshold (filters out irrelevant noise)
 
         Returns:
             List of RetrievedContext, sorted by relevance (most relevant first).
@@ -147,7 +149,7 @@ class RAGRetriever:
         contexts = []
         for doc, score in results:
             # Filter out low-relevance noise so casual dialogue isn't hijacked by random textbook chunks
-            if float(score) < 0.55:
+            if float(score) < min_score:
                 continue
             ctx = RetrievedContext(
                 content=doc.page_content,
@@ -169,8 +171,8 @@ class RAGRetriever:
             return ""
 
         parts = [
-            "[OPTIONAL CEFR REFERENCE NOTES]",
-            "Note for MILO: Use the notes below ONLY if relevant to what the student is discussing or asking. Do NOT force these topics into the conversation or lecture about them unnecessarily:"
+            "[SUPPLEMENTARY CEFR REFERENCE]",
+            "Use only if the student asked a specific question about this topic. Do NOT monologue or force this into casual dialogue:"
         ]
         for i, ctx in enumerate(contexts, 1):
             parts.append(
@@ -189,6 +191,7 @@ async def retrieve_context(
     k: int | None = None,
     skill_filter: str | None = None,
     cefr_level: str = "B1",
+    min_score: float = 0.70,
 ) -> list[RetrievedContext]:
     """High-level retrieval helper used by the pipeline."""
-    return await rag_retriever.retrieve(query, k, skill_filter, cefr_level)
+    return await rag_retriever.retrieve(query, k, skill_filter, cefr_level, min_score=min_score)

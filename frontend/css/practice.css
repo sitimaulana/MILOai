@@ -97,6 +97,68 @@ body.practice-body {
     box-shadow: 0 2px 8px rgba(140, 98, 57, 0.08);
 }
 
+.session-timer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    border: 1px solid var(--card-border);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    box-shadow: 0 2px 8px rgba(31, 46, 36, 0.05);
+}
+
+.session-timer-badge i {
+    color: var(--secondary);
+    font-size: 13.5px;
+}
+
+.timer-target-pill {
+    background: var(--primary-tint);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.session-timer-badge.completed {
+    border-color: #10B981;
+    background: #ECFDF5;
+    color: #065F46;
+}
+
+.session-timer-badge.completed .timer-target-pill {
+    background: #10B981;
+    color: #FFFFFF;
+}
+
+.duration-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+
+.value-duration {
+    font-size: 14.5px;
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.badge-duration-progress {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--secondary);
+    background: #FFFFFF;
+    border: 1px solid rgba(140, 98, 57, 0.2);
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
 /* ─── Progress Strip ─────────────────────────────────────────────────────────── */
 .session-progress-strip {
     width: calc(100% - 72px);
@@ -792,6 +854,179 @@ body.practice-body {
     border-left: 2px solid var(--primary);
 }
 
+/* ─── Targeted User Bubble Inline Feedback ───────────────────────────────────── */
+.user-bubble-feedback-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.user-feedback-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: default;
+}
+
+.user-feedback-tag.tag-accurate {
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.user-feedback-tag.tag-corrections {
+    background: #FEF2F2;
+    color: #991B1B;
+    border: 1px solid rgba(220, 38, 38, 0.25);
+    cursor: pointer;
+}
+
+.user-feedback-tag.tag-corrections:hover {
+    background: #FEE2E2;
+}
+
+.user-inline-corrections-box {
+    margin-top: 6px;
+    background: #FFFFFF;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.user-corr-item-orig {
+    color: #DC2626;
+    font-weight: 700;
+}
+
+.user-corr-item-fix {
+    color: #16A34A;
+    font-weight: 700;
+}
+
+.user-corr-item-expl {
+    color: var(--text-subtle);
+    font-size: 11.5px;
+    line-height: 1.4;
+}
+
+/* ─── Duration Goal Completion Modal ─────────────────────────────────────────── */
+.duration-goal-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.goal-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(31, 46, 36, 0.45);
+    backdrop-filter: blur(4px);
+}
+
+.goal-modal-card {
+    position: relative;
+    background: #FFFFFF;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 48px rgba(31, 46, 36, 0.16);
+    max-width: 440px;
+    width: 100%;
+    padding: 30px 24px;
+    text-align: center;
+    animation: modalPopIn 0.25s ease-out;
+}
+
+@keyframes modalPopIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.goal-modal-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #ECFDF5;
+    color: #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.goal-modal-title {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+
+.goal-modal-desc {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text-subtle);
+    margin-bottom: 22px;
+}
+
+.goal-modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-goal-finish {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--secondary);
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.btn-goal-finish:hover {
+    background: var(--secondary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-goal-continue {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-subtle);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-goal-continue:hover {
+    background: var(--neutral-bg);
+    color: var(--text-main);
+}
+
 @keyframes fadeInBubble {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1003,10 +1238,15 @@ body.practice-body {
     color: #FFFFFF;
 }
 
+/* Mobile Segmented Switcher (Hidden on Desktop) */
+.mobile-practice-tabs {
+    display: none;
+}
+
 /* ─── Responsive Breakpoints ─────────────────────────────────────────────────── */
 @media (max-width: 1080px) {
     .practice-main-canvas {
-        grid-template-columns: 280px 1fr 360px;
+        grid-template-columns: 280px minmax(200px, 1fr) 380px;
         gap: 16px;
         width: calc(100% - 32px);
     }
@@ -1020,23 +1260,225 @@ body.practice-body {
 
 @media (max-width: 860px) {
     body.practice-body {
-        overflow-y: auto;
-        height: auto;
-        min-height: 100vh;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
+
+    .practice-nav-header {
+        padding: 10px 16px 4px;
+        width: 100%;
+    }
+
+    .back-to-setup {
+        font-size: 15px;
+        gap: 8px;
+    }
+
+    .level-badge-pill {
+        font-size: 12px;
+        padding: 4px 14px;
+    }
+
+    .session-progress-strip {
+        width: calc(100% - 32px);
+        margin: 2px auto 8px;
+        height: 5px;
+    }
+
     .practice-main-canvas {
-        grid-template-columns: 1fr;
-        height: auto;
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 0;
+        min-height: 0;
+        overflow: hidden;
+        width: calc(100% - 24px);
+        margin: 0 auto 8px;
+        gap: 8px;
+    }
+
+    /* Milo Stage at Top on Mobile */
+    .card-companion-stage {
+        order: 1;
+        flex-shrink: 0;
+        max-height: 140px;
+        padding-bottom: 2px;
         overflow: visible;
     }
-    .card-companion-stage {
-        order: -1;
-        max-height: 320px;
+
+    .companion-avatar-container {
+        max-height: 105px;
+        height: 105px;
     }
+
     .companion-character-img {
-        max-height: 250px;
+        max-height: 100%;
     }
+
+    .companion-aura {
+        width: 120px;
+        height: 120px;
+        bottom: 10px;
+    }
+
+    .companion-ground-shadow {
+        width: 90px;
+        height: 8px;
+        bottom: -2px;
+    }
+
+    .companion-status-pill {
+        padding: 4px 12px;
+        font-size: 11px;
+        margin-top: 3px;
+        box-shadow: 0 2px 8px rgba(31, 46, 36, 0.06);
+    }
+
+    /* Mobile Segmented Tab Switcher */
+    .mobile-practice-tabs {
+        order: 2;
+        display: flex;
+        flex-shrink: 0;
+        width: 100%;
+        background: #FFFFFF;
+        border: 1.5px solid var(--card-border);
+        border-radius: 12px;
+        padding: 3px;
+        gap: 4px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .mobile-tab-btn {
+        flex: 1;
+        min-height: 40px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-subtle);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-tab-btn:hover {
+        color: var(--text-main);
+    }
+
+    .mobile-tab-btn.active {
+        background: var(--primary);
+        color: #FFFFFF;
+        box-shadow: 0 2px 6px rgba(122, 154, 130, 0.25);
+    }
+
+    .mobile-eval-counter {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.08);
+        color: var(--text-subtle);
+    }
+
+    .mobile-tab-btn.active .mobile-eval-counter {
+        background: rgba(255, 255, 255, 0.25);
+        color: #FFFFFF;
+    }
+
+    /* Content Cards Switching on Mobile */
     .card-conversation {
-        min-height: 440px;
+        order: 3;
+        flex: 1 1 0;
+        min-height: 0;
+        display: none;
+        padding: 14px 16px;
+        border-radius: 18px;
+    }
+
+    .card-conversation.mobile-active {
+        display: flex;
+    }
+
+    .card-progress-sesi {
+        order: 3;
+        flex: 1 1 0;
+        min-height: 0;
+        display: none;
+        padding: 14px 16px;
+        border-radius: 18px;
+    }
+
+    .card-progress-sesi.mobile-active {
+        display: flex;
+    }
+
+    /* Bubbles & Waveform on Mobile */
+    .bubble-milo-wrapper {
+        max-width: 90%;
+    }
+
+    .bubble-user-wrapper {
+        max-width: 90%;
+    }
+
+    .bubble-milo, .bubble-user {
+        padding: 10px 14px;
+        font-size: 13.5px;
+    }
+
+    .box-audio-waveform {
+        height: 48px;
+        padding: 6px 12px;
+    }
+
+    /* Mobile Sticky Bottom Controls */
+    .bottom-dock-controls {
+        flex-shrink: 0;
+        padding: 8px 16px max(12px, env(safe-area-inset-bottom));
+        border-radius: 22px 22px 0 0;
+        gap: 16px;
+        background: rgba(255, 255, 255, 0.96);
+        backdrop-filter: blur(12px);
+    }
+
+    .btn-mic-main {
+        width: 58px;
+        height: 58px;
+        font-size: 22px;
+    }
+
+    .btn-keyboard, .btn-end-session {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .practice-nav-header {
+        padding: 8px 12px 2px;
+    }
+
+    .card-companion-stage {
+        max-height: 125px;
+    }
+
+    .companion-avatar-container {
+        max-height: 95px;
+        height: 95px;
+    }
+
+    .card-conversation, .card-progress-sesi {
+        padding: 12px 12px;
+    }
+
+    .bottom-dock-controls {
+        gap: 12px;
     }
 }

@@ -5,18 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MILO PRACTICE: English Speaking Practice</title>
-    <link rel="stylesheet" href="css/practice.css?v=20261112d">
+    <link rel="stylesheet" href="css/practice.css?v=20261112e">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body class="practice-body">
 
-    <!-- Header: ← MILO PRACTICE ... Level B1 -->
+    <!-- Header: ← MILO PRACTICE ... Timer ... Level B1 -->
     <header class="practice-nav-header">
         <a href="/ui/setup.html" class="back-to-setup" id="brandExitLink" title="Kembali ke Setup">
             <i class="fa-solid fa-arrow-left"></i>
             <span>MILO PRACTICE</span>
         </a>
+        <div class="session-timer-badge" id="sessionTimerBadge" title="Durasi Latihan Berlangsung">
+            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+            <span id="sessionTimerText">00:00 / 15:00</span>
+            <span class="timer-target-pill" id="timerGoalPill">15 Mnt</span>
+        </div>
         <div class="level-badge-pill" id="practiceLevelPill">
             Level B1
         </div>
@@ -24,20 +29,29 @@
 
     <!-- Horizontal Blue Progress Bar -->
     <div class="session-progress-strip">
-        <div class="progress-strip-fill" id="progressBarFill" style="width: 20%;"></div>
+        <div class="progress-strip-fill" id="progressBarFill" style="width: 0%;"></div>
     </div>
 
     <!-- Main Practice Canvas (Two Floating White Cards) -->
     <main class="practice-main-canvas">
 
         <!-- Left Card: Progress Sesi -->
-        <aside class="card-progress-sesi">
+        <aside class="card-progress-sesi" id="cardProgressSesi">
             <h3 class="title-progress-sesi">Progress Sesi</h3>
 
             <!-- Topik Box -->
             <div class="box-topik-card">
                 <div class="label-topik">Topik</div>
                 <div class="value-topik" id="practiceTopicValue">Job Interview</div>
+            </div>
+
+            <!-- Durasi & Waktu Latihan Box -->
+            <div class="box-topik-card box-duration-card">
+                <div class="label-topik">Target Durasi</div>
+                <div class="duration-row">
+                    <span class="value-duration" id="practiceDurationValue">15 Menit</span>
+                    <span class="badge-duration-progress" id="practiceDurationProgress">00:00</span>
+                </div>
             </div>
 
             <!-- AI Speech Evaluation Live Panel -->
@@ -149,8 +163,21 @@
             </div>
         </section>
 
+        <!-- Mobile Segmented View Switcher (Visible on Phone/Tablet) -->
+        <div class="mobile-practice-tabs" id="mobilePracticeTabs" role="tablist" aria-label="Tampilan Mode Latihan">
+            <button type="button" class="mobile-tab-btn active" id="btnTabChat" role="tab" aria-selected="true" aria-controls="cardConversation">
+                <i class="fa-solid fa-comments" aria-hidden="true"></i>
+                <span>Percakapan</span>
+            </button>
+            <button type="button" class="mobile-tab-btn" id="btnTabEval" role="tab" aria-selected="false" aria-controls="cardProgressSesi">
+                <i class="fa-solid fa-chart-simple" aria-hidden="true"></i>
+                <span>Evaluasi AI</span>
+                <span class="mobile-eval-counter" id="mobileEvalCounter">0</span>
+            </button>
+        </div>
+
         <!-- Right Card: Conversation & Audio Waveform -->
-        <section class="card-conversation">
+        <section class="card-conversation mobile-active" id="cardConversation">
             <!-- Chat Dialogue Stream -->
             <div class="chat-dialogue-stream" id="messagesContainer">
                 <!-- Initial messages injected here -->
@@ -204,6 +231,30 @@
 
     </main>
 
+    <!-- Target Completion Notification Modal -->
+    <div class="duration-goal-modal" id="durationGoalModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle">
+        <div class="goal-modal-backdrop" id="goalModalBackdrop"></div>
+        <div class="goal-modal-card">
+            <div class="goal-modal-icon">
+                <i class="fa-solid fa-flag-checkered"></i>
+            </div>
+            <h3 class="goal-modal-title" id="goalModalTitle">Target Waktu Tercapai!</h3>
+            <p class="goal-modal-desc" id="goalModalDesc">
+                Bagus sekali! Anda telah berlatih sesuai durasi pilihan Anda (<span id="goalReachedMinutes">15</span> menit).
+                Anda dapat menyelesaikan sesi sekarang untuk melihat evaluasi akhir, atau terus melanjutkan percakapan.
+            </p>
+            <div class="goal-modal-actions">
+                <button type="button" class="btn-goal-finish" id="btnGoalFinish">
+                    <i class="fa-solid fa-square-check"></i>
+                    <span>Selesaikan & Lihat Hasil</span>
+                </button>
+                <button type="button" class="btn-goal-continue" id="btnGoalContinue">
+                    <span>Lanjutkan Percakapan</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Bottom Controls Shelf: [Keyboard] [Big Blue Mic] [Red Hangup] -->
     <footer class="bottom-dock-controls">
         <button class="dock-btn btn-keyboard" id="btnToggleKeyboard" title="Toggle Keyboard">
@@ -220,8 +271,8 @@
     </footer>
 
     <!-- Global Helpers and Logic Script -->
-    <script src="js/common.js?v=20261112d"></script>
-    <script src="js/practice.js?v=20261112d"></script>
+    <script src="js/common.js?v=20261112e"></script>
+    <script src="js/practice.js?v=20261112e"></script>
 </body>
 
 </html>

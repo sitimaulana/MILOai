@@ -42,7 +42,71 @@ def _calc_duration_minutes(start: Optional[datetime], end: Optional[datetime]) -
         return 0.0
     s = start.replace(tzinfo=None) if start.tzinfo else start
     e = end.replace(tzinfo=None) if end.tzinfo else end
-    return round(abs((e - s).total_seconds()) / 60, 1)
+    diff_sec = abs((e - s).total_seconds())
+    return round(max(diff_sec / 60.0, 0.1), 1)
+
+
+def _extract_goal_info(learning_goal: Optional[str]) -> tuple[str, int]:
+    """Extract daily goal key ('5_min', '15_min', '30_min') and target minutes."""
+    if not learning_goal:
+        return "15_min", 15
+    lg = learning_goal.lower()
+    if "5 min" in lg or "5_min" in lg:
+        return "5_min", 5
+    if "30 min" in lg or "30_min" in lg:
+        return "30_min", 30
+    return "15_min", 15
+
+
+def _build_session_diagnostics(
+    all_corrections: list[dict],
+    grammar_score: float,
+    vocab_score: float,
+    fluency_score: float,
+) -> tuple[list[str], list[str]]:
+    """Build concrete mistakes list and actionable improvements from actual session performance."""
+    top_mistakes = []
+    seen = set()
+    for c in all_corrections:
+        orig = c.get("original", "").strip()
+        corr = c.get("corrected", "").strip()
+        etype = (c.get("error_type") or "grammar").capitalize()
+        if orig and corr and (orig, corr) not in seen:
+            seen.add((orig, corr))
+            top_mistakes.append(f"{etype}: \"{orig}\" → \"{corr}\"")
+        if len(top_mistakes) >= 4:
+            break
+
+    improvement_areas = []
+    error_types = [(c.get("error_type") or "grammar").lower() for c in all_corrections]
+    grammar_count = sum(1 for e in error_types if e == "grammar")
+    vocab_count = sum(1 for e in error_types if "vocab" in e)
+    fluency_count = sum(1 for e in error_types if "fluen" in e)
+
+    if grammar_count > 0:
+        improvement_areas.append(
+            f"Akurasi Tata Bahasa ({grammar_count} catatan): Perhatikan bentuk tenses, subject-verb agreement, dan artikel dalam kalimat lisan."
+        )
+    elif grammar_score < 75:
+        improvement_areas.append("Akurasi Tata Bahasa: Latih penggunaan auxiliary verbs dan bentuk kata kerja lampau secara konsisten.")
+
+    if vocab_count > 0:
+        improvement_areas.append(
+            f"Pengayaan Kosakata ({vocab_count} catatan): Gunakan padanan kata spesifik dan hindari terjemahan harfiah langsung."
+        )
+    elif vocab_score < 75:
+        improvement_areas.append("Pengayaan Kosakata: Perluas sinonim deskriptif dan terminologi kontekstual sesuai topik latihan.")
+
+    if fluency_count > 0 or fluency_score < 75:
+        improvement_areas.append(
+            "Kelancaran & Struktur: Gunakan discourse markers (seperti 'Moreover', 'In my experience') untuk menyambung gagasan secara mengalir."
+        )
+
+    if not improvement_areas:
+        improvement_areas.append("Pertahankan Performa: Struktur kalimat Anda sangat rapi dan alami di sepanjang sesi ini.")
+        improvement_areas.append("Eksplorasi Lanjutan: Coba integrasikan kalimat kompleks dan ungkapan idiomatik untuk persiapan level berikutnya.")
+
+    return top_mistakes, improvement_areas
 
 # ─── Topic Greetings ──────────────────────────────────────────────────────────
 
@@ -194,8 +258,8 @@ async def end_session(
     End a practice session:
     1. Compute average scores (Grammar, Vocabulary, Fluency)
     2. Map overall score → CEFR level
-    3. Generate AI session summary
-    4. Return comprehensive results
+    3. Generate AI session summary referencing actual speech performance
+    4. Return comprehensive results and transcript documentation
     """
     conv = ConversationService(db)
 
@@ -206,23 +270,27 @@ async def end_session(
             detail=f"Session '{request.session_id}' not found.",
         )
 
-    # End session and compute scores
     session = await conv.end_session(request.session_id)
-
-    # Get corrections
     summary_data = await conv.get_session_feedback_summary(request.session_id)
+    all_corrections = summary_data.get("all_corrections", [])
 
-    # Generate AI summary
-    history = await conv.get_history(request.session_id, max_turns=40)
+    duration_minutes = _calc_duration_minutes(session.created_at, session.ended_at)
+    daily_goal_key, target_duration = _extract_goal_info(session.learning_goal)
+
+    history = await conv.get_history(request.session_id, max_turns=60)
     session_summary = await _generate_session_summary(
         history=history,
-        avg_grammar=session.avg_grammar_score or 0,
-        avg_vocab=session.avg_vocabulary_score or 0,
-        cefr_level=session.cefr_level or "B1",
+        all_corrections=all_corrections,
+        avg_grammar=session.avg_grammar_score or 0.0,
+        avg_vocab=session.avg_vocabulary_score or 0.0,
+        avg_fluency=session.avg_fluency_score or 0.0,
+        overall_score=session.overall_score or 0.0,
+        cefr_target=session.cefr_level or "B1",
+        cefr_result=session.cefr_result or "A1",
         topic=session.topic or "",
+        duration_minutes=duration_minutes,
     )
 
-    # Save summary to session
     from sqlalchemy import update as sa_update
     from app.db.models import Session as DBSession
     import uuid
@@ -232,38 +300,23 @@ async def end_session(
         .values(session_summary=session_summary)
     )
 
-    # Extract top mistakes
-    all_corrections = summary_data.get("all_corrections", [])
-    error_types: dict[str, int] = {}
-    for c in all_corrections:
-        et = c.get("error_type", "grammar")
-        error_types[et] = error_types.get(et, 0) + 1
-
-    top_mistakes = [
-        f"{et.capitalize()} errors ({count} instance{'s' if count > 1 else ''})"
-        for et, count in sorted(error_types.items(), key=lambda x: -x[1])
-    ]
-
-    improvement_areas = []
-    if (session.avg_grammar_score or 0) < 70:
-        improvement_areas.append("Sentence grammar & structure")
-    if (session.avg_vocabulary_score or 0) < 70:
-        improvement_areas.append("Vocabulary range & word choice")
-    if (session.avg_fluency_score or 0) < 70:
-        improvement_areas.append("Fluency & sentence variety")
-
-    # Calculate duration
-    duration_minutes = _calc_duration_minutes(session.created_at, session.ended_at)
+    top_mistakes, improvement_areas = _build_session_diagnostics(
+        all_corrections=all_corrections,
+        grammar_score=session.avg_grammar_score or 0.0,
+        vocab_score=session.avg_vocabulary_score or 0.0,
+        fluency_score=session.avg_fluency_score or 0.0,
+    )
 
     topic = session.topic or "daily_conversation"
+    transcript_messages = await conv.get_session_messages(request.session_id)
 
     return SessionEndResponse(
         session_id=request.session_id,
         total_turns=summary_data["total_turns"],
-        avg_grammar_score=session.avg_grammar_score or 0,
-        avg_vocabulary_score=session.avg_vocabulary_score or 0,
-        avg_fluency_score=session.avg_fluency_score or 0,
-        overall_score=session.overall_score or 0,
+        avg_grammar_score=session.avg_grammar_score or 0.0,
+        avg_vocabulary_score=session.avg_vocabulary_score or 0.0,
+        avg_fluency_score=session.avg_fluency_score or 0.0,
+        overall_score=session.overall_score or 0.0,
         cefr_target=session.cefr_level or "B1",
         cefr_result=session.cefr_result or "A1",
         cefr_achieved=(session.cefr_result or "A1") >= (session.cefr_level or "B1"),
@@ -277,11 +330,14 @@ async def end_session(
             )
             for c in all_corrections
         ],
-        top_mistakes=top_mistakes[:3],
+        top_mistakes=top_mistakes,
         improvement_areas=improvement_areas,
         topic=topic,
         topic_label=TOPIC_LABELS.get(topic, topic),
         duration_minutes=duration_minutes,
+        daily_goal=daily_goal_key,
+        target_duration_minutes=target_duration,
+        transcript_history=transcript_messages,
     )
 
 
@@ -425,41 +481,50 @@ async def get_session_feedback(
         )
 
     summary_data = await conv.get_session_feedback_summary(session_id)
+    all_corrections = summary_data.get("all_corrections", [])
 
-    history = await conv.get_history(session_id, max_turns=40)
-    session_summary = await _generate_session_summary(
-        history=history,
-        avg_grammar=summary_data["avg_grammar_score"],
-        avg_vocab=summary_data["avg_vocabulary_score"],
-        cefr_level=session.cefr_level or "B1",
-        topic=session.topic or "",
+    duration_minutes = _calc_duration_minutes(
+        session.created_at, session.ended_at or datetime.now(timezone.utc)
+    )
+    daily_goal_key, target_duration = _extract_goal_info(session.learning_goal)
+
+    history = await conv.get_history(session_id, max_turns=60)
+    session_summary = session.session_summary
+    if not session_summary:
+        session_summary = await _generate_session_summary(
+            history=history,
+            all_corrections=all_corrections,
+            avg_grammar=session.avg_grammar_score or summary_data["avg_grammar_score"],
+            avg_vocab=session.avg_vocabulary_score or summary_data["avg_vocabulary_score"],
+            avg_fluency=session.avg_fluency_score or summary_data["avg_fluency_score"],
+            overall_score=session.overall_score or 0.0,
+            cefr_target=session.cefr_level or "B1",
+            cefr_result=session.cefr_result or "A1",
+            topic=session.topic or "",
+            duration_minutes=duration_minutes,
+        )
+
+    top_mistakes, improvement_areas = _build_session_diagnostics(
+        all_corrections=all_corrections,
+        grammar_score=session.avg_grammar_score or summary_data["avg_grammar_score"],
+        vocab_score=session.avg_vocabulary_score or summary_data["avg_vocabulary_score"],
+        fluency_score=session.avg_fluency_score or summary_data["avg_fluency_score"],
     )
 
-    all_corrections = summary_data.get("all_corrections", [])
-    error_types: dict[str, int] = {}
-    for c in all_corrections:
-        et = c.get("error_type", "grammar")
-        error_types[et] = error_types.get(et, 0) + 1
-
-    top_mistakes = [
-        f"{et.capitalize()} errors ({count} instance{'s' if count > 1 else ''})"
-        for et, count in sorted(error_types.items(), key=lambda x: -x[1])
-    ]
-
-    improvement_areas = []
-    if summary_data["avg_grammar_score"] < 70:
-        improvement_areas.append("Sentence grammar & structure")
-    if summary_data["avg_vocabulary_score"] < 70:
-        improvement_areas.append("Vocabulary range & word choice")
-    if summary_data["avg_fluency_score"] < 70:
-        improvement_areas.append("Fluency & sentence variety")
+    topic = session.topic or "daily_conversation"
+    transcript_messages = await conv.get_session_messages(session_id)
 
     return SessionFeedbackResponse(
         session_id=session_id,
         total_turns=summary_data["total_turns"],
-        avg_grammar_score=summary_data["avg_grammar_score"],
-        avg_vocabulary_score=summary_data["avg_vocabulary_score"],
-        avg_fluency_score=summary_data["avg_fluency_score"],
+        avg_grammar_score=session.avg_grammar_score or summary_data["avg_grammar_score"],
+        avg_vocabulary_score=session.avg_vocabulary_score or summary_data["avg_vocabulary_score"],
+        avg_fluency_score=session.avg_fluency_score or summary_data["avg_fluency_score"],
+        overall_score=session.overall_score or 0.0,
+        cefr_target=session.cefr_level or "B1",
+        cefr_result=session.cefr_result or "A1",
+        cefr_achieved=(session.cefr_result or "A1") >= (session.cefr_level or "B1"),
+        session_summary=session_summary,
         all_corrections=[
             GrammarCorrection(
                 original=c.get("original", ""),
@@ -469,9 +534,16 @@ async def get_session_feedback(
             )
             for c in all_corrections
         ],
-        session_summary=session_summary,
-        top_mistakes=top_mistakes[:3],
+        top_mistakes=top_mistakes,
         improvement_areas=improvement_areas,
+        topic=topic,
+        topic_label=TOPIC_LABELS.get(topic, topic),
+        duration_minutes=duration_minutes,
+        daily_goal=daily_goal_key,
+        target_duration_minutes=target_duration,
+        created_at=session.created_at,
+        ended_at=session.ended_at,
+        transcript_history=transcript_messages,
     )
 
 
@@ -479,47 +551,90 @@ async def get_session_feedback(
 
 async def _generate_session_summary(
     history: list[dict],
+    all_corrections: list[dict],
     avg_grammar: float,
     avg_vocab: float,
-    cefr_level: str,
+    avg_fluency: float,
+    overall_score: float,
+    cefr_target: str,
+    cefr_result: str,
     topic: str,
+    duration_minutes: float,
 ) -> str:
-    """Generate a brief AI summary of the learning session."""
+    """Generate an evidence-grounded AI evaluation report referencing actual user performance."""
     if not history:
-        return "No conversation data available for this session."
+        return "Belum ada rekaman percakapan yang tersedia untuk sesi ini."
 
     topic_label = TOPIC_LABELS.get(topic, topic or "General practice")
+    user_turns = [h for h in history if h.get("role") == "user"]
+    total_turns = len(user_turns)
 
-    transcript_lines = [
-        f"{turn['role'].capitalize()}: {turn['content'][:100]}"
-        for turn in history[-10:]
+    user_samples = [
+        f"- Student said: \"{t.get('content', '')[:140]}\""
+        for t in user_turns[-8:]
     ]
-    transcript_excerpt = "\n".join(transcript_lines)
+    sample_text = "\n".join(user_samples) if user_samples else "(No utterances recorded)"
+
+    corr_samples = [
+        f"- \"{c.get('original', '')}\" → \"{c.get('corrected', '')}\" ({c.get('explanation', '')})"
+        for c in all_corrections[:6]
+    ]
+    corr_text = "\n".join(corr_samples) if corr_samples else "None (all recorded utterances were accurate)"
 
     summary_prompt = f"""\
-Write a brief, encouraging 2–3 sentence summary of this English learning session for a {cefr_level} student.
-Topic: {topic_label}
-Average grammar score: {avg_grammar:.0f}/100
-Average vocabulary score: {avg_vocab:.0f}/100
+You are an expert CEFR English evaluator and speaking coach.
+Write an objective, encouraging, and well-structured evaluation report for this student's completed speaking session.
+Your evaluation MUST refer directly to what the student actually spoke about and their actual performance.
 
-Recent conversation excerpt:
-{transcript_excerpt}
+Session Data:
+- Topic: {topic_label}
+- Target CEFR: {cefr_target} | Achieved CEFR: {cefr_result}
+- Duration: {duration_minutes:.1f} minutes ({total_turns} spoken turns)
+- Grammar Accuracy: {avg_grammar:.0f}/100
+- Vocabulary Score: {avg_vocab:.0f}/100
+- Fluency Score: {avg_fluency:.0f}/100
+- Composite Score: {overall_score:.0f}/100
 
-The summary should: mention the topic discussed, highlight progress, and give one specific encouragement."""
+Representative User Utterances From This Session:
+{sample_text}
+
+Specific Errors & Corrections From This Session:
+{corr_text}
+
+Output Format Guidelines (STRICT):
+- Do NOT output document titles with '#' or composite score headers (the UI already has a score gauge and title).
+- Structure your response cleanly using these exact sections:
+
+## Ringkasan Performa
+<1-2 paragraphs of supportive, evidence-based narrative about what the student actually discussed in {topic_label} and how effectively they communicated.>
+
+## Kelebihan Teramati
+- **<Aspect, e.g. Kosakata / Kelancaran / Pemahaman>**: <specific strength with concrete example from their speech>
+- **<Aspect>**: <another specific strength>
+
+## Catatan Kaidah & Kosakata
+<If errors occurred, list 1-2 points formatted like:
+- **"original phrase"** → gunakan **"corrected phrase"** (brief explanation).
+If no errors occurred, explain why their sentence structures were precise.>
+
+## Rekomendasi Latihan Selanjutnya
+<1 actionable, motivating recommendation for their next speaking session.>
+
+Write in natural, encouraging Indonesian with English terms in quotes or bold where helpful."""
 
     try:
         result = await generate_response(
             user_message=summary_prompt,
             history=[],
             learning_goal="",
-            cefr_level=cefr_level,
+            cefr_level=cefr_result or cefr_target or "B1",
         )
         return result.content
     except Exception:
         return (
-            f"You completed a {cefr_level} English practice session on {topic_label}. "
-            f"Your grammar score was {avg_grammar:.0f}/100 and vocabulary score was {avg_vocab:.0f}/100. "
-            "Keep practicing — consistency is the key to improvement!"
+            f"Anda telah menyelesaikan sesi latihan {cefr_target} pada topik {topic_label} selama {duration_minutes:.1f} menit ({total_turns} putaran bicara). "
+            f"Performa Anda menghasilkan skor tata bahasa {avg_grammar:.0f}/100, kosakata {avg_vocab:.0f}/100, dan kelancaran {avg_fluency:.0f}/100 dengan capaian level {cefr_result}. "
+            "Terus pertahankan konsistensi latihan untuk memperkaya spontanitas dan ketepatan berbicara Anda!"
         )
 
 

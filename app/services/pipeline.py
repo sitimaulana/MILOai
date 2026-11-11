@@ -82,6 +82,8 @@ class MILOPipeline:
         cefr_level: str = "B1",
         return_audio: bool = True,
         user_id: Optional[str] = None,
+        input_type: str = "text",
+        transcript: Optional[str] = None,
     ) -> PipelineResult:
         """
         Process a text input through the full pipeline.
@@ -119,30 +121,56 @@ class MILOPipeline:
 
         t_start = time.perf_counter()
 
-        # 3. Concurrently kick off feedback analysis immediately!
-        # analyze_utterance only depends on user_message and effective_cefr_level,
-        # so it runs in parallel with history retrieval, RAG, and LLM generation.
-        feedback_task = asyncio.create_task(
-            analyze_utterance(user_message, effective_cefr_level)
+        # 3. Retrieve conversation history and (if relevant) RAG context concurrently
+        t_rag_start = time.perf_counter()
+        user_lower = user_message.lower().strip()
+        is_knowledge_query = any(
+            trigger in user_lower
+            for trigger in (
+                "what is", "what does", "how do", "how to", "difference between",
+                "can you explain", "explain", "meaning of", "grammar rule", "why do",
+                "is it correct", "how should i say", "vocabulary for", "cefr"
+            )
         )
 
-        # 4. Fetch conversation history and RAG context concurrently
-        t_rag_start = time.perf_counter()
+        async def _fetch_rag():
+            if not is_knowledge_query and not topic_name:
+                return []
+            min_score = 0.68 if is_knowledge_query else 0.76
+            return await retrieve_context(
+                query=user_message,
+                cefr_level=effective_cefr_level,
+                min_score=min_score,
+            )
+
         history, rag_contexts = await asyncio.gather(
             self._conv.get_history(
                 actual_session_id,
                 max_turns=settings.max_conversation_history,
             ),
-            retrieve_context(
-                query=user_message,
-                cefr_level=effective_cefr_level,
-            ),
+            _fetch_rag(),
         )
         t_rag = time.perf_counter() - t_rag_start
         rag_context_str = rag_retriever.format_context_for_prompt(rag_contexts)
         rag_sources = [ctx.source for ctx in rag_contexts]
 
-        # 5. LLM response generation (runs while feedback_task is already computing!)
+        # Extract preceding assistant turn to give context to feedback engine
+        last_assistant_turn = next(
+            (turn["content"] for turn in reversed(history) if turn["role"] == "assistant"),
+            None,
+        )
+
+        # 4. Concurrently kick off feedback analysis with topic and preceding context
+        feedback_task = asyncio.create_task(
+            analyze_utterance(
+                user_text=user_message,
+                cefr_level=effective_cefr_level,
+                topic=topic_name,
+                context=last_assistant_turn,
+            )
+        )
+
+        # 5. LLM response generation (runs while feedback_task is computing)
         t_llm_start = time.perf_counter()
         llm_response: LLMResponse = await generate_response(
             user_message=user_message,
@@ -199,7 +227,8 @@ class MILOPipeline:
             session_id=actual_session_id,
             role="user",
             content=user_message,
-            input_type="text",
+            input_type=input_type,
+            transcript=transcript if input_type == "voice" else None,
             feedback=feedback_result,
         )
         await self._conv.add_message(
@@ -284,7 +313,7 @@ class MILOPipeline:
 
         logger.info(f"ASR result: '{transcript[:80]}...' (lang={asr_result.language})")
 
-        # 2. Process as text
+        # 2. Process as text with voice provenance
         result = await self.process_text(
             session_id=session_id,
             user_message=transcript,
@@ -292,6 +321,8 @@ class MILOPipeline:
             cefr_level=cefr_level,
             return_audio=return_audio,
             user_id=user_id,
+            input_type="voice",
+            transcript=transcript,
         )
 
         # Attach transcript to the result

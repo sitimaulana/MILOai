@@ -71,18 +71,21 @@ You are MILO — a warm, lively, and supportive English speaking companion and t
 ## Your Persona & Tone:
 - Warm, natural, and genuinely interested in the student. You speak like a friendly peer or thoughtful mentor, NOT a rigid textbook robot or strict examiner.
 - Conversational flow: Always connect directly to what the student just expressed (their feelings, story, opinion, or experience).
-- Keep replies concise (2–3 natural sentences). Never monologue or write long paragraphs.
+- Spoken conciseness: Keep replies concise (2–3 natural spoken sentences, max 40 words total). Never monologue or write long paragraphs.
 
 ## Conversational Principles:
-1. ACTIVE LISTENING & GENUINE REACTIONS:
-   - React authentically to the content of the student's message first before moving forward.
+1. ACTIVE LISTENING & STRICT GROUNDING:
+   - React authentically and strictly to what the student just said in their latest message.
+   - Do NOT invent unmentioned topics, assume fake scenarios, or jump to unrelated subjects.
    - Example (Good): "Oh, having two cats must be lively! What are their names?"
    - Example (Bad/Stiff): "That is interesting. Now, tell me about your job."
 2. ONE QUESTION RULE:
    - Always end with exactly ONE engaging, open-ended question that is easy and natural to answer. Never stack multiple questions in one message.
-3. NATURAL IMPLICIT CORRECTION:
-   - If the student makes a grammatical mistake, casually weave the correct phrase into your response naturally without lecturing (e.g. if student says "I go to beach last week", reply: "Oh, you went to the beach? How was the weather?").
-4. AVOID ROBOTIC CLICHÉS:
+3. NO UNSOLICITED LECTURING:
+   - Never give unrequested grammar lectures, quiz the user out of the blue, or explain textbook rules unless the student explicitly asks ("How do I use...", "Explain...", "What is the difference...").
+4. NATURAL IMPLICIT RECASTING:
+   - If the student makes a minor mistake, casually weave the correct phrase into your response naturally without lecturing (e.g. if student says "I go to beach last week", reply: "Oh, you went to the beach? How was the weather?").
+5. AVOID ROBOTIC CLICHÉS:
    - Never start every message with repetitive filler praise like "That's great!", "Awesome!", or "That sounds wonderful!". Vary your transitions like a real human.
 
 ## Important Rules:
@@ -97,7 +100,7 @@ You are MILO — a warm, lively, and supportive English speaking companion and t
 SYSTEM_PROMPT_WITH_RAG = """\
 {base_system_prompt}
 
-## Relevant CEFR Learning Materials (use as reference, not to quote directly)
+## Reference Materials (Use ONLY if the student asked a specific question about this topic; do NOT lecture or quote unprompted):
 {rag_context}
 """
 
@@ -113,34 +116,59 @@ class LLMResponse:
 class MILOConversationLLM:
     """GPT-4o Mini conversation manager for MILO."""
 
-    def __init__(self) -> None:
-        if settings.ai_provider == "local":
-            self._client = AsyncOpenAI(
-                api_key="ollama",  # Ollama doesn't need an API key, but OpenAI client requires one
-                base_url=settings.ollama_base_url,
+    def _get_client_and_model(self) -> tuple[AsyncOpenAI, str, str]:
+        """Dynamically resolve client and model from fresh settings so .env changes apply live."""
+        from app.config import Settings
+        cfg = Settings()
+        provider = cfg.ai_provider
+
+        if provider == "local":
+            return (
+                AsyncOpenAI(
+                    api_key="ollama",
+                    base_url=cfg.ollama_base_url,
+                ),
+                cfg.local_llm_model,
+                provider,
             )
-        elif settings.ai_provider == "bifrost":
-            self._client = AsyncOpenAI(
-                api_key=settings.bifrost_api_key or "bk-milo-token-gateway",
-                base_url=settings.bifrost_base_url,
-                default_headers={
-                    "X-Bifrost-App": "MILO-AI-Backend",
-                },
+        elif provider == "bifrost":
+            return (
+                AsyncOpenAI(
+                    api_key=cfg.bifrost_api_key or "bk-milo-token-gateway",
+                    base_url=cfg.bifrost_base_url,
+                    default_headers={"X-Bifrost-App": "MILO-AI-Backend"},
+                ),
+                cfg.bifrost_model,
+                provider,
             )
-            self._model = settings.bifrost_model
-        elif settings.ai_provider == "openrouter":
-            self._client = AsyncOpenAI(
-                api_key=settings.openrouter_api_key or "missing_key",
-                base_url=settings.openrouter_base_url,
-                default_headers={
-                    "HTTP-Referer": "http://localhost:8000",
-                    "X-Title": "MILO AI English Tutor",
-                },
+        elif provider == "groq":
+            return (
+                AsyncOpenAI(
+                    api_key=cfg.groq_api_key or "missing_groq_key",
+                    base_url=cfg.groq_base_url,
+                ),
+                cfg.groq_model,
+                provider,
             )
-            self._model = settings.openrouter_model
+        elif provider == "openrouter":
+            return (
+                AsyncOpenAI(
+                    api_key=cfg.openrouter_api_key or "missing_key",
+                    base_url=cfg.openrouter_base_url,
+                    default_headers={
+                        "HTTP-Referer": "http://localhost:8000",
+                        "X-Title": "MILO AI English Tutor",
+                    },
+                ),
+                cfg.openrouter_model,
+                provider,
+            )
         else:
-            self._client = AsyncOpenAI(api_key=settings.openai_api_key)
-            self._model = settings.llm_model
+            return (
+                AsyncOpenAI(api_key=cfg.openai_api_key),
+                cfg.llm_model,
+                provider,
+            )
 
     async def generate(
         self,
@@ -164,6 +192,8 @@ class MILOConversationLLM:
         Returns:
             LLMResponse with content and token usage.
         """
+        client, model, provider = self._get_client_and_model()
+
         # Build system prompt
         cefr_guidelines = CEFR_LEVEL_GUIDELINES.get(cefr_level, CEFR_LEVEL_GUIDELINES["B1"])
         base_system = MILO_SYSTEM_PROMPT.format(
@@ -191,41 +221,79 @@ class MILOConversationLLM:
         messages.append({"role": "user", "content": user_message})
 
         logger.debug(
-            f"LLM request: model={settings.llm_model}, "
+            f"LLM request: provider={provider}, model={model}, "
             f"history_turns={len(history)}, "
             f"rag_context_len={len(rag_context)}"
         )
 
         extra_kwargs = {}
-        if settings.ai_provider == "openrouter":
+        if provider == "openrouter":
+            from app.config import Settings
+            cfg = Settings()
             extra_kwargs["extra_body"] = {
                 "reasoning": {"max_tokens": 0},
-                "models": settings.openrouter_model_list,
+                "models": cfg.openrouter_model_list,
                 "route": "fallback",
             }
 
         try:
-            completion = await self._client.chat.completions.create(
-                model=self._model,
+            completion = await client.chat.completions.create(
+                model=model,
                 messages=messages,  # type: ignore[arg-type]
-                temperature=settings.llm_temperature,
+                temperature=min(settings.llm_temperature, 0.45),
                 max_tokens=settings.llm_max_tokens,
                 **extra_kwargs,
             )
         except Exception as e:
-            logger.error(f"LLM API error with primary model: {e}")
-            if settings.ai_provider == "openrouter" and self._model != "openrouter/free":
+            err_msg = str(e).lower()
+            logger.error(f"LLM API error with primary model {model}: {e}")
+
+            # Check if this is a 401 Unauthorized / User not found error
+            if "401" in err_msg or "unauthorized" in err_msg or "user not found" in err_msg:
+                fallback_msg = (
+                    "⚠️ [Autentikasi Gagal 401] API Key Anda tidak valid atau salah salin (User not found). "
+                    "Silakan periksa kembali nilai API Key di file .env."
+                )
+                return LLMResponse(
+                    content=fallback_msg,
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    model=f"{model} (Auth Error 401)",
+                )
+
+            # Check if this is a 429 rate limit error
+            if "429" in err_msg or "rate limit" in err_msg or "quota" in err_msg:
+                fallback_msg = (
+                    "⚠️ [Batas Kuota Tercapai] Kuota harian API model AI Anda saat ini telah mencapai batas (Error 429). "
+                    "Silakan ganti API Key dari akun OpenRouter baru atau beralih ke provider Groq di file .env untuk kuota tanpa batas!"
+                )
+                return LLMResponse(
+                    content=fallback_msg,
+                    prompt_tokens=0,
+                    completion_tokens=0,
+                    model=f"{model} (Rate Limited 429)",
+                )
+
+            if provider == "openrouter" and model != "openrouter/free":
                 logger.info("Attempting automatic fallback to 'openrouter/free'...")
                 try:
-                    completion = await self._client.chat.completions.create(
+                    completion = await client.chat.completions.create(
                         model="openrouter/free",
                         messages=messages,  # type: ignore[arg-type]
-                        temperature=settings.llm_temperature,
+                        temperature=min(settings.llm_temperature, 0.45),
                         max_tokens=settings.llm_max_tokens,
                         extra_body={"reasoning": {"max_tokens": 0}},
                     )
                 except Exception as fb_err:
+                    fb_str = str(fb_err).lower()
                     logger.error(f"Fallback to openrouter/free also failed: {fb_err}")
+                    if "429" in fb_str or "rate limit" in fb_str:
+                        return LLMResponse(
+                            content="⚠️ [Batas Kuota Tercapai] Seluruh kuota gratis OpenRouter untuk akun ini telah habis (Error 429). Silakan gunakan provider Groq atau akun OpenRouter baru di file .env.",
+                            prompt_tokens=0,
+                            completion_tokens=0,
+                            model="openrouter/free (Rate Limited 429)",
+                        )
                     raise e
             else:
                 raise

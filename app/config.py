@@ -29,7 +29,12 @@ class Settings(BaseSettings):
         return [o.strip() for o in self.cors_origins.split(",")]
 
     # ── AI Provider Mode ────────────────────────────────────────────────────────
-    ai_provider: str = "local"  # "openai", "local" (Ollama), "openrouter", or "bifrost"
+    ai_provider: str = "local"  # "openai", "local" (Ollama), "openrouter", "groq", or "bifrost"
+
+    # ── Groq (Super Cepat & Gratis Kuota 14.400 request/hari) ─────────────────
+    groq_api_key: str = ""  # Required when AI_PROVIDER=groq
+    groq_base_url: str = "https://api.groq.com/openai/v1"
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # ── Bifrost Gateway (LLM Token & Rate-Limit Gateway) ───────────────────────
     bifrost_base_url: str = "http://localhost:8080/v1"

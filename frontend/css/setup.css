@@ -903,15 +903,96 @@ body.setup-body {
         padding: 16px 20px;
     }
     .setup-main-container {
-        width: calc(100% - 40px);
+        width: calc(100% - 32px);
     }
     .setup-bottom-shelf {
-        padding: 16px 20px;
+        padding: 16px 20px max(16px, env(safe-area-inset-bottom));
         flex-direction: column;
         gap: 12px;
     }
     .btn-cta-next {
         width: 100%;
         justify-content: center;
+    }
+}
+
+@media (max-width: 540px) {
+    .setup-nav-header {
+        padding: 12px 16px 6px;
+    }
+    .btn-header-back {
+        width: 40px;
+        height: 40px;
+    }
+    .setup-main-container {
+        width: calc(100% - 24px);
+        padding: 6px 0 20px;
+    }
+    .prompt-bubble-card {
+        padding: 18px 16px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+    }
+    .prompt-bubble-card h2 {
+        font-size: 18px;
+    }
+    .prompt-bubble-desc {
+        font-size: 12.5px;
+    }
+    .level-selection-card {
+        padding: 16px;
+        border-radius: 14px;
+        gap: 12px;
+    }
+    .signal-icon-box {
+        width: 38px;
+        height: 38px;
+    }
+    .card-title-text {
+        font-size: 15px;
+    }
+    .card-desc-text {
+        font-size: 12px;
+    }
+    .diagnostic-helper-banner {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .diagnostic-banner-arrow {
+        width: 100%;
+        justify-content: center;
+        height: 38px;
+    }
+    .goals-grid-layout {
+        gap: 10px;
+    }
+    .goal-selection-card {
+        padding: 14px 16px;
+        border-radius: 14px;
+        gap: 12px;
+    }
+    .topics-grid-layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    .topic-selection-card {
+        padding: 16px;
+        border-radius: 14px;
+    }
+    .setup-bottom-shelf {
+        padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+        border-radius: 20px 20px 0 0;
+    }
+    .btn-cta-next, .btn-cta-secondary {
+        height: 46px;
+    }
+    .modal-dialog-box {
+        width: calc(100% - 24px);
+        margin: 12px auto;
+        padding: 20px 16px;
+        max-height: 90vh;
+        overflow-y: auto;
     }
 }

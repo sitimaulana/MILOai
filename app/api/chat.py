@@ -56,6 +56,8 @@ async def chat(
             cefr_level=request.cefr_level,
             return_audio=request.return_audio,
             user_id=request.user_id,
+            input_type=request.input_type or "text",
+            transcript=request.transcript,
         )
     except Exception as e:
         logger.error(f"Chat pipeline error: {e}", exc_info=True)

@@ -155,15 +155,11 @@ class WhisperASR:
 
         options: dict = {
             "task": "transcribe",
-            "fp16": is_cuda,  # Enable FP16 acceleration on CUDA GPU
-            "verbose": None,  # In Whisper, verbose=None disables tqdm (verbose=False enables it!)
-            "temperature": (0.0, 0.2),  # Dynamic temperature escape fallback against repetitive loops
+            "fp16": is_cuda,
+            "verbose": None,
+            "temperature": 0.0,
             "condition_on_previous_text": False,
             "no_speech_threshold": 0.6,
-            "initial_prompt": (
-                "Hello, I'm Lana. My MBTI is INTJ, INTP, INFJ, ENFP. "
-                "Let's practice English speaking, IELTS, TOEFL, daily life, hobbies, anime, manga, and job interviews."
-            ),
         }
 
         # English-only models (like small.en or base.en) reject or don't need a language arg
@@ -178,19 +174,22 @@ class WhisperASR:
         segments = result.get("segments", [])
         text = result.get("text", "").strip()
 
-        # If no speech segments survived the silence threshold, treat as silence
+        # Filter out YouTube subtitle noise and silent hallucinations
         if not segments:
             text = ""
         else:
-            # Filter known Whisper hallucination artifacts on silence or quiet background noise
-            clean_check = text.lower().rstrip(".!,?")
-            if clean_check in (
+            clean_check = text.lower().rstrip(".!,? ")
+            hallucinations = {
                 "thanks for watching",
                 "thank you for watching",
                 "subtitles by",
                 "subscribe",
                 "please subscribe",
-            ) and segments[0].get("no_speech_prob", 0.0) > 0.4:
+                "watching",
+                "thank you for your time",
+                "thanks for listening",
+            }
+            if clean_check in hallucinations and segments[0].get("no_speech_prob", 0.0) > 0.6:
                 text = ""
 
         if segments:

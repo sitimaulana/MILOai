@@ -42,6 +42,8 @@ class ChatRequest(BaseModel):
     learning_goal: Optional[str] = Field(None, description="e.g. 'Practice job interview English'")
     cefr_level: str = Field("B1", description="Target CEFR level: A2, B1, B2")
     return_audio: bool = Field(True, description="Whether to return TTS audio in response")
+    input_type: Optional[str] = Field("text", description="Input type: 'text' or 'voice'")
+    transcript: Optional[str] = Field(None, description="Transcript text if from voice audio")
 
 
 class ChatResponse(BaseModel):
@@ -125,6 +127,9 @@ class SessionEndResponse(BaseModel):
     topic: str
     topic_label: str
     duration_minutes: float = 0.0
+    daily_goal: Optional[str] = "15_min"
+    target_duration_minutes: Optional[int] = 15
+    transcript_history: list[dict] = Field(default_factory=list)
 
 
 # ─── Dashboard ────────────────────────────────────────────────────────────────
@@ -148,7 +153,7 @@ class DashboardResponse(BaseModel):
     skill_averages: dict  # {"grammar": 75.0, "vocabulary": 68.0, "fluency": 72.0}
 
 
-# ─── Legacy Schemas (kept for backward compatibility) ─────────────────────────
+# ─── Feedback Summary Schema ──────────────────────────────────────────────────
 
 class SessionFeedbackResponse(BaseModel):
     session_id: str
@@ -156,10 +161,22 @@ class SessionFeedbackResponse(BaseModel):
     avg_grammar_score: float
     avg_vocabulary_score: float
     avg_fluency_score: float
-    all_corrections: list[GrammarCorrection]
+    overall_score: float = 0.0
+    cefr_target: str = "B1"
+    cefr_result: str = "B1"
+    cefr_achieved: bool = True
     session_summary: str = Field(..., description="AI-generated summary of the conversation")
+    all_corrections: list[GrammarCorrection] = Field(default_factory=list)
     top_mistakes: list[str] = Field(default_factory=list)
     improvement_areas: list[str] = Field(default_factory=list)
+    topic: str = "daily_conversation"
+    topic_label: str = "Daily Conversation"
+    duration_minutes: float = 0.0
+    daily_goal: Optional[str] = "15_min"
+    target_duration_minutes: Optional[int] = 15
+    created_at: Optional[datetime] = None
+    ended_at: Optional[datetime] = None
+    transcript_history: list[dict] = Field(default_factory=list)
 
 
 class SessionCreateRequest(BaseModel):

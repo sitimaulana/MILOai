@@ -122,6 +122,36 @@ class ConversationService:
                 cefr_result=cefr_result,
             )
         )
+
+        if session.user_id:
+            for skill, score in [
+                ("grammar", summary["avg_grammar_score"]),
+                ("vocabulary", summary["avg_vocabulary_score"]),
+                ("fluency", summary["avg_fluency_score"]),
+            ]:
+                if score > 0:
+                    prog_res = await self._db.execute(
+                        select(LearningProgress).where(
+                            LearningProgress.user_id == session.user_id,
+                            LearningProgress.skill == skill,
+                        )
+                    )
+                    prog = prog_res.scalar_one_or_none()
+                    if prog:
+                        prog.sessions_count += 1
+                        prog.score = round((prog.score * (prog.sessions_count - 1) + score) / prog.sessions_count, 1)
+                        prog.total_corrections += len(summary.get("all_corrections", []))
+                        prog.last_updated = datetime.now(timezone.utc)
+                    else:
+                        new_prog = LearningProgress(
+                            user_id=session.user_id,
+                            skill=skill,
+                            score=score,
+                            sessions_count=1,
+                            total_corrections=len(summary.get("all_corrections", [])),
+                        )
+                        self._db.add(new_prog)
+
         await self._db.flush()
 
         # Reload session with updated values
@@ -205,6 +235,27 @@ class ConversationService:
 
         return [
             {"role": msg.role, "content": msg.content}
+            for msg in messages
+        ]
+
+    async def get_session_messages(self, session_id: str) -> list[dict]:
+        """Retrieve full chronological conversation transcript with feedback."""
+        result = await self._db.execute(
+            select(DBMessage)
+            .where(DBMessage.session_id == uuid.UUID(session_id))
+            .order_by(DBMessage.created_at.asc())
+        )
+        messages = result.scalars().all()
+        return [
+            {
+                "id": str(msg.id),
+                "role": msg.role,
+                "content": msg.content,
+                "input_type": msg.input_type,
+                "transcript": msg.transcript,
+                "feedback": msg.feedback,
+                "created_at": msg.created_at.isoformat() if msg.created_at else None,
+            }
             for msg in messages
         ]
 

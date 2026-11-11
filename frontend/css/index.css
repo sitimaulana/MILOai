@@ -1106,3 +1106,105 @@ body.home-body {
         display: none;
     }
 }
+
+@media (max-width: 640px) {
+    .home-nav-wrapper {
+        padding: 10px 12px;
+    }
+    .home-navbar {
+        padding: 8px 14px;
+        border-radius: 14px;
+    }
+    .nav-brand-title {
+        font-size: 16px;
+    }
+    .nav-brand-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    .nav-cta-btn {
+        padding: 7px 12px;
+        font-size: 12px;
+        height: 38px;
+    }
+    .hero-section-clean {
+        padding: 20px 14px 32px;
+    }
+    .hero-tag-pill {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+    .hero-main-title {
+        font-size: 26px;
+        line-height: 1.25;
+    }
+    .hero-sub-desc {
+        font-size: 13.5px;
+    }
+    .hero-cta-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+    .btn-hero-primary, .btn-hero-secondary {
+        width: 100%;
+        justify-content: center;
+        height: 46px;
+    }
+    .hero-trust-list {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 12px;
+    }
+    .preview-studio-frame {
+        padding: 10px;
+        border-radius: 18px;
+    }
+    .studio-stage-mockup {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        min-height: auto;
+        padding: 12px;
+    }
+    .preview-milo-stage {
+        order: -1;
+    }
+    .preview-milo-img {
+        max-height: 150px;
+    }
+    .section-wrapper {
+        padding: 36px 14px;
+    }
+    .section-title {
+        font-size: 22px;
+    }
+    .section-desc {
+        font-size: 13px;
+    }
+    .zone-feature-card, .scenario-card, .cefr-track-card {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+    .bottom-invitation-card {
+        padding: 24px 18px;
+        border-radius: 20px;
+        gap: 16px;
+    }
+    .invitation-text-content h2 {
+        font-size: 20px;
+    }
+    .invitation-text-content p {
+        font-size: 13px;
+    }
+    .btn-invitation-cta {
+        width: 100%;
+        justify-content: center;
+        height: 46px;
+    }
+    .footer-links-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+}

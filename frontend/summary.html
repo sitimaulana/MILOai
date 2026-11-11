@@ -7,7 +7,7 @@
     <!-- Google Fonts & Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css, practice.css & dashboard.css) -->
-    <link rel="stylesheet" href="css/summary.css?v=20261112c">
+    <link rel="stylesheet" href="css/summary.css?v=20261112e">
 </head>
 <body class="summary-body">
 
@@ -44,100 +44,183 @@
          2. MAIN SUMMARY CONTENT
          ═══════════════════════════════════════════════════════════════════════ -->
     <main class="summary-page-wrapper">
-        <!-- Main Score Card -->
-        <section class="summary-hero-card">
-            <h2>Sesi Latihan Selesai!</h2>
-            <p id="summaryTopicMeta">
-                Latihan Speaking &bull; Durasi: 5 menit &bull; 8 Putaran Percakapan
+        <!-- Header & Session Meta Chips -->
+        <header class="summary-header-block">
+            <div class="summary-badge-pill">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>Laporan Hasil Sesi Bicara</span>
+            </div>
+            <h1 class="summary-page-title">Evaluasi Sesi & Capaian CEFR</h1>
+            <p id="summaryTopicMeta" class="summary-topic-meta">
+                Latihan Speaking &bull; Durasi: -- menit &bull; -- Putaran Percakapan
             </p>
+        </header>
 
-            <!-- Overall Dial -->
-            <div class="overall-dial-box">
-                <svg viewBox="0 0 120 120">
-                    <circle class="gauge-bg-circle" cx="60" cy="60" r="52" style="stroke-width: 8;"/>
-                    <circle id="summaryOverallDial" class="gauge-fill-circle" cx="60" cy="60" r="52" 
-                            style="stroke: var(--primary); stroke-width: 8; stroke-dasharray: 0, 327;"/>
-                </svg>
-                <div class="overall-dial-score">
-                    <span class="overall-score-num" id="summaryOverallScore">--</span>
-                    <span class="overall-score-lbl">Skor Akhir</span>
+        <!-- Top Dual-Column Metrics Grid (Overall Score Dial + 3 Pillar Bars) -->
+        <div class="summary-metrics-grid">
+            <!-- Left Card: Overall Score & CEFR Level -->
+            <section class="summary-card hero-score-card">
+                <div class="card-eyebrow">
+                    <i class="fa-solid fa-gauge-high"></i>
+                    <span>Skor Komposit Akhir</span>
+                </div>
+
+                <div class="overall-dial-box">
+                    <svg viewBox="0 0 120 120">
+                        <circle class="gauge-bg-circle" cx="60" cy="60" r="52" style="stroke-width: 8;"/>
+                        <circle id="summaryOverallDial" class="gauge-fill-circle" cx="60" cy="60" r="52" 
+                                style="stroke: var(--primary); stroke-width: 8; stroke-dasharray: 0, 327;"/>
+                    </svg>
+                    <div class="overall-dial-score">
+                        <span class="overall-score-num" id="summaryOverallScore">--</span>
+                        <span class="overall-score-lbl">Skor Akhir</span>
+                    </div>
+                </div>
+
+                <div class="cefr-badge-row">
+                    <div class="cefr-pill-result">
+                        <span class="cefr-pill-label">Level Capaian:</span>
+                        <span class="cefr-pill-val" id="summaryCefrResult">--</span>
+                    </div>
+                    <div class="cefr-target-note">
+                        Target Sesi: <strong id="summaryCefrTarget">--</strong>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Card: 3 Skill Breakdown Progress Bars -->
+            <section class="summary-card skill-breakdown-card">
+                <div class="card-eyebrow">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    <span>Rincian 3 Pilar Kemampuan</span>
+                </div>
+
+                <div class="skill-bars-stack">
+                    <!-- Grammar Bar -->
+                    <div class="bar-row">
+                        <div class="bar-header">
+                            <span class="bar-name"><i class="fa-solid fa-spell-check" style="color: var(--primary);"></i> Akurasi Grammar</span>
+                            <span id="summaryGrammarVal" class="bar-val" style="color: var(--primary-dark);">-- / 100</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill grammar" id="grammarBarFill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Vocabulary Bar -->
+                    <div class="bar-row">
+                        <div class="bar-header">
+                            <span class="bar-name"><i class="fa-solid fa-book-open" style="color: var(--secondary);"></i> Kekayaan Kosakata</span>
+                            <span id="summaryVocabVal" class="bar-val" style="color: var(--secondary-dark);">-- / 100</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill vocab" id="vocabBarFill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Fluency Bar -->
+                    <div class="bar-row">
+                        <div class="bar-header">
+                            <span class="bar-name"><i class="fa-solid fa-wave-square" style="color: var(--fluency-amber);"></i> Kelancaran (Fluency)</span>
+                            <span id="summaryFluencyVal" class="bar-val" style="color: var(--fluency-amber);">-- / 100</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill fluency" id="fluencyBarFill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- AI Coach Qualitative Assessment Card -->
+        <section class="summary-card coach-evaluation-card">
+            <div class="coach-card-header">
+                <div class="coach-header-left">
+                    <div class="coach-avatar-circle">
+                        <span>M</span>
+                    </div>
+                    <div>
+                        <h3 class="coach-title">Catatan Evaluasi Tutor MILO</h3>
+                        <p class="coach-subtitle">Ulasan kualitatif berbasis performa tuturan aktual selama sesi latihan</p>
+                    </div>
+                </div>
+                <div class="coach-verified-chip">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Terdokumentasi</span>
                 </div>
             </div>
 
-            <!-- CEFR Match Box -->
-            <div class="cefr-match-row">
-                <span>Target: <strong id="summaryCefrTarget">B1</strong></span>
-                <span style="opacity: 0.35;">&bull;</span>
-                <span>Evaluasi CEFR: <strong id="summaryCefrResult" style="color: var(--primary); font-size: 15px;">B2</strong></span>
+            <!-- Dynamic Structured Coach Container -->
+            <div id="summaryCoachAssessment" class="coach-assessment-body">
+                <div class="coach-loading-placeholder">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Menyusun evaluasi komprehensif berdasarkan tuturan Anda...</span>
+                </div>
             </div>
         </section>
 
-        <!-- Skill Breakdown Progress Bars -->
-        <section class="breakdown-bars-card">
-            <h3>Rincian Kompetensi Bicara</h3>
-
-            <!-- Grammar Bar -->
-            <div class="bar-row">
-                <div class="bar-header">
-                    <span>Akurasi Grammar</span>
-                    <span id="summaryGrammarVal" style="color: var(--primary);">-- / 100</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill grammar" id="grammarBarFill" style="width: 0%;"></div>
-                </div>
+        <!-- Target Recommendations (if present) -->
+        <section class="summary-card" id="improvementBox" style="display: none;">
+            <div class="card-eyebrow" style="color: var(--secondary);">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Saran Peningkatan Mandiri</span>
             </div>
-
-            <!-- Vocabulary Bar -->
-            <div class="bar-row">
-                <div class="bar-header">
-                    <span>Kekayaan Vocabulary</span>
-                    <span id="summaryVocabVal" style="color: var(--secondary);">-- / 100</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill vocab" id="vocabBarFill" style="width: 0%;"></div>
-                </div>
-            </div>
-
-            <!-- Fluency Bar -->
-            <div class="bar-row">
-                <div class="bar-header">
-                    <span>Kelancaran (Fluency)</span>
-                    <span id="summaryFluencyVal" style="color: var(--fluency-amber);">-- / 100</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill fluency" id="fluencyBarFill" style="width: 0%;"></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- AI Coach Qualitative Assessment -->
-        <section class="breakdown-bars-card">
-            <h3>Catatan Evaluasi Tutor MILO</h3>
-            <p id="summaryCoachAssessment">
-                Menganalisis performa percakapan Anda...
-            </p>
-        </section>
-
-        <!-- Target Recommendations -->
-        <section class="breakdown-bars-card" id="improvementBox" style="display: none;">
-            <h3 style="color: var(--secondary);">Saran Peningkatan</h3>
-            <ul id="improvementList" style="padding-left: 20px; color: var(--text-slate); font-size: 14.5px; display: flex; flex-direction: column; gap: 8px;">
+            <ul id="improvementList" class="improvement-bullets-list">
                 <!-- Generated items -->
             </ul>
         </section>
 
         <!-- Session Corrections Review -->
-        <section class="breakdown-bars-card" id="allCorrectionsCard">
-            <h3>Daftar Pembetulan & Catatan Kalimat</h3>
-            <div id="allCorrectionsList" style="display: flex; flex-direction: column; gap: 10px;">
+        <section class="summary-card" id="allCorrectionsCard">
+            <div class="card-header-with-badge">
+                <div class="title-with-icon">
+                    <div class="title-icon-circle icon-amber">
+                        <i class="fa-solid fa-pen-nib"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title-text">Daftar Pembetulan & Catatan Kalimat</h3>
+                        <p class="card-subtitle-text">Perbandingan tuturan Anda dengan bentuk baku yang lebih tepat dan alami</p>
+                    </div>
+                </div>
+                <span class="corrections-count-badge" id="correctionsCountBadge">0 Pembetulan</span>
+            </div>
+            <div id="allCorrectionsList" class="corrections-entries-stack">
+                <!-- Injected via script -->
+            </div>
+        </section>
+
+        <!-- Complete Session Transcript & History Review -->
+        <section class="summary-card" id="sessionTranscriptCard">
+            <div class="card-header-with-badge">
+                <div class="title-with-icon">
+                    <div class="title-icon-circle icon-sage">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title-text">Dokumentasi & Transkrip Percakapan</h3>
+                        <p class="card-subtitle-text">Rekaman utuh dialog antara Anda dan Milo untuk meninjau kembali performa aktual</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-export-obsidian" id="btnExportObsidian" title="Unduh catatan sesi ini ke format Obsidian Markdown">
+                    <i class="fa-solid fa-file-arrow-down"></i>
+                    <span>Ekspor Obsidian (.md)</span>
+                </button>
+            </div>
+            <div id="sessionTranscriptList" class="session-transcript-stream">
                 <!-- Injected via script -->
             </div>
         </section>
 
         <!-- Footer Actions -->
         <div class="summary-actions-row">
-            <a href="setup.html" class="btn-primary-summary">Mulai Sesi Baru</a>
-            <a href="dashboard.html" class="btn-secondary-summary">Lihat Seluruh Dashboard</a>
+            <a href="setup.html" class="btn-primary-summary">
+                <i class="fa-solid fa-arrow-rotate-right"></i>
+                <span>Mulai Sesi Baru</span>
+            </a>
+            <a href="dashboard.html" class="btn-secondary-summary">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Lihat Dashboard Lengkap</span>
+            </a>
         </div>
     </main>
 
@@ -156,7 +239,7 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="js/common.js?v=20261112b"></script>
-    <script src="js/summary.js?v=20261112b"></script>
+    <script src="js/common.js?v=20261112e"></script>
+    <script src="js/summary.js?v=20261112e"></script>
 </body>
 </html>
