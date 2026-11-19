@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MILO PRACTICE: English Speaking Practice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/practice.css?v=20261112e">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -13,14 +16,15 @@
 
     <!-- Header: ← MILO PRACTICE ... Timer ... Level B1 -->
     <header class="practice-nav-header">
-        <a href="/ui/setup.html" class="back-to-setup" id="brandExitLink" title="Kembali ke Setup">
+        <a href="setup.html" class="back-to-setup" id="brandExitLink" title="Kembali ke Setup">
             <i class="fa-solid fa-arrow-left"></i>
-            <span>MILO PRACTICE</span>
+            <span class="brand-mark" aria-hidden="true">✿</span>
+            <span class="practice-brand-name">MILO <small>PRACTICE</small></span>
         </a>
         <div class="session-timer-badge" id="sessionTimerBadge" title="Durasi Latihan Berlangsung">
             <i class="fa-regular fa-clock" aria-hidden="true"></i>
-            <span id="sessionTimerText">00:00 / 15:00</span>
-            <span class="timer-target-pill" id="timerGoalPill">15 Mnt</span>
+            <span id="sessionTimerText">00:00 / 05:00</span>
+            <span class="timer-target-pill" id="timerGoalPill">5 Mnt</span>
         </div>
         <div class="level-badge-pill" id="practiceLevelPill">
             Level B1
@@ -147,6 +151,16 @@
                 <div class="eval-positive-note" id="evalPositiveNote" style="display: none;">
                     <span id="evalPositiveText">Great effort!</span>
                 </div>
+
+                <!-- RAG Grounding Reference Card (Pedoman Resmi Terverifikasi) -->
+                <div class="eval-rag-box" id="evalRagBox" style="display: none;">
+                    <div class="eval-rag-header">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <span>Pedoman Terverifikasi RAG</span>
+                    </div>
+                    <div class="eval-rag-title" id="evalRagTitle">Cambridge English Vocabulary in Use</div>
+                    <p class="eval-rag-snippet" id="evalRagSnippet">Koreksi dan panduan tuturan diselaraskan dengan silabus internasional.</p>
+                </div>
             </div>
         </aside>
 
@@ -231,6 +245,23 @@
 
     </main>
 
+    <!-- Session Closing Notification Toast / Banner -->
+    <div class="session-closing-toast" id="sessionClosingToast" style="display: none;" role="status" aria-live="polite">
+        <div class="closing-toast-content">
+            <div class="closing-toast-icon">
+                <i class="fa-solid fa-hourglass-end"></i>
+            </div>
+            <div class="closing-toast-text">
+                <strong id="closingToastTitle">Waktu Latihan Selesai</strong>
+                <span id="closingToastDesc">Milo sedang memberikan rangkuman penutup...</span>
+            </div>
+            <button type="button" class="btn-skip-to-summary" id="btnSkipToSummary" title="Langsung beralih ke halaman ringkasan evaluasi">
+                <span>Lihat Evaluasi</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Target Completion Notification Modal -->
     <div class="duration-goal-modal" id="durationGoalModal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle">
         <div class="goal-modal-backdrop" id="goalModalBackdrop"></div>
@@ -269,6 +300,30 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
     </footer>
+
+    <!-- Interactive RAG Grounding Inspector Modal -->
+    <div class="rag-modal-backdrop" id="ragModalBackdrop" style="display: none;" onclick="closeRagInspectorModal(event)">
+        <div class="rag-modal-card" onclick="event.stopPropagation()">
+            <div class="rag-modal-header">
+                <div class="rag-modal-badge"><i class="fa-solid fa-shield-halved"></i> Terverifikasi RAG Grounding</div>
+                <button type="button" class="rag-modal-close-btn" onclick="closeRagInspectorModal()">&times;</button>
+            </div>
+            <h3 class="rag-modal-book" id="ragModalBook">Cambridge English Vocabulary in Use</h3>
+            <div class="rag-modal-meta">
+                <span class="rag-meta-pill" id="ragModalCategory">Vocabulary & Collocations</span>
+                <span class="rag-meta-pill level" id="ragModalLevel">CEFR B2</span>
+                <span class="rag-meta-pill score" id="ragModalScore">Tingkat Keselarasan: 88%</span>
+            </div>
+            <div class="rag-modal-content-box">
+                <div class="rag-content-label"><i class="fa-solid fa-quote-left"></i> Kutipan Materi & Aturan Pembelajaran:</div>
+                <p class="rag-content-text" id="ragModalSnippet">Materi tuturan ini diselaraskan dengan standar buku rujukan resmi.</p>
+            </div>
+            <div class="rag-modal-footer">
+                <span class="rag-verified-text"><i class="fa-solid fa-circle-check"></i> Strict Grounding & Dynamic Score Thresholding</span>
+                <button type="button" class="rag-modal-btn" onclick="closeRagInspectorModal()">Paham</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Global Helpers and Logic Script -->
     <script src="js/common.js?v=20261112e"></script>

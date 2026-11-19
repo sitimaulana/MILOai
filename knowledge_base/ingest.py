@@ -1,23 +1,13 @@
 """
 MILO AI Backend - Knowledge Base Ingestion Script
 
-Loads CEFR B1-B2 learning materials from knowledge_base/documents/
+Loads CEFR B1-B2 learning materials from knowledge_base/
 and indexes them into ChromaDB for RAG retrieval.
 
 Usage:
-    python knowledge_base/ingest.py
-    python knowledge_base/ingest.py --reset    # Clears existing DB first
-    python knowledge_base/ingest.py --docs-dir ./my_docs  # Custom directory
-
-Usage:
-    # Use the existing Knowledge Base MILO folder:
-    python knowledge_base/ingest.py --docs-dir "./Knowledge Base MILO"
-
-    # Or the specific version:
-    python knowledge_base/ingest.py --docs-dir "./Knowledge Base MILO/MILO_Knowledge_Base_B1_B2_COMPLETE_2026"
-
-    # Reset and re-ingest:
-    python knowledge_base/ingest.py --docs-dir "./Knowledge Base MILO" --reset
+    uv run python knowledge_base/ingest.py
+    uv run python knowledge_base/ingest.py --reset    # Clears existing DB first
+    uv run python knowledge_base/ingest.py --docs-dir ./my_docs  # Custom directory
 
 Supported file formats: PDF, DOCX, TXT, MD
 """
@@ -90,16 +80,25 @@ def load_documents(docs_dir: Path) -> list[Document]:
         except Exception as e:
             logger.warning(f"  ⚠️  Failed to load {docx_path.name}: {e}")
 
-    # Load TXT and MD (excluding hidden folders like .obsidian, .git)
+    # Load TXT and MD (excluding hidden folders like .obsidian, .git, and internal directories)
     raw_text_files = list(docs_dir.rglob("*.txt")) + list(docs_dir.rglob("*.md"))
-    text_files = [f for f in raw_text_files if not any(part.startswith(".") for part in f.parts)]
+    text_files = [
+        f for f in raw_text_files
+        if not any(part.startswith(".") or part in ("chroma_db", "__pycache__") for part in f.parts)
+    ]
     logger.info(f"Found {len(text_files)} TXT/MD file(s) (ignoring hidden files/folders)")
     for txt_path in text_files:
         try:
             loader = TextLoader(str(txt_path), encoding="utf-8")
             docs = loader.load()
             for doc in docs:
-                doc.metadata.update(_extract_metadata(txt_path, docs_root=docs_dir))
+                meta = _extract_metadata(txt_path, docs_root=docs_dir)
+                doc.metadata.update(meta)
+                # If markdown has frontmatter, clean page_content and add clean text
+                if txt_path.suffix in (".md", ".markdown") and doc.page_content.startswith("---"):
+                    parts = doc.page_content.split("---", 2)
+                    if len(parts) >= 3:
+                        doc.page_content = parts[2].strip()
             all_docs.extend(docs)
             logger.info(f"  ✅ Loaded: {txt_path.name} ({len(docs)} doc)")
         except Exception as e:
@@ -111,13 +110,9 @@ def load_documents(docs_dir: Path) -> list[Document]:
 
 def _extract_metadata(file_path: Path, docs_root: Path | None = None) -> dict:
     """
-    Infer metadata (skill_type, cefr_level) from the file path.
-    
-    Supports both:
-    1. Flat naming: grammar_B1_present_perfect.pdf
-    2. Nested directories: 02_grammar/B1/present_perfect.md  (existing KB structure)
+    Infer metadata (skill_type, cefr_level, topic_id, track_code, is_primary)
+    from YAML frontmatter and the file path.
     """
-    # Use the full relative path for richer context
     if docs_root:
         try:
             rel_path = str(file_path.relative_to(docs_root)).lower().replace("\\", "/")
@@ -127,41 +122,74 @@ def _extract_metadata(file_path: Path, docs_root: Path | None = None) -> dict:
         rel_path = str(file_path).lower()
 
     name = file_path.stem.lower()
-    combined = f"{rel_path} {name}"  # Search in both path and filename
+    combined = f"{rel_path} {name}"
 
-    # Detect skill type (from directory name or filename)
-    if any(k in combined for k in ["grammar", "02_grammar"]):
-        skill_type = "grammar"
-    elif any(k in combined for k in ["vocabulary", "vocab", "03_vocabulary"]):
-        skill_type = "vocabulary"
-    elif any(k in combined for k in ["speaking", "conversation", "04_speaking", "07_scenarios"]):
-        skill_type = "speaking"
-    elif any(k in combined for k in ["pronunciation", "05_pronunciation"]):
-        skill_type = "pronunciation"
-    elif any(k in combined for k in ["feedback", "06_feedback", "assessment", "09_assessment"]):
-        skill_type = "assessment"
-    elif any(k in combined for k in ["rag", "08_rag", "cefr", "01_cefr"]):
-        skill_type = "general"
-    elif "writing" in combined:
-        skill_type = "writing"
-    else:
-        skill_type = "general"
+    topic_id = ""
+    track_code = ""
+    cefr_level = "B1-B2"
+    skill_type = "general"
+    is_primary = False
 
-    # Detect CEFR level (from directory path OR filename)
-    if "/b2/" in rel_path or "/b2 " in rel_path or "_b2_" in combined or combined.endswith("_b2"):
-        cefr_level = "B2"
-    elif "/b1/" in rel_path or "/b1 " in rel_path or "_b1_" in combined or combined.endswith("_b1"):
-        cefr_level = "B1"
-    elif "/a2/" in rel_path or "_a2_" in combined:
-        cefr_level = "A2"
-    else:
-        cefr_level = "B1-B2"  # Default: applicable to both levels
+    # 1. Parse YAML frontmatter if available
+    if file_path.suffix in (".md", ".markdown"):
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                header = f.read(1500)
+            if header.startswith("---"):
+                parts = header.split("---", 2)
+                if len(parts) >= 3:
+                    for line in parts[1].splitlines():
+                        if ":" in line:
+                            k, v = line.split(":", 1)
+                            k = k.strip().lower()
+                            val = v.strip().strip('"').strip("'")
+                            if k == "topic_id":
+                                topic_id = val.upper()
+                            elif k == "track_code":
+                                track_code = val.upper()
+                            elif k == "cefr_level":
+                                cefr_level = val.upper()
+                            elif k == "skill_type":
+                                skill_type = val.lower()
+        except Exception:
+            pass
+
+    # 2. Heuristics fallback for skill type
+    if not skill_type or skill_type == "general":
+        if any(k in combined for k in ["grammar", "02_grammar"]):
+            skill_type = "grammar"
+        elif any(k in combined for k in ["vocabulary", "vocab", "03_vocabulary"]):
+            skill_type = "vocabulary"
+        elif any(k in combined for k in ["speaking", "conversation", "04_speaking", "07_scenarios"]):
+            skill_type = "speaking"
+        elif any(k in combined for k in ["pronunciation", "05_pronunciation"]):
+            skill_type = "pronunciation"
+        elif any(k in combined for k in ["feedback", "06_feedback", "assessment", "09_assessment"]):
+            skill_type = "assessment"
+        else:
+            skill_type = "general"
+
+    # 3. Heuristics fallback for CEFR level
+    if cefr_level == "B1-B2":
+        if "/b2/" in rel_path or "/b2 " in rel_path or "_b2_" in combined or combined.endswith("_b2"):
+            cefr_level = "B2"
+        elif "/b1/" in rel_path or "/b1 " in rel_path or "_b1_" in combined or combined.endswith("_b1"):
+            cefr_level = "B1"
+        elif "/a2/" in rel_path or "_a2_" in combined:
+            cefr_level = "A2"
+
+    # 4. Determine priority status (Microlearning 18 topics & Grammar are primary)
+    if "07_scenarios/microlearning" in rel_path or topic_id or skill_type == "grammar":
+        is_primary = True
 
     return {
         "source": file_path.name,
         "source_path": rel_path,
         "skill_type": skill_type,
         "cefr_level": cefr_level,
+        "topic_id": topic_id,
+        "track_code": track_code,
+        "is_primary": "true" if is_primary else "false",
     }
 
 
@@ -209,17 +237,15 @@ def ingest_to_chroma(
 
 
 def main() -> None:
-    # Auto-detect default directory (prefer 'Knowledge Base MILO' Obsidian Vault if exists)
-    repo_root = Path(__file__).parent.parent
-    candidate_kb = repo_root / "Knowledge Base MILO"
-    default_docs = candidate_kb if candidate_kb.exists() else Path(__file__).parent / "documents"
+    # Default docs directory is the knowledge_base folder itself
+    default_docs = Path(__file__).parent
 
     parser = argparse.ArgumentParser(description="MILO Knowledge Base Ingestion")
     parser.add_argument(
         "--docs-dir",
         type=Path,
         default=default_docs,
-        help="Directory containing CEFR learning materials (Obsidian Vault)",
+        help="Directory containing CEFR learning materials (Obsidian Vault in knowledge_base)",
     )
     parser.add_argument(
         "--reset",
@@ -233,8 +259,29 @@ def main() -> None:
     # Optionally reset the vector store
     if args.reset and chroma_path.exists():
         logger.info(f"🗑️  Resetting ChromaDB at '{chroma_path}'...")
-        shutil.rmtree(chroma_path)
-        logger.info("ChromaDB cleared.")
+        try:
+            shutil.rmtree(chroma_path)
+            logger.info("ChromaDB directory cleared.")
+        except PermissionError:
+            logger.warning(
+                f"⚠️  Folder '{chroma_path}' sedang digunakan oleh proses lain (misalnya server Uvicorn/backend sedang berjalan).\n"
+                "    Mencoba membersihkan collection secara internal via ChromaDB..."
+            )
+            try:
+                import chromadb
+                client = chromadb.PersistentClient(path=str(chroma_path))
+                try:
+                    client.delete_collection(settings.chroma_collection_name)
+                    logger.info(f"✅ Collection '{settings.chroma_collection_name}' berhasil dibersihkan.")
+                except Exception:
+                    logger.info("Collection belum ada atau sudah kosong.")
+            except Exception as reset_err:
+                logger.error(
+                    f"❌ Gagal membersihkan ChromaDB: {reset_err}\n"
+                    "👉 SOLUSI: Hentikan server backend (tekan Ctrl+C pada terminal yang menjalankan Uvicorn/FastAPI), "
+                    "lalu jalankan ulang perintah ini."
+                )
+                sys.exit(1)
 
     chroma_path.mkdir(parents=True, exist_ok=True)
 
@@ -252,7 +299,7 @@ def main() -> None:
     documents = load_documents(args.docs_dir)
 
     if not documents:
-        logger.error("No documents found! Add PDF/DOCX/TXT files to knowledge_base/documents/")
+        logger.error("No documents found! Add PDF/DOCX/TXT/MD files to knowledge_base/")
         sys.exit(1)
 
     chunks = split_documents(

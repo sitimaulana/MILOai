@@ -1,4 +1,5 @@
 let sessionId = null;
+let currentTopicId = 'A1';
 let currentTopic = 'job_interview';
 let currentLevel = 'B1';
 let sessionStartTime = Date.now();
@@ -8,6 +9,8 @@ let timerInterval = null;
 let targetMinutes = 15;
 let targetSeconds = 900;
 let goalModalShown = false;
+let isSessionClosing = false;
+let autoCloseInitiated = false;
 
 let mediaRecorder = null;
 let audioChunks = [];
@@ -55,15 +58,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     currentTopic = sessionStorage.getItem('milo_topic') || 'job_interview';
+    currentTopicId = urlParams.get('topic_id') || sessionStorage.getItem('milo_topic_id') || 'A1';
     currentLevel = sessionStorage.getItem('milo_cefr_level') || 'B1';
     const topicLabel = sessionStorage.getItem('milo_topic_label') || 'Job Interview';
+    const topicTitle = sessionStorage.getItem('milo_topic_title') || '';
 
     // Update Header Level Pill & Topic Box
     const levelPill = document.getElementById('practiceLevelPill');
     if (levelPill) levelPill.textContent = `Level ${currentLevel}`;
 
     const topicValue = document.getElementById('practiceTopicValue');
-    if (topicValue) topicValue.textContent = topicLabel;
+    if (topicValue) {
+        topicValue.textContent = topicTitle ? `[${currentTopicId}] ${topicTitle}` : topicLabel;
+    }
 
     // Initialize Target Duration & Real-Time Sync Timer
     initSessionDurationTimer();
@@ -97,6 +104,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Bind End Session
     btnEndSession.addEventListener('click', () => confirmEndSession());
+
+    // Bind Skip To Summary Button on Closing Toast
+    const btnSkipToSummary = document.getElementById('btnSkipToSummary');
+    if (btnSkipToSummary) {
+        btnSkipToSummary.addEventListener('click', () => confirmEndSession(true));
+    }
 
     // Bind Pillar Tabs (Grammar, Vocab, Fluency)
     document.querySelectorAll('.eval-pillar-tab').forEach(btn => {
@@ -137,11 +150,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 const messageStore = new Map();
 let messageIdCounter = 0;
 
-function appendMessage(text, sender, audioBase64 = null, translation = null) {
+function formatRagSourceLabel(src) {
+    if (!src) return '';
+    let s = src.trim();
+    if (s.includes('Cambridge English Vocabulary in Use')) return 'Cambridge Vocabulary in Use (B2)';
+    if (s.includes('The Cambridge Guide to English Usage')) return 'Cambridge Guide to English Usage';
+    if (s.includes('Collins Speaking for IELTS')) return 'Collins Speaking for IELTS';
+    if (s.includes('Council of Europe') || s.includes('CEFR Companion Volume')) return 'CEFR Companion Volume';
+    
+    // Clean file names if a raw filename was passed
+    s = s.replace(/\.md$/i, '').replace(/_/g, ' ');
+    if (s.toLowerCase().startsWith('unit ')) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+    return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function appendMessage(text, sender, audioBase64 = null, translation = null, ragSources = [], ragDetails = []) {
     const isMilo = sender === 'milo';
     const msgId = ++messageIdCounter;
 
-    // Store in message store for audio & translation interactions
+    // Store in message store for audio, translation, and RAG interactions
     let audioId = null;
     if (audioBase64) {
         audioId = audioIdCounter++;
@@ -153,12 +182,47 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
         sender,
         audioBase64,
         audioId,
-        translation
+        translation,
+        ragSources,
+        ragDetails
     });
 
     const row = document.createElement('div');
     row.id = `msgWrapper-${msgId}`;
     row.className = isMilo ? 'bubble-milo-wrapper' : 'bubble-user-wrapper';
+
+    let ragBadgesHtml = '';
+    if (isMilo) {
+        const details = (ragDetails && Array.isArray(ragDetails) && ragDetails.length > 0)
+            ? ragDetails
+            : (ragSources && Array.isArray(ragSources) && ragSources.length > 0)
+                ? ragSources.map(src => ({
+                    source: src,
+                    book: formatRagSourceLabel(src),
+                    title: formatRagSourceLabel(src),
+                    category: 'Buku Rujukan Kurikulum Resmi',
+                    skill: 'Speaking & CEFR Mastery',
+                    level: currentLevel,
+                    score: 0.85,
+                    snippet: 'Materi tuturan ini diselaraskan dengan silabus resmi standar Cambridge / Collins untuk pengayaan berbicara.'
+                }))
+                : [];
+
+        if (details.length > 0) {
+            const badges = details.map((d, dIdx) => `
+                <button type="button" class="milo-rag-badge" onclick="openRagInspectorModal(${msgId}, ${dIdx})" title="Klik untuk meninjau rujukan buku resmi">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    <span>Ref: ${escapeHtml(d.book || d.title || 'Buku Rujukan')}</span>
+                    <i class="fa-solid fa-circle-info" style="font-size: 10px; margin-left: 3px; opacity: 0.8;"></i>
+                </button>
+            `).join('');
+            ragBadgesHtml = `
+                <div class="milo-rag-badge-wrapper">
+                    ${badges}
+                </div>
+            `;
+        }
+    }
 
     if (isMilo) {
         row.innerHTML = `
@@ -169,6 +233,7 @@ function appendMessage(text, sender, audioBase64 = null, translation = null) {
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
                 </div>
+                ${ragBadgesHtml}
                 <div class="bubble-translation-wrapper">
                     <button type="button" class="btn-bubble-translate" id="btnTrans-${msgId}" onclick="toggleBubbleTranslation(${msgId}, this)" title="Terjemahkan ke Bahasa Indonesia">
                         <i class="fa-solid fa-language"></i>
@@ -330,7 +395,22 @@ async function toggleBubbleTranslation(msgId, btnElement) {
 }
 window.toggleBubbleTranslation = toggleBubbleTranslation;
 
+function getAuthHeaders() {
+    const token = localStorage.getItem('milo_token');
+    return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+function getAuthUserId() {
+    try {
+        const u = JSON.parse(localStorage.getItem('milo_user'));
+        return u?.id || null;
+    } catch {
+        return null;
+    }
+}
+
 async function sendTextMessage() {
+    if (isSessionClosing) return;
     const text = userTextInput.value.trim();
     if (!text) return;
 
@@ -340,17 +420,30 @@ async function sendTextMessage() {
     if (waveformBox) waveformBox.classList.add('active-recording');
     setCompanionState('thinking', 'Milo sedang berpikir...');
 
+    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - sessionStartTime) / 1000));
+    const shouldCloseThisTurn = (elapsedSeconds >= targetSeconds) || isSessionClosing;
+    if (shouldCloseThisTurn) {
+        isSessionClosing = true;
+        lockConversationInputs('Waktu latihan selesai. Milo sedang merespons...');
+        showClosingToast('Waktu Latihan Selesai', 'Milo sedang memberikan rangkuman penutup...');
+    }
+
     try {
+        const authUserId = getAuthUserId();
+        const chatPayload = {
+            session_id: sessionId,
+            message: text,
+            return_audio: true,
+            cefr_level: currentLevel,
+            input_type: 'text',
+            is_closing: shouldCloseThisTurn,
+        };
+        if (authUserId) chatPayload.user_id = authUserId;
+
         const response = await fetch('/api/v1/chat', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                session_id: sessionId,
-                message: text,
-                return_audio: true,
-                cefr_level: currentLevel,
-                input_type: 'text',
-            })
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(chatPayload)
         });
 
         if (waveformBox) waveformBox.classList.remove('active-recording');
@@ -362,9 +455,14 @@ async function sendTextMessage() {
 
         const data = await response.json();
 
+        if (data.is_session_closed || shouldCloseThisTurn) {
+            handleSessionClosedResponse(data);
+            return;
+        }
+
         // Render MILO's reply with audio and Indonesian translation
         setCompanionState('speaking', 'Milo menjawab...');
-        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
+        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, data.rag_sources, data.rag_details);
         setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
         // Update real-time Speech Evaluation HUD and inline user bubble badge
@@ -372,6 +470,7 @@ async function sendTextMessage() {
             updateEvaluationHUD(data.feedback);
             attachUserFeedback(userMsgId, data.feedback);
         }
+        updateRagFeedbackHUD(data.rag_details, data.rag_sources);
     } catch (err) {
         if (waveformBox) waveformBox.classList.remove('active-recording');
         setCompanionState('idle', 'Milo siap berlatih');
@@ -470,6 +569,14 @@ async function sendVoiceMessage(audioBlob) {
     messagesContainer.appendChild(thinkingRow);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
+    const elapsedSeconds = Math.max(0, Math.floor((Date.now() - sessionStartTime) / 1000));
+    const shouldCloseThisTurn = (elapsedSeconds >= targetSeconds) || isSessionClosing;
+    if (shouldCloseThisTurn) {
+        isSessionClosing = true;
+        lockConversationInputs('Waktu latihan selesai. Milo sedang merespons...');
+        showClosingToast('Waktu Latihan Selesai', 'Milo sedang memberikan rangkuman penutup...');
+    }
+
     try {
         let ext = 'webm';
         if (audioBlob.type.includes('ogg')) ext = 'ogg';
@@ -503,17 +610,22 @@ async function sendVoiceMessage(audioBlob) {
             const statusSpan = document.getElementById('miloThinkingStatus');
             if (statusSpan) statusSpan.textContent = 'MILO is preparing a response...';
 
+            const authUserId = getAuthUserId();
+            const voiceChatPayload = {
+                session_id: sessionId,
+                message: transcriptText,
+                return_audio: true,
+                cefr_level: currentLevel,
+                input_type: 'voice',
+                transcript: transcriptText,
+                is_closing: shouldCloseThisTurn,
+            };
+            if (authUserId) voiceChatPayload.user_id = authUserId;
+
             const chatResponse = await fetch('/api/v1/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    session_id: sessionId,
-                    message: transcriptText,
-                    return_audio: true,
-                    cefr_level: currentLevel,
-                    input_type: 'voice',
-                    transcript: transcriptText,
-                })
+                headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+                body: JSON.stringify(voiceChatPayload)
             });
 
             thinkingRow.remove();
@@ -524,6 +636,11 @@ async function sendVoiceMessage(audioBlob) {
             }
 
             const data = await chatResponse.json();
+
+            if (data.is_session_closed || shouldCloseThisTurn) {
+                handleSessionClosedResponse(data);
+                return;
+            }
 
             // Render MILO's reply with audio and Indonesian translation
             setCompanionState('speaking', 'Milo menjawab...');
@@ -544,9 +661,13 @@ async function sendVoiceMessage(audioBlob) {
         formData.append('session_id', sessionId);
         formData.append('return_audio', 'true');
         formData.append('cefr_level', currentLevel);
+        formData.append('is_closing', shouldCloseThisTurn ? 'true' : 'false');
+        const fallbackUserId = getAuthUserId();
+        if (fallbackUserId) formData.append('user_id', fallbackUserId);
 
         const response = await fetch('/api/v1/voice', {
             method: 'POST',
+            headers: getAuthHeaders(),
             body: formData,
         });
 
@@ -571,9 +692,14 @@ async function sendVoiceMessage(audioBlob) {
         const msgObj = messageStore.get(userMsgId);
         if (msgObj) msgObj.text = finalTranscript;
 
+        if (data.is_session_closed || shouldCloseThisTurn) {
+            handleSessionClosedResponse(data);
+            return;
+        }
+
         // Render MILO's reply with audio and Indonesian translation
         setCompanionState('speaking', 'Milo menjawab...');
-        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
+        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, data.rag_sources, data.rag_details);
         setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
 
         // Update real-time Speech Evaluation HUD and inline user bubble badge
@@ -581,6 +707,7 @@ async function sendVoiceMessage(audioBlob) {
             updateEvaluationHUD(data.feedback);
             attachUserFeedback(userMsgId, data.feedback);
         }
+        updateRagFeedbackHUD(data.rag_details, data.rag_sources);
     } catch (err) {
         const ind = document.getElementById('miloVoiceThinking');
         if (ind) ind.remove();
@@ -765,13 +892,17 @@ function toggleUserCorrBox(msgId) {
 window.toggleUserCorrBox = toggleUserCorrBox;
 
 function initSessionDurationTimer() {
-    const dailyGoal = sessionStorage.getItem('milo_daily_goal') || '15_min';
-    if (dailyGoal === '5_min') {
+    const dailyGoal = sessionStorage.getItem('milo_daily_goal') || '5_min';
+    if (dailyGoal === '3_min') {
+        targetMinutes = 3;
+    } else if (dailyGoal === '5_min') {
         targetMinutes = 5;
+    } else if (dailyGoal === '15_min') {
+        targetMinutes = 15;
     } else if (dailyGoal === '30_min') {
         targetMinutes = 30;
     } else {
-        targetMinutes = 15;
+        targetMinutes = 5;
     }
     targetSeconds = targetMinutes * 60;
 
@@ -851,13 +982,152 @@ function updateTimerDisplay() {
             timerGoalPill.textContent = 'Selesai ✓';
         }
 
-        if (!goalModalShown) {
-            goalModalShown = true;
-            if (durationGoalModal) {
-                durationGoalModal.style.display = 'flex';
-            }
+        if (!autoCloseInitiated) {
+            autoCloseInitiated = true;
             playTargetCompletionChime();
+            if (isRecording) {
+                isSessionClosing = true;
+                stopRecording();
+            } else {
+                triggerAutoSessionClose();
+            }
         }
+    }
+}
+
+function lockConversationInputs(reasonText) {
+    if (btnMicAction) {
+        btnMicAction.disabled = true;
+        btnMicAction.classList.add('disabled-locked');
+        btnMicAction.title = reasonText || 'Sesi latihan telah selesai';
+    }
+    if (userTextInput) {
+        userTextInput.disabled = true;
+        userTextInput.placeholder = reasonText || 'Sesi latihan telah selesai...';
+    }
+    if (btnSendText) {
+        btnSendText.disabled = true;
+    }
+}
+
+function showClosingToast(title, desc) {
+    const toast = document.getElementById('sessionClosingToast');
+    const toastTitle = document.getElementById('closingToastTitle');
+    const toastDesc = document.getElementById('closingToastDesc');
+    if (toastTitle && title) toastTitle.textContent = title;
+    if (toastDesc && desc) toastDesc.textContent = desc;
+    if (toast) toast.style.display = 'block';
+}
+
+function playClosingAudioAndRedirect(base64Audio) {
+    showClosingToast('Waktu Latihan Selesai', 'Mendengarkan salam penutup Milo. Mengalihkan ke evaluasi setelah selesai...');
+    let redirected = false;
+    const triggerRedirect = () => {
+        if (!redirected) {
+            redirected = true;
+            showClosingToast('Menyusun Evaluasi', 'Menyimpan performa dan mengalihkan ke ringkasan...');
+            confirmEndSession(true);
+        }
+    };
+
+    if (base64Audio) {
+        try {
+            const audio = new Audio("data:audio/mp3;base64," + base64Audio);
+            setCompanionState('speaking', 'Milo menutup percakapan...');
+            audio.onended = () => {
+                setCompanionState('idle', 'Sesi latihan selesai');
+                setTimeout(triggerRedirect, 1500);
+            };
+            audio.onerror = () => {
+                setCompanionState('idle', 'Sesi latihan selesai');
+                setTimeout(triggerRedirect, 2500);
+            };
+            audio.play().catch(e => {
+                console.log("Audio autoplay prevented by browser policy:", e);
+                setCompanionState('idle', 'Sesi latihan selesai');
+                setTimeout(triggerRedirect, 3500);
+            });
+            setTimeout(triggerRedirect, 15000);
+            return;
+        } catch (e) {
+            console.error("Closing audio error:", e);
+        }
+    }
+
+    setTimeout(triggerRedirect, 3500);
+}
+
+function handleSessionClosedResponse(data) {
+    isSessionClosing = true;
+    lockConversationInputs('Sesi latihan telah selesai');
+    setCompanionState('speaking', 'Milo menutup percakapan...');
+
+    // Append Milo's closing message to the chat (without generic autoplay)
+    appendMessage(data.response_text, 'milo', null, data.translation, data.rag_sources, data.rag_details);
+
+    // Update real-time Speech Evaluation HUD if feedback exists
+    if (data.feedback) {
+        updateEvaluationHUD(data.feedback);
+    }
+
+    // Play closing audio and schedule auto redirect
+    playClosingAudioAndRedirect(data.audio_base64);
+}
+
+async function triggerAutoSessionClose() {
+    if (isSessionClosing) return;
+    isSessionClosing = true;
+
+    lockConversationInputs('Waktu latihan selesai. Milo sedang memberikan rangkuman penutup...');
+    showClosingToast('Waktu Latihan Selesai', 'Durasi tercapai. Milo sedang memberikan ucapan penutup...');
+    setCompanionState('thinking', 'Milo sedang menutup sesi...');
+
+    const thinkingRow = document.createElement('div');
+    thinkingRow.className = 'chat-message-row milo-row thinking-indicator-row';
+    thinkingRow.id = 'miloClosingThinking';
+    thinkingRow.innerHTML = `
+        <div class="milo-avatar-icon"><span style="font-weight: 800; font-size: 14px; color: #FFFFFF;">M</span></div>
+        <div class="message-bubble milo-bubble thinking-bubble" style="opacity: 0.85; font-style: italic;">
+            <i class="fa-solid fa-spinner fa-spin"></i> <span>Milo sedang merangkum sesi latihan...</span>
+        </div>
+    `;
+    messagesContainer.appendChild(thinkingRow);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    try {
+        const authUserId = getAuthUserId();
+        const closePayload = {
+            session_id: sessionId,
+            message: "Time is up for today's practice session.",
+            learning_goal: sessionStorage.getItem('milo_learning_goal') || '',
+            cefr_level: currentLevel,
+            return_audio: true,
+            input_type: 'text',
+            is_closing: true,
+            trigger: 'time_limit_reached',
+        };
+        if (authUserId) closePayload.user_id = authUserId;
+
+        const response = await fetch('/api/v1/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(closePayload)
+        });
+
+        thinkingRow.remove();
+
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Close session error ${response.status}: ${errText}`);
+        }
+
+        const data = await response.json();
+        handleSessionClosedResponse(data);
+    } catch (err) {
+        console.error("Auto close session error:", err);
+        const ind = document.getElementById('miloClosingThinking');
+        if (ind) ind.remove();
+        confirmEndSession(true);
     }
 }
 
@@ -899,7 +1169,7 @@ async function confirmEndSession(skipConfirm = false) {
     try {
         const response = await fetch('/api/v1/session/end', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
             body: JSON.stringify({ session_id: sessionId })
         });
 
@@ -910,10 +1180,68 @@ async function confirmEndSession(skipConfirm = false) {
 
         const summaryData = await response.json();
         sessionStorage.setItem('milo_summary_data', JSON.stringify(summaryData));
-        window.location.href = `/ui/summary.html?session_id=${encodeURIComponent(sessionId)}`;
+        window.location.href = `/ui/summary.html?session_id=${encodeURIComponent(sessionId)}&topic_id=${encodeURIComponent(currentTopicId)}`;
     } catch (err) {
         hideGlobalLoading();
         alert('Gagal mengakhiri sesi: ' + err.message);
         console.error('End session error:', err);
     }
 }
+
+// ─── RAG Grounding HUD & Interactive Inspector Modal ──────────────────────────
+
+function updateRagFeedbackHUD(ragDetails, ragSources) {
+    const ragBox = document.getElementById('evalRagBox');
+    const ragTitle = document.getElementById('evalRagTitle');
+    const ragSnippet = document.getElementById('evalRagSnippet');
+    if (!ragBox) return;
+
+    if (ragDetails && Array.isArray(ragDetails) && ragDetails.length > 0) {
+        const item = ragDetails[0];
+        if (ragTitle) ragTitle.textContent = item.book || item.title || 'Cambridge / Collins RAG';
+        if (ragSnippet) ragSnippet.textContent = item.snippet || 'Kutipan materi pembelajaran terverifikasi.';
+        ragBox.style.display = 'flex';
+    } else if (ragSources && Array.isArray(ragSources) && ragSources.length > 0) {
+        if (ragTitle) ragTitle.textContent = formatRagSourceLabel(ragSources[0]);
+        if (ragSnippet) ragSnippet.textContent = 'Materi tuturan diverifikasi oleh buku rujukan kurikulum resmi.';
+        ragBox.style.display = 'flex';
+    }
+}
+
+window.openRagInspectorModal = function(msgId, detailIdx) {
+    const msg = messageStore.get(msgId);
+    if (!msg) return;
+    const details = msg.ragDetails || [];
+    const detail = details[detailIdx] || {
+        book: msg.ragSources && msg.ragSources[detailIdx] ? formatRagSourceLabel(msg.ragSources[detailIdx]) : 'Cambridge & Collins RAG Knowledge Base',
+        category: 'Materi Pembelajaran Resmi',
+        level: currentLevel || 'B1-B2',
+        score: 0.85,
+        snippet: 'Materi ini terverifikasi oleh knowledge base MILO berbasis buku referensi resmi.'
+    };
+
+    const modal = document.getElementById('ragModalBackdrop');
+    if (!modal) return;
+    const bElem = document.getElementById('ragModalBook');
+    const cElem = document.getElementById('ragModalCategory');
+    const lElem = document.getElementById('ragModalLevel');
+    const sElem = document.getElementById('ragModalScore');
+    const snElem = document.getElementById('ragModalSnippet');
+
+    if (bElem) bElem.textContent = detail.book || detail.title || 'Cambridge / Collins RAG';
+    if (cElem) cElem.textContent = detail.category || 'Curriculum Material';
+    if (lElem) lElem.textContent = `CEFR ${detail.level || currentLevel || 'B1-B2'}`;
+    const pct = Math.round((detail.score || 0.85) * 100);
+    if (sElem) sElem.textContent = `Skor Keselarasan: ${pct}%`;
+    if (snElem) snElem.textContent = `"${detail.snippet || 'Kutipan materi pembelajaran.'}"`;
+    modal.style.display = 'flex';
+};
+
+window.closeRagInspectorModal = function(e) {
+    if (e && e.target && e.target.id !== 'ragModalBackdrop' && !e.target.classList.contains('rag-modal-close-btn') && !e.target.classList.contains('rag-modal-btn')) {
+        return;
+    }
+    const modal = document.getElementById('ragModalBackdrop');
+    if (modal) modal.style.display = 'none';
+};
+

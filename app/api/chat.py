@@ -1,7 +1,7 @@
 """
 MILO AI Backend - Chat API Route
 
-POST /api/v1/chat — Process text input and return MILO's response.
+POST /api/v1/chat: Process text input and return MILO's response.
 """
 
 import logging
@@ -10,7 +10,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import get_current_user_optional
+from app.core.translator import translate_to_indonesian
 from app.db.database import get_db
+from app.db.models import User
 from app.models.schemas import (
     ChatRequest,
     ChatResponse,
@@ -19,7 +22,6 @@ from app.models.schemas import (
     TranslateRequest,
     TranslateResponse,
 )
-from app.core.translator import translate_to_indonesian
 from app.services.pipeline import MILOPipeline
 
 logger = logging.getLogger(__name__)
@@ -37,6 +39,7 @@ router = APIRouter(prefix="/api/v1", tags=["Chat"])
 )
 async def chat(
     request: ChatRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> ChatResponse:
     """
@@ -47,6 +50,7 @@ async def chat(
     - Always returns feedback on the user's text.
     """
     pipeline = MILOPipeline(db)
+    effective_user_id = request.user_id or (str(current_user.id) if current_user else None)
 
     try:
         result = await pipeline.process_text(
@@ -55,9 +59,11 @@ async def chat(
             learning_goal=request.learning_goal or "",
             cefr_level=request.cefr_level,
             return_audio=request.return_audio,
-            user_id=request.user_id,
+            user_id=effective_user_id,
             input_type=request.input_type or "text",
             transcript=request.transcript,
+            is_closing=bool(request.is_closing),
+            trigger=request.trigger,
         )
     except Exception as e:
         logger.error(f"Chat pipeline error: {e}", exc_info=True)
@@ -98,7 +104,9 @@ async def chat(
         audio_base64=result.audio_base64,
         feedback=feedback_response,
         rag_sources=result.rag_sources,
+        rag_details=getattr(result, "rag_details", []),
         avatar_emotion=getattr(result, "avatar_emotion", "friendly"),
+        is_session_closed=getattr(result, "is_session_closed", False),
     )
 
 

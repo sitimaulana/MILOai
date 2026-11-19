@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluasi Sesi & Ringkasan CEFR: MILO English Speaking Practice</title>
     <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css, practice.css & dashboard.css) -->
     <link rel="stylesheet" href="css/summary.css?v=20261112e">
@@ -12,33 +15,42 @@
 <body class="summary-body">
 
     <!-- ═══════════════════════════════════════════════════════════════════════
-         1. TOP FLOATING NAVBAR (Senada dengan index & dashboard)
+         1. TOP FLOATING NAVBAR (Senada dengan index.html & dashboard.html)
          ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="home-nav-wrapper">
-        <header class="home-navbar">
-            <a href="/ui/index.html" class="nav-brand-group">
-                <div class="nav-brand-icon">
-                    <span style="font-weight: 800; font-size: 19px;">M</span>
-                </div>
-                <div>
-                    <span class="nav-brand-title">MILO</span>
-                    <span class="nav-brand-badge">Evaluation</span>
-                </div>
+    <header class="site-header">
+        <nav class="nav-inner wrap" aria-label="Navigasi utama">
+            <a id="brand-link" class="brand" href="index.html">
+                <span class="brand-mark" aria-hidden="true">✿</span>
+                MILO <small>(Evaluasi)</small>
             </a>
-
-            <nav>
-                <ul class="nav-center-menu">
-                    <li><a href="/ui/index.html" class="nav-menu-link">Beranda</a></li>
-                    <li><a href="/ui/setup.html" class="nav-menu-link">Latihan</a></li>
-                    <li><a href="/ui/dashboard.html" class="nav-menu-link">Dashboard</a></li>
-                </ul>
-            </nav>
-
-            <div>
-                <a href="/ui/setup.html" class="nav-cta-btn">Latihan Lagi</a>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="setup.html">Ruang Latihan</a>
+                <a href="dashboard.html">Dashboard</a>
             </div>
-        </header>
-    </div>
+            <div class="nav-action-wrapper">
+                <a href="setup.html" class="pill nav-cta">Latihan Lagi</a>
+            </div>
+            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-nav-drawer">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
+            <div id="drawer-user-info" class="drawer-user-info" style="display:none;"></div>
+            <div class="mobile-nav-links">
+                <a href="index.html" class="mobile-nav-link">Beranda</a>
+                <a href="setup.html" class="mobile-nav-link">Ruang Latihan</a>
+                <a href="dashboard.html" class="mobile-nav-link">Dashboard Progres</a>
+            </div>
+            <div class="mobile-nav-actions">
+                <a href="setup.html" class="pill primary-btn" style="width: 100%; min-height: 44px; justify-content: center;">
+                    Latihan Lagi <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
          2. MAIN SUMMARY CONTENT
@@ -55,6 +67,59 @@
                 Latihan Speaking &bull; Durasi: -- menit &bull; -- Putaran Percakapan
             </p>
         </header>
+
+        <!-- Gamification Celebration Banner (Shown when session ends) -->
+        <section class="summary-gamification-banner" id="summaryGamificationCard" style="display: none; margin-bottom: 24px;">
+            <div class="gam-celebrate-left">
+                <div class="gam-celebrate-icon">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <div class="gam-celebrate-title" id="gamCelebrateTitle">Sesi Latihan Berhasil Diselesaikan!</div>
+                    <div class="gam-celebrate-desc" id="gamCelebrateDesc">Poin pengalaman latihan dan streak Anda telah diperbarui.</div>
+                </div>
+            </div>
+            <div class="gam-celebrate-badges-row" id="gamCelebratePills">
+                <span class="gam-chip xp" id="gamChipXp"><i class="fa-solid fa-star" style="color: #F59E0B;"></i> +50 XP</span>
+                <span class="gam-chip streak" id="gamChipStreak"><i class="fa-solid fa-fire" style="color: #EF4444;"></i> 1 Hari Streak</span>
+                <span class="gam-chip unlocked" id="gamChipBadge" style="display: none;"><i class="fa-solid fa-award"></i> Lencana Terbuka!</span>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             0. POST-PRACTICE MICRO-QUIZ (Reinforcement & Gamification)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="summary-card" id="microQuizCard" style="display: none; margin-bottom: 24px; border: 2px solid var(--primary-border);">
+            <div class="card-header-with-badge" style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div class="title-with-icon">
+                    <div class="title-icon-circle" style="background: var(--primary-tint); color: var(--primary-dark);">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h2 class="card-title-text" style="font-size: 18px;" id="quizCardTitle">Kuis Pemahaman Materi (Micro-Quiz)</h2>
+                        <p class="card-subtitle-text" id="quizCardSubtitle">Uji pemahaman kosakata dan strategi dari modul yang baru kamu latih (2 soal cepat)</p>
+                    </div>
+                </div>
+                <div class="quiz-score-badge" id="quizScoreBadge" style="display: none; background: var(--secondary); color: #FFFFFF; padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 13px;">
+                    <span id="quizScoreText">100 / 100</span>
+                </div>
+            </div>
+
+            <div id="quizQuestionsContainer" style="margin-top: 18px; display: flex; flex-direction: column; gap: 16px;">
+                <!-- Dynamically populated from /api/v1/curriculum/topic/{id} -->
+            </div>
+
+            <div id="quizActionRow" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+                <button type="button" class="btn-primary-summary" id="btnSubmitMicroQuiz" style="padding: 10px 24px; font-size: 13.5px;">
+                    <i class="fa-solid fa-check"></i>
+                    <span>Kirim Jawaban & Dapatkan Poin</span>
+                </button>
+            </div>
+
+            <div id="quizResultNotice" style="display: none; margin-top: 16px; padding: 14px 18px; border-radius: 12px; background: #EFF5F1; border: 1px solid #C2D6C7;">
+                <!-- Feedback & gamification points -->
+            </div>
+        </section>
 
         <!-- Top Dual-Column Metrics Grid (Overall Score Dial + 3 Pillar Bars) -->
         <div class="summary-metrics-grid">
@@ -170,6 +235,27 @@
             </ul>
         </section>
 
+        <!-- RAG Grounded Recommended Reading Section -->
+        <section class="summary-card rag-recommendation-card" id="ragRecommendationCard" style="margin-bottom: 24px;">
+            <div class="card-header-with-badge" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                <div class="title-with-icon" style="display: flex; align-items: center; gap: 12px;">
+                    <div class="title-icon-circle" style="width: 40px; height: 40px; border-radius: 10px; background: #FFF4E5; color: #C87D55; display: flex; align-items: center; justify-content: center; font-size: 18px;">
+                        <i class="fa-solid fa-book-open-reader"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title-text" style="font-size: 18px; font-weight: 800; color: #1A202C; margin: 0;">Rekomendasi Rujukan Belajar (RAG Knowledge Base)</h3>
+                        <p class="card-subtitle-text" style="font-size: 13px; color: #718096; margin: 2px 0 0 0;">Modul rujukan yang disarankan sistem dari buku Cambridge & Collins untuk mengatasi catatan evaluasi Anda</p>
+                    </div>
+                </div>
+                <span class="corrections-count-badge" style="background: #EBF8FF; color: #2B6CB0; border: 1px solid #BEE3F8; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px;">
+                    <i class="fa-solid fa-shield-halved"></i> Terverifikasi Pedoman Resmi
+                </span>
+            </div>
+            <div class="rag-rec-books-grid" id="ragRecBooksGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <!-- Dynamically populated via summary.js -->
+            </div>
+        </section>
+
         <!-- Session Corrections Review -->
         <section class="summary-card" id="allCorrectionsCard">
             <div class="card-header-with-badge">
@@ -211,6 +297,88 @@
             </div>
         </section>
 
+        <!-- Guest Auth Save Callout (Shown when not logged in) -->
+        <div id="summaryGuestSaveCard" class="summary-guest-save-card" style="display: none;">
+            <div class="guest-save-info">
+                <i class="fa-solid fa-cloud-arrow-up guest-save-icon"></i>
+                <div>
+                    <div class="guest-save-title">Simpan Skor & Riwayat Sesi Ini ke Akunmu</div>
+                    <p class="guest-save-desc">Masuk atau daftar akun baru agar hasil latihan dan perkembangan CEFR Anda tercatat permanen di dashboard.</p>
+                </div>
+            </div>
+            <div class="guest-save-buttons">
+                <a href="login.html?redirect=summary.html" class="btn-guest-login">Masuk</a>
+                <a href="register.html?redirect=summary.html" class="btn-guest-register">Daftar Akun</a>
+            </div>
+        </div>
+
+        <!-- Post-Session Evaluation Survey (Thesis/PA Engagement & UEQ) -->
+        <section class="post-session-survey-card" id="postSessionSurveyCard">
+            <div class="survey-header-row">
+                <div class="survey-title-box">
+                    <div class="survey-icon">
+                        <i class="fa-solid fa-square-poll-vertical"></i>
+                    </div>
+                    <div>
+                        <div class="survey-title">Survei Evaluasi Pengalaman Belajar</div>
+                        <div class="survey-desc">Bantu riset evaluasi MILO dan dapatkan bonus tambahan XP untuk profil Anda.</div>
+                    </div>
+                </div>
+                <div class="survey-bonus-tag">
+                    <i class="fa-solid fa-star" style="color: #F59E0B;"></i>
+                    <span>+30 XP Bonus</span>
+                </div>
+            </div>
+
+            <form id="evaluationSurveyForm" class="survey-questions-stack">
+                <div class="survey-question-item">
+                    <label class="survey-q-label">1. Keterlibatan Perilaku: Saya berusaha aktif berbicara dan merespon MILO secara maksimal.</label>
+                    <div class="survey-rating-options" data-dim="behavioral">
+                        <button type="button" class="survey-rate-btn" data-val="1">1</button>
+                        <button type="button" class="survey-rate-btn" data-val="2">2</button>
+                        <button type="button" class="survey-rate-btn" data-val="3">3</button>
+                        <button type="button" class="survey-rate-btn" data-val="4">4</button>
+                        <button type="button" class="survey-rate-btn selected" data-val="5">5</button>
+                    </div>
+                </div>
+
+                <div class="survey-question-item">
+                    <label class="survey-q-label">2. Keterlibatan Emosional: Saya merasa nyaman, percaya diri, dan termotivasi saat berlatih dengan MILO.</label>
+                    <div class="survey-rating-options" data-dim="emotional">
+                        <button type="button" class="survey-rate-btn" data-val="1">1</button>
+                        <button type="button" class="survey-rate-btn" data-val="2">2</button>
+                        <button type="button" class="survey-rate-btn" data-val="3">3</button>
+                        <button type="button" class="survey-rate-btn" data-val="4">4</button>
+                        <button type="button" class="survey-rate-btn selected" data-val="5">5</button>
+                    </div>
+                </div>
+
+                <div class="survey-question-item">
+                    <label class="survey-q-label">3. Keterlibatan Kognitif: Umpan balik grammar dan vocabulary membantu saya memperbaiki tuturan saya.</label>
+                    <div class="survey-rating-options" data-dim="cognitive">
+                        <button type="button" class="survey-rate-btn" data-val="1">1</button>
+                        <button type="button" class="survey-rate-btn" data-val="2">2</button>
+                        <button type="button" class="survey-rate-btn" data-val="3">3</button>
+                        <button type="button" class="survey-rate-btn" data-val="4">4</button>
+                        <button type="button" class="survey-rate-btn selected" data-val="5">5</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label for="surveyFeedbackInput" class="survey-q-label">Komentar atau saran tambahan (opsional):</label>
+                    <textarea id="surveyFeedbackInput" class="survey-textarea" rows="2" placeholder="Bagikan kesan atau hal yang paling membantu Anda selama sesi latihan..."></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div id="surveyFeedbackNotice" style="display: none; font-size: 13px; font-weight: 700; color: #047857;"></div>
+                    <button type="submit" class="survey-submit-btn" id="btnSubmitSurvey">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Kirim Evaluasi (+30 XP)</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
         <!-- Footer Actions -->
         <div class="summary-actions-row">
             <a href="setup.html" class="btn-primary-summary">
@@ -232,6 +400,10 @@
             <a href="setup.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Mulai Latihan</a>
             <span style="color: var(--border-subtle);">&bull;</span>
             <a href="dashboard.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Dashboard</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="login.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Masuk</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="register.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Daftar</a>
             <span style="color: var(--border-subtle);">&bull;</span>
             <a href="/docs" target="_blank" rel="noopener" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Dokumentasi API</a>
         </div>

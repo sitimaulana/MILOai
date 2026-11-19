@@ -1,24 +1,35 @@
 """
 MILO AI Backend - Session API Routes
 
-POST /api/v1/session/start   — Start a new practice session (select topic & level)
-POST /api/v1/session/end     — End session & get scores + CEFR evaluation
-GET  /api/v1/dashboard       — Dashboard with recent sessions & progress
-GET  /api/v1/session/{id}/feedback — Get session-level feedback summary
-POST /api/v1/session         — Create a session (legacy)
-GET  /api/v1/session/{id}    — Get session info (legacy)
+POST /api/v1/session/start   :  Start a new practice session (select topic & level)
+POST /api/v1/session/end     :  End session & get scores + CEFR evaluation
+GET  /api/v1/dashboard       :  Dashboard with recent sessions & progress
+GET  /api/v1/session/{id}/feedback :  Get session-level feedback summary
+POST /api/v1/session         :  Create a session (legacy)
+GET  /api/v1/session/{id}    :  Get session info (legacy)
 """
 
 import logging
+import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.llm import generate_response
+from app.core.security import get_current_user_optional
 from app.core.tts import synthesize_speech
 from app.db.database import get_db
+from app.db.models import (
+    EvaluationSurvey,
+    LearningProgress,
+    SystemLogAnalytics,
+    User,
+    UserBadge,
+    UserGamification,
+)
 from app.models.schemas import (
     DashboardResponse,
     DashboardSessionItem,
@@ -30,6 +41,11 @@ from app.models.schemas import (
     SessionInfo,
     SessionStartRequest,
     SessionStartResponse,
+    SkillProgressItem,
+    SurveySubmitRequest,
+    SurveySubmitResponse,
+    UserBadgeItem,
+    UserGamificationStats,
 )
 from app.services.conversation import ConversationService, TOPIC_LABELS
 
@@ -113,7 +129,7 @@ def _build_session_diagnostics(
 TOPIC_GREETINGS = {
     "job_interview": (
         "Good morning! Thank you for coming in today. Welcome to your job interview practice session. "
-        "I'll be your interviewer. Let's start — could you tell me a little bit about yourself?"
+        "I'll be your interviewer. Let's start :  could you tell me a little bit about yourself?"
     ),
     "academic_discussion": (
         "Welcome to our academic discussion! I'm excited to have a scholarly conversation with you. "
@@ -121,14 +137,14 @@ TOPIC_GREETINGS = {
     ),
     "daily_conversation": (
         "Hey there! Welcome to our daily conversation practice. "
-        "Feel free to talk about anything — your hobbies, weekend plans, or daily life. "
+        "Feel free to talk about anything :  your hobbies, weekend plans, or daily life. "
         "So, how's your day going?"
     ),
 }
 
 LEVEL_ADAPTED_GREETINGS = {
     "A1": {
-        "job_interview": "Hello! Welcome to your job interview practice. I am Milo. Let's start simple — what is your name and what job do you like?",
+        "job_interview": "Hello! Welcome to your job interview practice. I am Milo. Let's start simple :  what is your name and what job do you like?",
         "academic_discussion": "Hello! Welcome to our study chat. What school subject or topic do you like to learn?",
         "daily_conversation": "Hi there! Welcome to English practice. How are you today? What do you like to do in your free time?",
     },
@@ -138,9 +154,9 @@ LEVEL_ADAPTED_GREETINGS = {
         "daily_conversation": "Hey there! Welcome to our daily practice. How was your day today? Did you do anything fun or interesting?",
     },
     "B1": {
-        "job_interview": "Good morning! Thank you for coming in today. Welcome to your job interview practice session. I'll be your interviewer. Let's start — could you tell me a little bit about yourself?",
+        "job_interview": "Good morning! Thank you for coming in today. Welcome to your job interview practice session. I'll be your interviewer. Let's start :  could you tell me a little bit about yourself?",
         "academic_discussion": "Welcome to our academic discussion! I'm excited to have a scholarly conversation with you. Today we can discuss any academic topic you're interested in. What subject would you like to explore?",
-        "daily_conversation": "Hey there! Welcome to our daily conversation practice. Feel free to talk about anything — your hobbies, weekend plans, or daily life. So, how's your day going?",
+        "daily_conversation": "Hey there! Welcome to our daily conversation practice. Feel free to talk about anything :  your hobbies, weekend plans, or daily life. So, how's your day going?",
     },
     "B2": {
         "job_interview": "Good morning and welcome to your professional interview practice. I'll be conducting your interview today. To kick things off, could you walk me through your background and what motivated you to pursue this path?",
@@ -148,7 +164,7 @@ LEVEL_ADAPTED_GREETINGS = {
         "daily_conversation": "Hey, great to connect with you! I'm ready to dive into some spontaneous English conversation today. What's been on your mind lately, or what exciting projects have you been working on?",
     },
     "C1": {
-        "job_interview": "Good day, and thank you for taking the time to meet with me. Let's delve right into our discussion — could you provide a comprehensive overview of your professional trajectory and the core competencies you bring to the table?",
+        "job_interview": "Good day, and thank you for taking the time to meet with me. Let's delve right into our discussion :  could you provide a comprehensive overview of your professional trajectory and the core competencies you bring to the table?",
         "academic_discussion": "Welcome to today's scholarly exchange. I look forward to an analytical discourse with you. Which theoretical framework, research inquiry, or critical discourse would you like to examine?",
         "daily_conversation": "Delighted to speak with you today! Let's engage in an open, nuanced conversation. What fascinating ideas, cultural insights, or current affairs have captured your curiosity recently?",
     },
@@ -156,9 +172,9 @@ LEVEL_ADAPTED_GREETINGS = {
 
 LEVEL_ADAPTED_GREETINGS_ID = {
     "B1": {
-        "job_interview": "Selamat pagi! Terima kasih sudah datang hari ini. Selamat datang di sesi latihan wawancara kerjamu. Saya akan menjadi pewawancaramu. Mari kita mulai — bisakah kamu menceritakan sedikit tentang dirimu?",
+        "job_interview": "Selamat pagi! Terima kasih sudah datang hari ini. Selamat datang di sesi latihan wawancara kerjamu. Saya akan menjadi pewawancaramu. Mari kita mulai :  bisakah kamu menceritakan sedikit tentang dirimu?",
         "academic_discussion": "Selamat datang di diskusi akademik kita! Saya sangat antusias untuk berdiskusi ilmiah denganmu. Hari ini kita bisa membahas topik akademis apa pun yang menarik minatmu. Subjek apa yang ingin kamu jelajahi?",
-        "daily_conversation": "Halo! Selamat datang di sesi latihan percakapan sehari-hari. Jangan ragu mengobrol tentang apa saja — hobimu, rencana akhir pekan, atau kehidupan sehari-hari. Jadi, bagaimana harimu hari ini?",
+        "daily_conversation": "Halo! Selamat datang di sesi latihan percakapan sehari-hari. Jangan ragu mengobrol tentang apa saja :  hobimu, rencana akhir pekan, atau kehidupan sehari-hari. Jadi, bagaimana harimu hari ini?",
     },
     "B2": {
         "job_interview": "Selamat pagi dan selamat datang di latihan wawancara profesionalmu. Saya akan memandu wawancaramu hari ini. Sebagai pembuka, bisakah kamu menjabarkan latar belakangmu dan apa yang memotivasimu mengejar jalur karier ini?",
@@ -184,6 +200,7 @@ TOPIC_GOALS = {
 )
 async def start_session(
     request: SessionStartRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> SessionStartResponse:
     """
@@ -199,22 +216,43 @@ async def start_session(
 
     conv = ConversationService(db)
     goal_base = TOPIC_GOALS.get(topic, "")
-    daily_goal_str = request.daily_goal or "15_min"
-    daily_goal_label = "15 min/day" if daily_goal_str == "15_min" else "5 min/day" if daily_goal_str == "5_min" else "30 min/day"
+    daily_goal_str = request.daily_goal or "5_min"
+    daily_goal_label = "5 min/day" if daily_goal_str == "5_min" else "3 min/day" if daily_goal_str == "3_min" else "15 min/day"
     learning_goal = f"{goal_base} Target: {daily_goal_label}. Level: {request.cefr_level}."
 
-    session = await conv.create_session(
-        user_id=request.user_id,
-        learning_goal=learning_goal,
-        topic=topic,
-        cefr_level=request.cefr_level,
-    )
+    topic_id = request.topic_id
+    topic_title = None
 
     level_dict = LEVEL_ADAPTED_GREETINGS.get(request.cefr_level, LEVEL_ADAPTED_GREETINGS["B1"])
     greeting = level_dict.get(topic, TOPIC_GREETINGS[topic])
 
     level_dict_id = LEVEL_ADAPTED_GREETINGS_ID.get(request.cefr_level, LEVEL_ADAPTED_GREETINGS_ID["B1"])
     greeting_translation = level_dict_id.get(topic, "Selamat datang di sesi latihan MILO!")
+
+    # Check if specific microlearning topic was selected
+    if topic_id:
+        try:
+            from app.api.curriculum import get_curriculum_data
+            curr_data = get_curriculum_data()
+            topic_match = next((t for t in curr_data.get("curriculum", []) if t.get("topic_id", "").upper() == topic_id.upper()), None)
+            if topic_match:
+                topic_title = topic_match.get("title", "")
+                learning_goal = f"{learning_goal} Topic {topic_id}: {topic_title}."
+                prompts = topic_match.get("milo_prompts", [])
+                lead_prompt = prompts[0] if prompts else "Could you share your thoughts on this topic?"
+                track_display = TOPIC_LABELS.get(topic, topic)
+                greeting = f"Hello and welcome to your {track_display}! Today we focus on {topic_title}. {lead_prompt}"
+                greeting_translation = f"Halo dan selamat datang di sesi {track_display}! Hari ini kita fokus pada topik {topic_title}. Mari kita mulai."
+        except Exception as e:
+            logger.warning(f"Could not load topic metadata for '{topic_id}': {e}")
+
+    effective_user_id = request.user_id or (str(current_user.id) if current_user else None)
+    session = await conv.create_session(
+        user_id=effective_user_id,
+        learning_goal=learning_goal,
+        topic=topic,
+        cefr_level=request.cefr_level,
+    )
 
     # Save the greeting as the first assistant message
     await conv.add_message(
@@ -235,6 +273,8 @@ async def start_session(
         session_id=str(session.id),
         cefr_level=request.cefr_level,
         topic=topic,
+        topic_id=topic_id,
+        topic_title=topic_title,
         topic_label=TOPIC_LABELS.get(topic, topic),
         daily_goal=daily_goal_str,
         greeting=greeting,
@@ -310,6 +350,11 @@ async def end_session(
     topic = session.topic or "daily_conversation"
     transcript_messages = await conv.get_session_messages(request.session_id)
 
+    gam_info = getattr(session, "gamification_info", {})
+    xp_earned = gam_info.get("xp_earned", 0)
+    current_streak = gam_info.get("current_streak", 0)
+    unlocked_badges = gam_info.get("unlocked_badges", [])
+
     return SessionEndResponse(
         session_id=request.session_id,
         total_turns=summary_data["total_turns"],
@@ -337,6 +382,9 @@ async def end_session(
         duration_minutes=duration_minutes,
         daily_goal=daily_goal_key,
         target_duration_minutes=target_duration,
+        xp_earned=xp_earned,
+        current_streak=current_streak,
+        unlocked_badges=unlocked_badges,
         transcript_history=transcript_messages,
     )
 
@@ -349,11 +397,14 @@ async def end_session(
     summary="Get dashboard data",
 )
 async def get_dashboard(
+    user_id: Optional[str] = None,
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> DashboardResponse:
     """Get recent sessions and aggregate statistics for the dashboard."""
+    active_user_id = str(current_user.id) if current_user else user_id
     conv = ConversationService(db)
-    recent = await conv.get_recent_sessions(limit=10)
+    recent = await conv.get_recent_sessions(limit=10, user_id=active_user_id)
 
     sessions_items = []
     total_score = 0.0
@@ -390,6 +441,84 @@ async def get_dashboard(
 
     avg_score = round(total_score / max(score_count, 1), 1)
 
+    gam_stats = None
+    skill_progress_items = []
+    user_profile_data = None
+
+    if active_user_id:
+        try:
+            user_uuid = uuid.UUID(active_user_id) if isinstance(active_user_id, str) else active_user_id
+
+            # 1. Gamification & Badges
+            gam_res = await db.execute(
+                select(UserGamification).where(UserGamification.user_id == user_uuid)
+            )
+            gam = gam_res.scalar_one_or_none()
+
+            badges_res = await db.execute(
+                select(UserBadge).where(UserBadge.user_id == user_uuid).order_by(UserBadge.earned_at.desc())
+            )
+            badges = badges_res.scalars().all()
+            badge_items = [
+                UserBadgeItem(
+                    badge_key=b.badge_key,
+                    badge_title=b.badge_title,
+                    earned_at=b.earned_at,
+                )
+                for b in badges
+            ]
+
+            if gam:
+                gam_stats = UserGamificationStats(
+                    points=gam.points,
+                    current_streak=gam.current_streak,
+                    highest_streak=gam.highest_streak,
+                    last_practice_date=gam.last_practice_date,
+                    badges=badge_items,
+                )
+            else:
+                gam_stats = UserGamificationStats(
+                    points=0,
+                    current_streak=0,
+                    highest_streak=0,
+                    badges=badge_items,
+                )
+
+            # 2. Skill Progress
+            lp_res = await db.execute(
+                select(LearningProgress).where(LearningProgress.user_id == user_uuid).order_by(LearningProgress.skill)
+            )
+            for lp in lp_res.scalars().all():
+                skill_progress_items.append(
+                    SkillProgressItem(
+                        skill=lp.skill,
+                        score=lp.score,
+                        sessions_count=lp.sessions_count,
+                        total_corrections=lp.total_corrections,
+                        last_updated=lp.last_updated,
+                    )
+                )
+
+            # 3. User profile data
+            if current_user:
+                user_profile_data = {
+                    "id": str(current_user.id),
+                    "username": current_user.username,
+                    "full_name": current_user.full_name,
+                    "cefr_level": current_user.cefr_level,
+                }
+            else:
+                user_obj = await db.get(User, user_uuid)
+                if user_obj:
+                    user_profile_data = {
+                        "id": str(user_obj.id),
+                        "username": user_obj.username,
+                        "full_name": user_obj.full_name,
+                        "cefr_level": user_obj.cefr_level,
+                    }
+        except Exception as e:
+            logger.warning(f"Failed to query gamification/progress data: {e}")
+
     return DashboardResponse(
         total_sessions=len(recent),
         avg_overall_score=avg_score,
@@ -399,6 +528,90 @@ async def get_dashboard(
             "vocabulary": round(vocab_sum / max(score_count, 1), 1),
             "fluency": round(fluency_sum / max(score_count, 1), 1),
         },
+        gamification=gam_stats,
+        skill_progress=skill_progress_items,
+        user_profile=user_profile_data,
+    )
+
+
+# ─── Post-Test & UEQ Survey Evaluation ────────────────────────────────────────
+
+@router.post(
+    "/feedback/survey",
+    response_model=SurveySubmitResponse,
+    summary="Submit user evaluation survey (Post-test & UEQ)",
+)
+async def submit_evaluation_survey(
+    request: SurveySubmitRequest,
+    current_user: Optional[User] = Depends(get_current_user_optional),
+    db: AsyncSession = Depends(get_db),
+) -> SurveySubmitResponse:
+    """
+    Persist student engagement & UEQ post-test survey response for Chapter 4 research.
+    Awards +30 XP bonus to the authenticated user.
+    """
+    overall_engagement = round(
+        (request.behavioral_score + request.emotional_score + request.cognitive_score) / 3.0, 2
+    )
+
+    user_uuid = current_user.id if current_user else None
+    session_uuid = None
+    if request.session_id:
+        try:
+            session_uuid = uuid.UUID(request.session_id)
+        except (ValueError, TypeError):
+            pass
+
+    respondent_name = "Guest Learner"
+    cefr_level = "B1"
+    if current_user:
+        respondent_name = current_user.full_name or current_user.username
+        cefr_level = current_user.cefr_level or "B1"
+
+    survey = EvaluationSurvey(
+        user_id=user_uuid,
+        session_id=session_uuid,
+        respondent_name=respondent_name,
+        cefr_level=cefr_level,
+        behavioral_score=request.behavioral_score,
+        emotional_score=request.emotional_score,
+        cognitive_score=request.cognitive_score,
+        overall_engagement_score=overall_engagement,
+        survey_responses=request.survey_responses,
+        ueq_scores=request.ueq_scores,
+        feedback_text=request.feedback_text,
+    )
+    db.add(survey)
+
+    bonus_xp = 30
+    if current_user:
+        try:
+            gam_res = await db.execute(
+                select(UserGamification).where(UserGamification.user_id == current_user.id)
+            )
+            gam = gam_res.scalar_one_or_none()
+            if gam:
+                gam.points += bonus_xp
+            else:
+                db.add(UserGamification(user_id=current_user.id, points=bonus_xp, current_streak=1, highest_streak=1))
+
+            log = SystemLogAnalytics(
+                user_id=current_user.id,
+                session_id=session_uuid,
+                event_type="survey_submit",
+                duration_seconds=0,
+                turns_count=0,
+                extra_meta={"bonus_xp": bonus_xp, "overall_engagement": overall_engagement},
+            )
+            db.add(log)
+        except Exception as e:
+            logger.warning(f"Failed to record survey bonus points: {e}")
+
+    await db.commit()
+    return SurveySubmitResponse(
+        status="ok",
+        bonus_xp=bonus_xp,
+        message="Terima kasih! Survei evaluasi berhasil disimpan dan bonus XP telah ditambahkan ke profil Anda.",
     )
 
 
@@ -729,7 +942,7 @@ async def export_session_obsidian(
     md.extend([
         "",
         "---",
-        "*Exported from AI-MILO Companion — Connected with [[00_Home_MOC|CEFR Knowledge Base]]*",
+        "*Exported from AI-MILO Companion :  Connected with [[00_Home_MOC|CEFR Knowledge Base]]*",
     ])
 
     content_str = "\n".join(md)

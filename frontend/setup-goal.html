@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentukan Target Waktu Harian: MILO English Speaking Practice</title>
+    <meta name="description" content="Pilih komitmen waktu latihan harian Anda bersama Milo: 3 menit, 5 menit (rekomendasi), atau 15 menit latihan mendalam.">
+    <!-- Google Fonts & Dedicated Auth CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/auth.css?v=20261119b">
+</head>
+<body class="auth-body">
+
+    <main class="auth-stage auth-stage-wide">
+        <div class="auth-floating-card">
+
+            <!-- Brand Badge -->
+            <div class="auth-brand-center">
+                <a href="index.html" class="auth-brand-pill" title="Kembali ke Beranda">
+                    <span class="brand-flower" aria-hidden="true">✿</span>
+                    <span class="brand-title-text">MILO</span>
+                </a>
+            </div>
+
+            <!-- Stepper Pill -->
+            <div style="text-align: center;">
+                <div class="onboarding-step-pill" style="background: rgba(233, 153, 101, 0.12); border-color: rgba(233, 153, 101, 0.3); color: #a45a27;">
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                    <span>Langkah 2 dari 2: Target Waktu Harian</span>
+                </div>
+            </div>
+
+            <h1 class="auth-card-title">Berapa Lama Waktu Latihan Setiap Hari?</h1>
+            <p class="auth-card-subtitle">Latihan konsisten 5 menit sehari terbukti lebih efektif membangun refleks bicara dibanding belajar berjam-jam sekali seminggu.</p>
+
+            <form id="goalForm" novalidate style="margin-top: 20px;">
+                <div class="onboarding-choice-list" role="radiogroup" aria-label="Pilihan Target Waktu Harian">
+                    <!-- Option 3m -->
+                    <label class="onboarding-card-option time-variant">
+                        <input type="radio" name="dailyGoal" value="3m">
+                        <div class="onboarding-card">
+                            <div class="onboarding-card-radio" aria-hidden="true"></div>
+                            <div class="onboarding-card-content">
+                                <div class="onboarding-card-header">
+                                    <span class="onboarding-card-title">3 Menit / Hari</span>
+                                    <span class="onboarding-card-tag">Sprint Cepat</span>
+                                </div>
+                                <p class="onboarding-card-desc">
+                                    Latihan ringan harian untuk membiasakan mulut dan lidah aktif berbicara bahasa Inggris di sela kesibukan.
+                                </p>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Option 5m -->
+                    <label class="onboarding-card-option time-variant">
+                        <input type="radio" name="dailyGoal" value="5m" checked>
+                        <div class="onboarding-card">
+                            <div class="onboarding-card-radio" aria-hidden="true"></div>
+                            <div class="onboarding-card-content">
+                                <div class="onboarding-card-header">
+                                    <span class="onboarding-card-title">5 Menit / Hari</span>
+                                    <span class="onboarding-card-tag">Rekomendasi Utama ⭐</span>
+                                </div>
+                                <p class="onboarding-card-desc">
+                                    Waktu ideal untuk 1 sesi percakapan dua arah lengkap bersama Milo, ditambah ulasan umpan balik CEFR langsung.
+                                </p>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Option 15m -->
+                    <label class="onboarding-card-option time-variant">
+                        <input type="radio" name="dailyGoal" value="15m">
+                        <div class="onboarding-card">
+                            <div class="onboarding-card-radio" aria-hidden="true"></div>
+                            <div class="onboarding-card-content">
+                                <div class="onboarding-card-header">
+                                    <span class="onboarding-card-title">15 Menit / Hari</span>
+                                    <span class="onboarding-card-tag">Latihan Mendalam</span>
+                                </div>
+                                <p class="onboarding-card-desc">
+                                    Sesi intensif multi-putaran untuk persiapan presentasi penting, wawancara kerja, atau sidang akademis.
+                                </p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit" id="btnSubmitGoal" class="btn-auth-submit">
+                    <span>Mulai Pilih Topik Latihan</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+
+        <div class="auth-home-back">
+            <a href="setup-level.html" class="auth-home-link" aria-label="Kembali ke langkah sebelumnya">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali ke Penentuan Level</span>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('goalForm');
+            const submitBtn = document.getElementById('btnSubmitGoal');
+
+            // Pre-select existing daily goal if present in local session
+            try {
+                const authUser = JSON.parse(localStorage.getItem('milo_user'));
+                if (authUser && authUser.daily_goal) {
+                    const matchRadio = document.querySelector(`input[name="dailyGoal"][value="${authUser.daily_goal}"]`);
+                    if (matchRadio) matchRadio.checked = true;
+                }
+            } catch {}
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const selectedRadio = document.querySelector('input[name="dailyGoal"]:checked');
+                const goal = selectedRadio ? selectedRadio.value : '5m';
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan target...';
+
+                try {
+                    let authUser = JSON.parse(localStorage.getItem('milo_user')) || {};
+                    authUser.daily_goal = goal;
+                    localStorage.setItem('milo_user', JSON.stringify(authUser));
+                } catch {}
+
+                setTimeout(() => {
+                    window.location.href = 'setup.html';
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>

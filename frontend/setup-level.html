@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Target Level CEFR: MILO English Speaking Practice</title>
+    <meta name="description" content="Tentukan level awal CEFR Anda di MILO: Level B1 untuk percakapan sehari-hari dan kerja umum, atau Level B2 untuk diskusi profesional.">
+    <!-- Google Fonts & Dedicated Auth CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/auth.css?v=20261119b">
+</head>
+<body class="auth-body">
+
+    <main class="auth-stage auth-stage-wide">
+        <div class="auth-floating-card">
+
+            <!-- Brand Badge -->
+            <div class="auth-brand-center">
+                <a href="index.html" class="auth-brand-pill" title="Kembali ke Beranda">
+                    <span class="brand-flower" aria-hidden="true">✿</span>
+                    <span class="brand-title-text">MILO</span>
+                </a>
+            </div>
+
+            <!-- Stepper Pill -->
+            <div style="text-align: center;">
+                <div class="onboarding-step-pill">
+                    <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                    <span>Langkah 1 dari 2: Penentuan Level</span>
+                </div>
+            </div>
+
+            <h1 class="auth-card-title">Berapa Target Level Kemampuanmu?</h1>
+            <p class="auth-card-subtitle">Pilih level awal yang paling mendekati target percakapanmu. Level ini dapat ditingkatkan kapan saja seiring kemajuan latihan.</p>
+
+            <!-- Dynamic Alert Container -->
+            <div id="levelAlertContainer" class="auth-alert-box"></div>
+
+            <form id="levelForm" novalidate style="margin-top: 20px;">
+                <div class="onboarding-choice-list" role="radiogroup" aria-label="Pilihan Level CEFR">
+                    <!-- Option B1 -->
+                    <label class="onboarding-card-option">
+                        <input type="radio" name="cefrLevel" value="B1" checked>
+                        <div class="onboarding-card">
+                            <div class="onboarding-card-radio" aria-hidden="true"></div>
+                            <div class="onboarding-card-content">
+                                <div class="onboarding-card-header">
+                                    <span class="onboarding-card-title">Level B1</span>
+                                    <span class="onboarding-card-tag">Intermediate</span>
+                                </div>
+                                <p class="onboarding-card-desc">
+                                    Mampu menyampaikan ide sehari-hari, pengalaman, opini umum, dan percakapan kerja dengan kalimat terhubung.
+                                </p>
+                            </div>
+                        </div>
+                    </label>
+
+                    <!-- Option B2 -->
+                    <label class="onboarding-card-option">
+                        <input type="radio" name="cefrLevel" value="B2">
+                        <div class="onboarding-card">
+                            <div class="onboarding-card-radio" aria-hidden="true"></div>
+                            <div class="onboarding-card-content">
+                                <div class="onboarding-card-header">
+                                    <span class="onboarding-card-title">Level B2</span>
+                                    <span class="onboarding-card-tag">Upper-Int.</span>
+                                </div>
+                                <p class="onboarding-card-desc">
+                                    Mampu berdiskusi secara mendalam tentang topik abstrak, teknis, argumentasi profesional, dan berbicara spontan.
+                                </p>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit" id="btnSubmitLevel" class="btn-auth-submit">
+                    <span>Lanjut ke Target Waktu Harian</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+
+        <div class="auth-home-back">
+            <a href="setup.html" class="auth-home-link" aria-label="Lewati penentuan level">
+                <span>Lewati sementara &amp; langsung ke Topik</span>
+                <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('levelForm');
+            const submitBtn = document.getElementById('btnSubmitLevel');
+            const alertBox = document.getElementById('levelAlertContainer');
+
+            // Pre-select existing level if present in local session
+            try {
+                const authUser = JSON.parse(localStorage.getItem('milo_user'));
+                if (authUser && authUser.cefr_level) {
+                    const matchRadio = document.querySelector(`input[name="cefrLevel"][value="${authUser.cefr_level}"]`);
+                    if (matchRadio) matchRadio.checked = true;
+                }
+            } catch {}
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                alertBox.innerHTML = '';
+
+                const selectedRadio = document.querySelector('input[name="cefrLevel"]:checked');
+                const level = selectedRadio ? selectedRadio.value : 'B1';
+
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan level...';
+
+                // Update local storage user profile
+                try {
+                    let authUser = JSON.parse(localStorage.getItem('milo_user')) || {};
+                    authUser.cefr_level = level;
+                    localStorage.setItem('milo_user', JSON.stringify(authUser));
+                } catch {}
+
+                // If authenticated, sync with backend API
+                const token = localStorage.getItem('milo_token');
+                if (token) {
+                    try {
+                        await fetch('/api/v1/auth/me', {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ cefr_level: level })
+                        });
+                    } catch {}
+                }
+
+                setTimeout(() => {
+                    window.location.href = 'setup-goal.html';
+                }, 350);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -177,8 +177,14 @@ _LEVEL_PROGRESSION = {"A1": "A2", "A2": "B1", "B1": "B2", "B2": "C1", "C1": "C2"
 class FeedbackEngine:
     """Language feedback analyzer using GPT-4o Mini with JSON mode."""
 
+    def __init__(self, client: Optional[AsyncOpenAI] = None):
+        self._client = client
+
     def _get_client_and_model(self) -> tuple[AsyncOpenAI, str, str]:
         """Dynamically resolve client and model from fresh settings so .env changes apply live."""
+        if self._client is not None:
+            return self._client, "mock-model", "openai"
+
         from app.config import Settings
         cfg = Settings()
         provider = cfg.ai_provider

@@ -6,6 +6,9 @@
     <title>Dashboard Kemajuan & Riwayat Sesi: MILO English Speaking Practice</title>
     <meta name="description" content="Pantau progres speaking Bahasa Inggris, skor kompetensi Grammar, Vocabulary, Fluency, dan riwayat sesi latihan bersama MILO.">
     <!-- Google Fonts & Font Awesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css & practice.css) -->
     <link rel="stylesheet" href="css/dashboard.css?v=20261112e">
@@ -15,31 +18,40 @@
     <!-- ═══════════════════════════════════════════════════════════════════════
          1. TOP FLOATING NAVBAR (Senada dengan index.html)
          ═══════════════════════════════════════════════════════════════════════ -->
-    <div class="home-nav-wrapper">
-        <header class="home-navbar">
-            <a href="/ui/index.html" class="nav-brand-group">
-                <div class="nav-brand-icon">
-                    <span style="font-weight: 800; font-size: 19px;">M</span>
-                </div>
-                <div>
-                    <span class="nav-brand-title">MILO</span>
-                    <span class="nav-brand-badge">Dashboard</span>
-                </div>
+    <header class="site-header">
+        <nav class="nav-inner wrap" aria-label="Navigasi utama">
+            <a id="brand-link" class="brand" href="index.html">
+                <span class="brand-mark" aria-hidden="true">✿</span>
+                MILO <small>(Dashboard)</small>
             </a>
-
-            <nav>
-                <ul class="nav-center-menu">
-                    <li><a href="/ui/index.html" class="nav-menu-link">Beranda</a></li>
-                    <li><a href="/ui/setup.html" class="nav-menu-link">Latihan</a></li>
-                    <li><a href="/ui/dashboard.html" class="nav-menu-link active">Dashboard</a></li>
-                </ul>
-            </nav>
-
-            <div>
-                <a href="/ui/setup.html" class="nav-cta-btn">Mulai Latihan</a>
+            <div class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="setup.html">Ruang Latihan</a>
+                <a href="dashboard.html" class="active">Dashboard</a>
             </div>
-        </header>
-    </div>
+            <div class="nav-action-wrapper">
+                <a href="setup.html" class="pill nav-cta">Mulai Latihan</a>
+            </div>
+            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-nav-drawer">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+
+        <!-- Mobile Navigation Drawer -->
+        <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
+            <div id="drawer-user-info" class="drawer-user-info" style="display:none;"></div>
+            <div class="mobile-nav-links">
+                <a href="index.html" class="mobile-nav-link">Beranda</a>
+                <a href="setup.html" class="mobile-nav-link">Ruang Latihan</a>
+                <a href="dashboard.html" class="mobile-nav-link active">Dashboard Progres</a>
+            </div>
+            <div class="mobile-nav-actions">
+                <a href="setup.html" class="pill primary-btn" style="width: 100%; min-height: 44px; justify-content: center;">
+                    Mulai Latihan Sekarang <i class="fa-solid fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </header>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
          2. DASHBOARD MAIN CONTENT
@@ -54,13 +66,28 @@
         <!-- Dashboard Header Row -->
         <div class="dash-header-row">
             <div class="dash-header-title-box">
-                <h1>Progres Speaking & Evaluasi CEFR</h1>
-                <p class="dash-header-subtitle">
+                <h1 id="dashTitleHeading">Progres Speaking & Evaluasi CEFR</h1>
+                <p class="dash-header-subtitle" id="dashSubtitleText">
                     Pantau peningkatan kompetensi Grammar, Vocabulary, dan Fluency Anda dari setiap sesi percakapan interaktif bersama MILO.
                 </p>
             </div>
-            <a href="/ui/setup.html" class="btn-dash-primary">Sesi Latihan Baru</a>
+            <a href="setup.html" class="btn-dash-primary">Sesi Latihan Baru</a>
         </div>
+
+        <!-- Guest Auth Banner (Visible when not logged in) -->
+        <section class="guest-auth-prompt-card" id="guestAuthPrompt" style="display: none;">
+            <div class="guest-prompt-left">
+                <i class="fa-solid fa-user-lock guest-prompt-icon"></i>
+                <div>
+                    <div class="guest-prompt-title">Anda sedang dalam Mode Tamu</div>
+                    <p class="guest-prompt-desc">Masuk atau buat akun baru agar setiap riwayat percakapan, skor CEFR, dan analitik Anda tersimpan secara permanen.</p>
+                </div>
+            </div>
+            <div class="guest-prompt-actions">
+                <a href="login.html?redirect=dashboard.html" class="btn-guest-login">Masuk</a>
+                <a href="register.html?redirect=dashboard.html" class="btn-guest-register">Daftar Akun</a>
+            </div>
+        </section>
 
         <!-- CEFR Progression & Target Focus Banner -->
         <section class="cefr-track-banner">
@@ -124,6 +151,77 @@
             </div>
         </section>
 
+        <!-- Gamification, Streaks & Badges Section (Only shown when available) -->
+        <section class="gamification-summary-card" id="gamificationSection" style="display: none;">
+            <div class="gamification-top-row">
+                <div class="gamification-title-box">
+                    <div class="gamification-title-icon">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div>
+                        <div class="gamification-title-text">Konsistensi & Pencapaian Belajar</div>
+                        <div class="gamification-subtitle-text">Kumpulkan XP dari latihan dan pertahankan streak harian Anda.</div>
+                    </div>
+                </div>
+                <div class="gamification-stats-pills">
+                    <div class="gam-pill xp" title="Total XP Terkumpul">
+                        <i class="fa-solid fa-star" style="color: #F59E0B;"></i>
+                        <span id="gamPointsVal">0 XP</span>
+                    </div>
+                    <div class="gam-pill streak" title="Streak Latihan Berturut-turut">
+                        <i class="fa-solid fa-fire" style="color: #EF4444;"></i>
+                        <span id="gamStreakVal">0 Hari Streak</span>
+                    </div>
+                    <div class="gam-pill highest" title="Rekor Streak Tertinggi">
+                        <i class="fa-solid fa-trophy" style="color: #8C6239;"></i>
+                        <span id="gamHighestStreakVal">Rekor: 0 Hari</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges Collection -->
+            <div class="badges-container">
+                <div class="badges-heading-text">Lencana Penghargaan Diperoleh:</div>
+                <div class="badges-shelf-grid" id="badgesContainer">
+                    <p class="badge-empty-note">Selesaikan sesi latihan atau kuis pertama untuk membuka lencana pertama Anda!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skill Mastery Breakdown -->
+        <section class="skill-progress-section" id="skillProgressSection" style="display: none;">
+            <div class="badges-heading-text" style="margin-bottom: 12px;">Akumulasi Kemampuan per Aspek:</div>
+            <div class="skill-progress-grid" id="skillProgressContainer"></div>
+        </section>
+
+        <!-- RAG Curriculum Knowledge Base Shelf -->
+        <section class="summary-card rag-knowledge-shelf-card" style="margin-top: 28px; background: #FAF7F2; border: 1px solid #E2D9CC; border-radius: 16px; padding: 24px;">
+            <div class="card-header-with-badge" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px;">
+                <div class="title-with-icon" style="display: flex; align-items: center; gap: 12px;">
+                    <div class="title-icon-circle" style="width: 44px; height: 44px; border-radius: 12px; background: #FFF4E5; color: #C87D55; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h3 class="card-title-text" style="font-size: 18px; font-weight: 800; color: #1A202C; margin: 0;">Pustaka Referensi RAG (Curriculum Knowledge Base)</h3>
+                        <p class="card-subtitle-text" style="font-size: 13px; color: #718096; margin: 4px 0 0 0;">Standar buku internasional yang diindeks ke dalam ChromaDB untuk memastikan respon tutor akurat & terverifikasi</p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span class="cefr-pill-tag" style="background: #EBF8FF; color: #2B6CB0; border: 1px solid #BEE3F8; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 999px;">
+                        <i class="fa-solid fa-database"></i> <span id="ragVectorCountText">539 Vektor</span>
+                    </span>
+                    <span class="cefr-pill-tag" style="background: #C6F6D5; color: #22543D; border: 1px solid #9AE6B4; font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 999px;">
+                        <i class="fa-solid fa-shield-halved"></i> Strict Grounding
+                    </span>
+                </div>
+            </div>
+
+            <!-- 4 Books Grid -->
+            <div class="rag-books-showcase-grid" id="ragBooksShowcaseGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+                <!-- Injected via dashboard.js -->
+            </div>
+        </section>
+
         <!-- Recent Sessions History -->
         <section class="history-table-card">
             <div class="table-header-flex">
@@ -150,6 +248,10 @@
             <a href="setup.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Mulai Latihan</a>
             <span style="color: var(--border-subtle);">&bull;</span>
             <a href="dashboard.html" style="color: var(--text-navy); text-decoration: none; font-size: 13.5px; font-weight: 700;">Dashboard</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="login.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Masuk</a>
+            <span style="color: var(--border-subtle);">&bull;</span>
+            <a href="register.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Daftar</a>
             <span style="color: var(--border-subtle);">&bull;</span>
             <a href="/docs" target="_blank" rel="noopener" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Dokumentasi API</a>
         </div>

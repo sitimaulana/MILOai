@@ -3,111 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre-Session Briefing: MILO English Speaking Practice</title>
+    <title>Pengenalan Modul Microlearning: MILO English Speaking Practice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/briefing.css?v=20261112e">
+    <link rel="stylesheet" href="css/briefing.css?v=20261118e">
 </head>
 <body class="briefing-body">
 
     <!-- Top Header Navigation -->
     <header class="briefing-header">
-        <a href="/ui/setup.html" class="btn-header-back" title="Kembali ke Setup" id="btnBackToSetup">
-            <i class="fa-solid fa-arrow-left"></i>
-        </a>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <a href="setup.html" class="btn-header-back" title="Kembali ke Setup Topik" id="btnBackToSetup" aria-label="Kembali ke Setup Topik">
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            </a>
+            <a href="index.html" class="brand setup-brand" title="Kembali ke Beranda">
+                <span class="brand-mark" aria-hidden="true">✿</span>
+                <span class="brand-text">MILO</span>
+            </a>
+        </div>
         <div class="header-badges-group">
+            <span class="header-badge-pill" id="briefingTopicIdBadge">Modul A1</span>
             <span class="header-badge-pill level" id="briefingLevelBadge">Level B1</span>
             <span class="header-badge-pill" id="briefingTopicBadge">Job Interview Practice</span>
         </div>
-        <div style="width: 44px;"></div>
+        <div class="setup-user-status" id="setupUserStatus"></div>
     </header>
 
     <!-- Main Briefing Container -->
     <main class="briefing-main-container">
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             1. SAFETY NET BANNER (Anxiety Reducer)
+             STEPPER TAB INDICATORS (Interactive Walkthrough Deck)
              ═══════════════════════════════════════════════════════════════════════ -->
-        <div class="safety-net-banner">
-            <div class="safety-text-block">
-                <h1>Jaring Pengaman: Ruang Aman Latihanmu</h1>
-                <p>Tarik napas santai! Di sini tidak ada nilai yang menghakimi kesalahanmu. MILO adalah AI tutor yang sabar dan siap mendampingimu untuk membangun rasa percaya diri berbicara bahasa Inggris.</p>
+        <nav class="lesson-progress-deck" aria-label="Tahapan Pembelajaran Modul">
+            <div class="progress-track-bar">
+                <div class="progress-track-fill" id="deckProgressFill" style="width: 25%;"></div>
             </div>
-        </div>
-
-        <!-- ═══════════════════════════════════════════════════════════════════════
-             2. SCENARIO CONTEXT (Skenario Konteks & Peran Pengguna)
-             ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="briefing-card">
-            <div class="card-section-header">
-                <h2>Skenario & Peran Kamu Hari Ini</h2>
-            </div>
-            <span class="scenario-roleplay-tag" id="scenarioRoleplayTag">Roleplay: Job Candidate</span>
-            <div class="scenario-context-text" id="scenarioDescription">
-                Kamu berperan sebagai pelamar kerja yang sedang menjalani sesi wawancara profesional bersama MILO (Hiring Manager). Ceritakan latar belakang, keahlian, dan motivasimu dengan percaya diri.
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════════════════════════════
-             3. TARGET VOCABULARY (Playful Cyan Chips)
-             ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="briefing-card">
-            <div class="card-section-header">
-                <h2>Target Vocabulary & Frasa Rekomendasi</h2>
-            </div>
-            <p class="vocab-subtext">
-                Gunakan kosakata atau frasa kunci berikut selama berbicara untuk melatih kelancaranmu. <strong>Klik pada frasa</strong> untuk mendengarkan contoh pelafalan:
-            </p>
-            <div class="vocab-chips-container" id="vocabChipsContainer">
-                <!-- Dynamically populated chips in playful cyan -->
-            </div>
-        </section>
-
-        <!-- ═══════════════════════════════════════════════════════════════════════
-             4. MIC CHECK COMPONENT (Interactive Real-Time Waveform)
-             ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="mic-check-card" id="micCheckCard">
-            <h2 class="mic-check-title">Uji Mikrofon (Mic Check)</h2>
-            <p class="mic-check-desc">
-                Tekan tombol mikrofon di bawah dan bicaralah selama 2 detik (misal: <em>"Hello MILO, I am ready"</em>) untuk memvalidasi bahwa suara terdengar jernih.
-            </p>
-
-            <!-- Dynamic Waveform Canvas -->
-            <div class="mic-visualizer-container">
-                <canvas id="micVisualizerCanvas" width="420" height="60"></canvas>
-            </div>
-
-            <!-- Action Row -->
-            <div class="mic-action-row">
-                <button type="button" class="btn-test-mic" id="btnTestMic" title="Klik untuk menguji mikrofon">
-                    <i class="fa-solid fa-microphone"></i>
+            <div class="deck-tabs-row">
+                <button type="button" class="deck-step-btn active" id="tabBtn1" data-tab="1" aria-label="Langkah 1: Sasaran Belajar">
+                    <span class="step-num-circle">1</span>
+                    <div class="step-label-group">
+                        <span class="step-super">Langkah 1</span>
+                        <span class="step-name">Sasaran Belajar</span>
+                    </div>
+                </button>
+                <button type="button" class="deck-step-btn" id="tabBtn2" data-tab="2" aria-label="Langkah 2: Kosakata Inti">
+                    <span class="step-num-circle">2</span>
+                    <div class="step-label-group">
+                        <span class="step-super">Langkah 2</span>
+                        <span class="step-name">Kosakata Inti</span>
+                    </div>
+                </button>
+                <button type="button" class="deck-step-btn" id="tabBtn3" data-tab="3" aria-label="Langkah 3: Idiom Alami">
+                    <span class="step-num-circle">3</span>
+                    <div class="step-label-group">
+                        <span class="step-super">Langkah 3</span>
+                        <span class="step-name">Idiom Alami</span>
+                    </div>
+                </button>
+                <button type="button" class="deck-step-btn" id="tabBtn4" data-tab="4" aria-label="Langkah 4: Siap Bicara">
+                    <span class="step-num-circle">4</span>
+                    <div class="step-label-group">
+                        <span class="step-super">Langkah 4</span>
+                        <span class="step-name">Siap Bicara</span>
+                    </div>
                 </button>
             </div>
+        </nav>
 
-            <!-- Status Indicator -->
-            <div class="mic-status-badge" id="micStatusBadge">
-                Mikrofon belum diuji. Klik tombol di atas untuk memulai tes.
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 1: LEARNING GOAL & SCENARIO CONTEXT
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="tab1Container" class="briefing-deck-panel">
+            <!-- Module Title Banner -->
+            <div class="module-hero-banner">
+                <div class="hero-tags-row">
+                    <span class="hero-track-pill" id="heroTrackPill"><i class="fa-solid fa-briefcase"></i> Job Interview</span>
+                    <span class="hero-meta-pill"><i class="fa-regular fa-clock"></i> 3-5 Menit</span>
+                </div>
+                <h1 id="lessonTitleText" class="module-title-h1">Memuat Modul...</h1>
+            </div>
+
+            <!-- Roleplay Persona Matrix -->
+            <div class="roleplay-matrix-card">
+                <div class="roleplay-col user">
+                    <div class="roleplay-avatar-box user">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div class="roleplay-meta">
+                        <span class="roleplay-tag user">Peran Anda</span>
+                        <div class="roleplay-role-title" id="roleplayUserRole">Job Candidate (Pelamar Kerja)</div>
+                        <div class="roleplay-role-desc" id="roleplayUserDesc">Berbicara secara aktif, memperkenalkan diri, dan menjawab pertanyaan.</div>
+                    </div>
+                </div>
+                <div class="roleplay-divider">
+                    <span class="roleplay-vs-badge">VS</span>
+                </div>
+                <div class="roleplay-col milo">
+                    <div class="roleplay-avatar-box milo">
+                        <i class="fa-solid fa-headset"></i>
+                    </div>
+                    <div class="roleplay-meta">
+                        <span class="roleplay-tag milo">Peran MILO</span>
+                        <div class="roleplay-role-title" id="roleplayMiloRole">Lead Hiring Manager</div>
+                        <div class="roleplay-role-desc" id="roleplayMiloDesc">Pewawancara ramah yang mendengarkan, memandu alur, dan merespons jawaban Anda.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Can-Do Statement Card -->
+            <div class="cando-mastery-card">
+                <div class="cando-icon-badge">
+                    <i class="fa-solid fa-award"></i>
+                </div>
+                <div class="cando-content-block">
+                    <div class="cando-super-label">Target Kemampuan (Can-Do Statement)</div>
+                    <div class="cando-text" id="lessonCanDoText">
+                        Mahasiswa mampu memperkenalkan latar belakang pendidikan, fokus bidang studi, dan ketertarikan karir dalam 3-4 kalimat terhubung secara percaya diri.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Situation & Scenario Context -->
+            <div class="scenario-context-card">
+                <div class="scenario-card-header">
+                    <i class="fa-regular fa-compass"></i>
+                    <h3>Konteks Simulasi & Panduan</h3>
+                </div>
+                <p class="scenario-context-paragraph" id="scenarioDescription">
+                    Perkenalan diri adalah penentu kesan pertama di hadapan rekruter. Fokuskan jawabanmu pada nama, jurusan kuliah saat ini, keahlian utama yang sedang ditekuni, dan tujuan karirmu ke depan.
+                </p>
+            </div>
+
+            <!-- RAG Grounded Curriculum Source Banner -->
+            <div class="briefing-rag-source-card" style="margin-top: 14px; padding: 14px 18px; background: rgba(255, 255, 255, 0.85); border: 1px solid #E2D9CC; border-left: 4px solid #C87D55; border-radius: 12px; display: flex; align-items: center; gap: 14px;">
+                <div style="width: 40px; height: 40px; border-radius: 10px; background: #FFF4E5; color: #C87D55; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 11px; font-weight: 700; color: #8C6239; text-transform: uppercase; letter-spacing: 0.4px;">
+                        <i class="fa-solid fa-shield-halved"></i> Dasar Kurikulum Terakreditasi (RAG Grounding)
+                    </div>
+                    <div style="font-size: 13.5px; font-weight: 700; color: #2D3748; margin-top: 2px;" id="briefingRagSourceTitle">
+                        Cambridge English Vocabulary in Use & Collins Speaking for IELTS
+                    </div>
+                    <p style="font-size: 12px; color: #718096; margin: 2px 0 0 0;" id="briefingRagSourceDesc">
+                        Kosakata, strategi dialog, dan deskriptor CEFR pada modul ini diverifikasi oleh pustaka materi resmi Cambridge & Collins.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step Navigation -->
+            <div class="lesson-deck-nav justify-end">
+                <button type="button" class="btn-deck-nav next" id="btnNextToVocab">
+                    <span>Lanjut: Pelajari Kosakata Inti (Langkah 2)</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 2: TARGET VOCABULARY DECK
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="tab2Container" class="briefing-deck-panel" style="display: none;">
+            <div class="section-lead-card">
+                <div class="lead-text-group">
+                    <span class="lead-badge sage"><i class="fa-solid fa-book-bookmark"></i> Fondasi Kalimat</span>
+                    <h2>Target Kosakata Inti</h2>
+                    <p class="lead-subtext">
+                        Kuasai frasa penting berikut untuk memperkuat jawaban Anda saat berbicara dengan MILO. Dengarkan contoh pelafalan dengan menekan tombol audio:
+                    </p>
+                </div>
+            </div>
+
+            <!-- Detailed Cards Deck -->
+            <div class="vocab-cards-deck" id="vocabCardsDeck">
+                <!-- Dynamically populated from API -->
+            </div>
+
+            <div class="lesson-deck-nav">
+                <button type="button" class="btn-deck-nav prev" id="btnBackToGoal">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Sasaran</span>
+                </button>
+                <button type="button" class="btn-deck-nav next" id="btnNextToIdioms">
+                    <span>Lanjut: Idiom Alami (Langkah 3)</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 3: IDIOMS & NATURAL EXPRESSIONS DECK
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="tab3Container" class="briefing-deck-panel" style="display: none;">
+            <div class="section-lead-card cinnamon-accent">
+                <div class="lead-text-group">
+                    <span class="lead-badge cinnamon"><i class="fa-solid fa-feather-pointed"></i> Percakapan Luwes</span>
+                    <h2>Idiom & Ekspresi Alami</h2>
+                    <p class="lead-subtext">
+                        Ungkapan idiomatik membantu ujaran Anda terdengar mengalir dan luwes seperti penutur asli. Pelajari makna figuratif dan situasi penggunaannya:
+                    </p>
+                </div>
+            </div>
+
+            <!-- Detailed Idioms Deck -->
+            <div class="vocab-cards-deck idioms-theme" id="idiomsCardsDeck">
+                <!-- Dynamically populated from API -->
+            </div>
+
+            <div class="lesson-deck-nav">
+                <button type="button" class="btn-deck-nav prev" id="btnBackToVocab">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Kosakata</span>
+                </button>
+                <button type="button" class="btn-deck-nav next" id="btnNextToReady">
+                    <span>Lanjut: Uji Kesiapan Bicara (Langkah 4)</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 4: SPEAKING STRATEGY & STUDIO MIC CHECK
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="tab4Container" class="briefing-deck-panel" style="display: none;">
+            <!-- Speaking Strategy Tips Cards -->
+            <div class="strategy-tips-grid">
+                <div class="strategy-tip-card">
+                    <div class="strategy-icon-box cinnamon">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div class="strategy-content">
+                        <h4>Pacing & Konektor Kalimat</h4>
+                        <p>Mengambil jeda berpikir 1 detik adalah wajar. Gunakan kata penghubung seperti <em>"For instance"</em> atau <em>"In addition"</em> agar alur tuturan tetap tersambung.</p>
+                    </div>
+                </div>
+                <div class="strategy-tip-card">
+                    <div class="strategy-icon-box sage">
+                        <i class="fa-solid fa-shield-heart"></i>
+                    </div>
+                    <div class="strategy-content">
+                        <h4>Jaring Pengaman & Terjemahan</h4>
+                        <p>Jangan khawatir jika ada kalimat MILO yang kurang dipahami. Di panggung percakapan nanti, Anda selalu bisa menekan tombol <strong>Terjemahkan</strong> kapan saja.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Studio Audio Box (High-Craft Mic Tester) -->
+            <div class="mic-studio-card" id="micCheckCard">
+                <div class="studio-header-block">
+                    <div class="studio-live-pill" id="studioLivePill">
+                        <span class="live-dot"></span>
+                        <span id="studioLiveStatusText">Standby Audio Check</span>
+                    </div>
+                    <h3 class="studio-title">Studio Uji Mikrofon & Kesiapan Audio</h3>
+                    <p class="studio-desc">
+                        Pastikan artikulasi suaramu terdengar jernih oleh sistem pengenal ucapan MILO sebelum sesi percakapan dimulai.
+                    </p>
+                </div>
+
+                <!-- 32-Bar Real-Time Equalizer Canvas -->
+                <div class="studio-visualizer-box">
+                    <canvas id="micVisualizerCanvas" width="560" height="90"></canvas>
+                </div>
+
+                <!-- Live Decibel / Energy Level Gauge -->
+                <div class="studio-gauge-container">
+                    <div class="gauge-labels-row">
+                        <span class="gauge-label-item">Tenang</span>
+                        <span class="gauge-label-item active-zone">Volume Optimal</span>
+                        <span class="gauge-label-item">Sangat Keras</span>
+                    </div>
+                    <div class="gauge-track">
+                        <div class="gauge-bar-fill" id="micEnergyGaugeFill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Action Button & Voice Prompt -->
+                <div class="studio-controls-block">
+                    <!-- Central Animated Mic Button -->
+                    <div class="mic-button-wrapper">
+                        <button type="button" class="btn-studio-mic" id="btnTestMic" title="Tekan untuk menguji mikrofon" aria-label="Uji Mikrofon">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                    </div>
+
+                    <!-- Prompt Text Guide -->
+                    <div class="studio-phrase-prompt">
+                        <span class="prompt-hint">Tekan tombol di atas, lalu ucapkan kalimat ini:</span>
+                        <div class="prompt-highlight-text">"Hello MILO, I am ready to practice"</div>
+                    </div>
+
+                    <!-- Dynamic Status Indicator -->
+                    <div class="studio-status-box" id="micStatusBadge">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                        <span>Mikrofon belum diuji. Tekan tombol mikrofon untuk memulai tes 2 detik.</span>
+                    </div>
+
+                    <!-- Human-Friendly Resilience / Bypass Action (C-4 Craftsmanship) -->
+                    <button type="button" class="btn-bypass-mic" id="btnBypassMic">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Mikrofon sudah aktif sebelumnya? Lewati tes ini dan lanjut</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bottom Deck Nav -->
+            <div class="lesson-deck-nav">
+                <button type="button" class="btn-deck-nav prev" id="btnBackToIdioms">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Idiom</span>
+                </button>
+                <button type="button" class="btn-start-session" id="btnStartSession" disabled>
+                    <i class="fa-solid fa-comments"></i>
+                    <span>Mulai Percakapan dengan MILO</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
         </section>
 
     </main>
 
-    <!-- ═══════════════════════════════════════════════════════════════════════
-         BOTTOM DOCK / SHELF (CTA Start Session - Disabled until Mic Validated)
-         ═══════════════════════════════════════════════════════════════════════ -->
-    <footer class="briefing-bottom-shelf">
-        <div class="shelf-reminder-note" id="shelfReminderNote">
-            <span>Selesaikan <strong>Mic Check</strong> terlebih dahulu untuk membuka sesi latihan.</span>
-        </div>
-        <button type="button" class="btn-start-session" id="btnStartSession" disabled>
-            <span>Mulai Sesi Latihan</span>
-        </button>
-    </footer>
-
     <!-- Audio Speech Toast -->
-    <div class="audio-toast" id="audioToast">Pronunciation playing...</div>
+    <div class="audio-toast" id="audioToast" role="status" aria-live="polite">Pronunciation playing...</div>
 
     <!-- Scripts -->
-    <script src="js/common.js?v=20261112e"></script>
-    <script src="js/briefing.js?v=20261112e"></script>
+    <script src="js/common.js?v=20261118e"></script>
+    <script src="js/briefing.js?v=20261118e"></script>
 </body>
 </html>

@@ -185,6 +185,95 @@ body.home-body {
     box-shadow: 0 6px 18px rgba(140, 98, 57, 0.35);
 }
 
+.nav-action-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-secondary-btn {
+    color: var(--text-navy);
+    background: transparent;
+    border: 1px solid var(--border-subtle);
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 42px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.nav-secondary-btn:hover {
+    background: var(--neutral-bg);
+    border-color: var(--secondary-border);
+}
+
+.user-profile-nav-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 4px 10px 4px 6px;
+    box-shadow: var(--shadow-sm);
+}
+
+.user-nav-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-nav-username {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text-navy);
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-nav-cefr {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--secondary);
+    background: var(--secondary-tint);
+    border: 1px solid var(--secondary-border);
+    padding: 1px 6px;
+    border-radius: 6px;
+}
+
+.btn-nav-logout {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.btn-nav-logout:hover {
+    color: #A33A2B;
+}
+
 /* ─── Hero Section: Asymmetric Split ─────────────────────────────────────────── */
 .home-hero-section {
     padding: 56px 24px 72px;

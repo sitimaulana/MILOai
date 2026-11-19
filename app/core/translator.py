@@ -25,6 +25,12 @@ class FastTranslator:
                 api_key="ollama",
                 base_url=settings.ollama_base_url,
             )
+        elif settings.ai_provider == "groq":
+            self._client = AsyncOpenAI(
+                api_key=settings.groq_api_key or "missing_groq_key",
+                base_url=settings.groq_base_url,
+            )
+            self._model = settings.groq_model
         elif settings.ai_provider == "bifrost":
             self._client = AsyncOpenAI(
                 api_key=settings.bifrost_api_key or "bk-milo-token-gateway",

@@ -61,12 +61,17 @@ class User(Base):
     id: Mapped[str] = mapped_column(GUID(), primary_key=True, default=uuid.uuid4)
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     email: Mapped[Optional[str]] = mapped_column(String(255), unique=True, nullable=True)
+    hashed_password: Mapped[str] = mapped_column(String(255), default="")
+    full_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     cefr_level: Mapped[str] = mapped_column(String(10), default="B1")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     sessions: Mapped[list["Session"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     progress: Mapped[list["LearningProgress"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    gamification: Mapped[Optional["UserGamification"]] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
+    badges: Mapped[list["UserBadge"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
 # ─── Session ──────────────────────────────────────────────────────────────────
@@ -141,3 +146,84 @@ class LearningProgress(Base):
     last_updated: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
     user: Mapped["User"] = relationship(back_populates="progress")
+
+
+# ─── Gamification & Badges ───────────────────────────────────────────────────
+
+class UserGamification(Base):
+    __tablename__ = "user_gamification"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(
+        GUID(), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
+    )
+    points: Mapped[int] = mapped_column(Integer, default=0)
+    current_streak: Mapped[int] = mapped_column(Integer, default=0)
+    highest_streak: Mapped[int] = mapped_column(Integer, default=0)
+    last_practice_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    user: Mapped["User"] = relationship(back_populates="gamification")
+
+
+class UserBadge(Base):
+    __tablename__ = "user_badges"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(
+        GUID(), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    badge_key: Mapped[str] = mapped_column(String(50), nullable=False)
+    badge_title: Mapped[str] = mapped_column(String(100), nullable=False)
+    earned_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="badges")
+
+
+# ─── System Log Analytics (Research Logging) ──────────────────────────────────
+
+class SystemLogAnalytics(Base):
+    """Logs detailed user engagement events for Thesis Chapter 4 quantitative analysis."""
+    __tablename__ = "system_log_analytics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    session_id: Mapped[Optional[str]] = mapped_column(
+        GUID(), ForeignKey("sessions.id", ondelete="SET NULL"), nullable=True
+    )
+    event_type: Mapped[str] = mapped_column(String(50), nullable=False)  # "session_start", "audio_turn", "session_complete", "survey_submit"
+    duration_seconds: Mapped[int] = mapped_column(Integer, default=0)
+    turns_count: Mapped[int] = mapped_column(Integer, default=0)
+    extra_meta: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+# ─── Evaluation Survey (Post-Test & UEQ Responses) ────────────────────────────
+
+class EvaluationSurvey(Base):
+    """Stores Post-Test Student Engagement & UEQ survey data from 30+ respondents."""
+    __tablename__ = "evaluation_surveys"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[Optional[str]] = mapped_column(
+        GUID(), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    session_id: Mapped[Optional[str]] = mapped_column(
+        GUID(), ForeignKey("sessions.id", ondelete="SET NULL"), nullable=True
+    )
+    respondent_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    cefr_level: Mapped[str] = mapped_column(String(10), default="B1")
+    
+    # 3 Student Engagement Dimensions (Likert 1-5 average)
+    behavioral_score: Mapped[float] = mapped_column(Float, default=0.0)
+    emotional_score: Mapped[float] = mapped_column(Float, default=0.0)
+    cognitive_score: Mapped[float] = mapped_column(Float, default=0.0)
+    overall_engagement_score: Mapped[float] = mapped_column(Float, default=0.0)
+
+    # Detailed item answers & UEQ
+    survey_responses: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    ueq_scores: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    feedback_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+

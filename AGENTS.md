@@ -27,7 +27,7 @@ User Audio/Text ──► Whisper ASR ──► ChromaDB (RAG) ──► LLM (Tu
   - `app/core/translator.py`: English to Indonesian translator
   - `app/core/tts.py`: Text-to-speech synthesis
 - **AI Gateway (Bifrost)**: `docker-compose.bifrost.yml` (port 8080)
-- **Knowledge Base (Obsidian Vault)**: `Knowledge Base MILO/`
+- **Knowledge Base (Obsidian Vault)**: `knowledge_base/`
 - **Database Models**: `app/db/models.py` (SQLAlchemy async)
 
 ## 4. Common Commands

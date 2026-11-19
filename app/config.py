@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:3000,http://localhost:5173"
     auto_translate_responses: bool = False  # Set to False for low latency (translate on-demand via UI button)
 
+    # ── Auth & Security ────────────────────────────────────────────────────────
+    jwt_secret_key: str = "milo-secret-key-change-in-production-2026"
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 60 * 24 * 7  # 7 days expiration
+
     @property
     def cors_origins_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",")]
@@ -66,9 +71,11 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.7
     llm_max_tokens: int = 512
 
-    # ── Whisper (Local) ────────────────────────────────────────────────────────
+    # ── Whisper (Local or Cloud API) ──────────────────────────────────────────
+    whisper_provider: str = "local"  # "local", "groq", or "openai"
     whisper_model_size: str = "base"
     whisper_device: str = "cpu"
+    whisper_cloud_model: str = "whisper-large-v3-turbo"  # for groq or "whisper-1" for openai
 
     # ── TTS ───────────────────────────────────────────────────────────────────
     tts_model: str = "tts-1"
@@ -81,10 +88,15 @@ class Settings(BaseSettings):
     rag_top_k: int = 3
     rag_chunk_size: int = 500
     rag_chunk_overlap: int = 50
+    # Dynamic Score Thresholding
+    rag_dense_threshold_qa: float = 0.68        # Strict floor for explicit QA & error remediation
+    rag_dense_threshold_scenario: float = 0.58  # Permissive floor for scenario & topic cues
+    rag_fused_min_score: float = 0.022          # Minimum RRF fused confidence cutoff to suppress noise
 
-    # ── PostgreSQL ─────────────────────────────────────────────────────────────
-    database_url: str = "postgresql+asyncpg://postgres:password@localhost:5432/milo_db"
-    database_url_sync: str = "postgresql+psycopg2://postgres:password@localhost:5432/milo_db"
+    # ── Database (MySQL for PA/Production) ────────────────────────────────────
+    # Format: mysql+aiomysql://<user>:<password>@<host>:<port>/<dbname>
+    database_url: str = "mysql+aiomysql://root:@localhost:3306/milo_db"
+    database_url_sync: str = "mysql+pymysql://root:@localhost:3306/milo_db"
 
     # ── Session ────────────────────────────────────────────────────────────────
     max_conversation_history: int = 20

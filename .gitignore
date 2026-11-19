@@ -40,6 +40,25 @@ Thumbs.db
 htmlcov/
 .pytest_cache/
 
+# Temporary, backup, and editor autosaves
+*~
+*.bak
+*.bak*
+*.tmp
+*.kra~
+*.psd~
+
+# Scratch audio and standalone binaries
+test.ogg
+test.webm
+test_*.mp3
+test_*.ogg
+test_*.webm
+ffmpeg.exe
+
+# Local Python cache
+.python/
+
 # Logs
 *.log
 

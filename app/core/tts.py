@@ -76,7 +76,7 @@ class TTSSynthesizer:
         logger.debug(f"TTS synthesizing {len(text)} chars with voice='{voice}'")
 
         try:
-            if settings.ai_provider in ("local", "openrouter"):
+            if settings.ai_provider != "openai" or self._client is None:
                 if edge_tts is None:
                     raise ImportError("edge-tts is not installed. Run `uv sync` to install it.")
                 
@@ -131,7 +131,7 @@ class TTSSynthesizer:
         voice = voice or settings.tts_voice
         model = model or settings.tts_model
 
-        if settings.ai_provider in ("local", "openrouter"):
+        if settings.ai_provider != "openai" or self._client is None:
             if edge_tts is None:
                 raise ImportError("edge-tts is not installed.")
             edge_voice = "en-US-AriaNeural"

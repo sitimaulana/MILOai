@@ -1,6 +1,16 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id') || sessionStorage.getItem('milo_session_id');
+    const topicId = urlParams.get('topic_id') || sessionStorage.getItem('milo_topic_id') || 'A1';
+
+    const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('milo_token');
+    const guestCard = document.getElementById('summaryGuestSaveCard');
+    if (guestCard) {
+        guestCard.style.display = token ? 'none' : 'flex';
+    }
+
+    // Load Micro-Quiz for this topic
+    loadMicroQuiz(topicId, sessionId);
 
     let data = null;
     const cachedSummary = sessionStorage.getItem('milo_summary_data');
@@ -15,7 +25,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!data && sessionId) {
         showGlobalLoading('Memuat evaluasi sesi percakapan...');
         try {
-            const res = await fetch(`/api/v1/session/${sessionId}/feedback`);
+            const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+            const res = await fetch(`/api/v1/session/${sessionId}/feedback`, { headers: authHeaders });
             if (res.ok) {
                 data = await res.json();
             }
@@ -30,6 +41,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('summaryCoachAssessment').textContent = 
             'Data evaluasi sesi tidak ditemukan. Silakan selesaikan sesi latihan terlebih dahulu.';
         return;
+    }
+
+    // Initialize Post-Session Evaluation Survey
+    initEvaluationSurvey(sessionId);
+
+    // Render Gamification Celebration Banner if XP, badges earned, or level promoted
+    const gamCard = document.getElementById('summaryGamificationCard');
+    const isLevelPromoted = (data.cefr_result === 'B2' || data.cefr_result === 'C1') && (data.cefr_target === 'B1');
+
+    if (gamCard && (data.xp_earned || data.current_streak || isLevelPromoted || (data.unlocked_badges && data.unlocked_badges.length > 0))) {
+        gamCard.style.display = 'flex';
+        const titleEl = document.getElementById('gamCelebrateTitle');
+        const descEl = document.getElementById('gamCelebrateDesc');
+        const chipXp = document.getElementById('gamChipXp');
+        const chipStreak = document.getElementById('gamChipStreak');
+        const chipBadge = document.getElementById('gamChipBadge');
+
+        if (isLevelPromoted) {
+            if (titleEl) titleEl.textContent = 'Selamat! Standar Level B2 Tercapai!';
+            if (descEl) descEl.textContent = 'Kemampuan bicaramu melampaui target B1. Profil akunmu berhasil naik level ke B2!';
+            try {
+                const authUser = JSON.parse(localStorage.getItem('milo_user'));
+                if (authUser) {
+                    authUser.cefr_level = 'B2';
+                    localStorage.setItem('milo_user', JSON.stringify(authUser));
+                }
+            } catch {}
+        }
+
+        if (chipXp) chipXp.innerHTML = `<i class="fa-solid fa-star" style="color: #F59E0B;"></i> +${data.xp_earned || 50} XP`;
+        if (chipStreak) chipStreak.innerHTML = `<i class="fa-solid fa-fire" style="color: #EF4444;"></i> ${data.current_streak || 1} Hari Streak`;
+        if (chipBadge && data.unlocked_badges && data.unlocked_badges.length > 0) {
+            chipBadge.style.display = 'inline-flex';
+            chipBadge.innerHTML = `<i class="fa-solid fa-award"></i> Lencana: ${escapeHtml(data.unlocked_badges.join(', '))}`;
+        }
     }
 
     const topicLabel = data.topic_label || sessionStorage.getItem('milo_topic_label') || 'Latihan Percakapan';
@@ -105,6 +151,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         improvList.innerHTML = data.improvement_areas.map(item => `<li>${escapeHtml(item)}</li>`).join('');
     }
 
+    // Populate RAG Grounded Reading Recommendations
+    renderRagRecommendations(data);
+
     const corrList = document.getElementById('allCorrectionsList');
     if (corrList) {
         if (data.all_corrections && data.all_corrections.length > 0) {
@@ -142,6 +191,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
+            let ragBadgesHtml = '';
+            if (!isUser && msg.rag_sources && Array.isArray(msg.rag_sources) && msg.rag_sources.length > 0) {
+                ragBadgesHtml = msg.rag_sources.map(src => `
+                    <span class="transcript-pill" style="background: rgba(200, 125, 85, 0.15); color: #8C6239; border: 1px solid rgba(200, 125, 85, 0.3); font-weight: 700;">
+                        <i class="fa-solid fa-book-bookmark"></i> Ref: ${escapeHtml(formatRagSourceLabel(src))}
+                    </span>
+                `).join('');
+            }
+
             return `
                 <div class="transcript-turn-card ${isUser ? 'user-turn' : 'milo-turn'}">
                     <div class="transcript-turn-header">
@@ -149,6 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="transcript-meta-pills">
                             <span class="transcript-pill ${pillTypeClass}">${inputType}</span>
                             ${feedbackBadge}
+                            ${ragBadgesHtml}
                         </div>
                     </div>
                     <div class="transcript-content-text">${escapeHtml(msg.content)}</div>
@@ -392,3 +451,317 @@ function renderCoachEvaluation(rawMarkdown, container) {
 
     container.innerHTML = html || `<div class="coach-narrative-box"><p class="coach-para">${formatInline(rawMarkdown)}</p></div>`;
 }
+
+// ─── Post-Practice Micro-Quiz Loader ──────────────────────────────────────────
+async function loadMicroQuiz(topicId, sessionId) {
+    const quizCard = document.getElementById('microQuizCard');
+    const container = document.getElementById('quizQuestionsContainer');
+    const titleEl = document.getElementById('quizCardTitle');
+    const btnSubmit = document.getElementById('btnSubmitMicroQuiz');
+    const badgeEl = document.getElementById('quizScoreBadge');
+    const scoreText = document.getElementById('quizScoreText');
+    const resultNotice = document.getElementById('quizResultNotice');
+    if (!quizCard || !container) return;
+
+    try {
+        const resp = await fetch(`/api/v1/curriculum/topic/${encodeURIComponent(topicId)}`);
+        if (!resp.ok) return;
+
+        const detail = await resp.json();
+        const quizzes = detail.quizzes || [];
+        if (quizzes.length === 0) return;
+
+        quizCard.style.display = 'block';
+        if (titleEl) {
+            titleEl.textContent = `Kuis Pemahaman Materi: [${detail.topic_id}] ${detail.title}`;
+        }
+
+        container.innerHTML = '';
+        const userAnswers = {};
+
+        quizzes.forEach((q, qIdx) => {
+            const qCard = document.createElement('div');
+            qCard.className = 'quiz-q-card';
+            qCard.id = `quizQCard_${qIdx}`;
+
+            const optionsHtml = Object.entries(q.options || {}).map(([optKey, optVal]) => `
+                <div class="quiz-option-item" data-qindex="${qIdx}" data-optkey="${optKey}">
+                    <span class="quiz-option-letter">${optKey}</span>
+                    <span class="quiz-option-text">${escapeHtml(optVal)}</span>
+                </div>
+            `).join('');
+
+            qCard.innerHTML = `
+                <div class="quiz-q-header">
+                    <span class="quiz-q-type-badge">${escapeHtml(q.type || 'Pemahaman')}</span>
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">Soal ${qIdx + 1} dari ${quizzes.length}</span>
+                </div>
+                <div class="quiz-q-text">${escapeHtml(q.question)}</div>
+                <div class="quiz-options-deck">
+                    ${optionsHtml}
+                </div>
+                <div class="quiz-explanation-box" id="quizExp_${qIdx}" style="display: none;"></div>
+            `;
+
+            // Bind click on option items
+            const optItems = qCard.querySelectorAll('.quiz-option-item');
+            optItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    if (btnSubmit.disabled) return;
+                    optItems.forEach(o => o.classList.remove('selected'));
+                    item.classList.add('selected');
+                    userAnswers[String(qIdx)] = item.getAttribute('data-optkey');
+                });
+            });
+
+            container.appendChild(qCard);
+        });
+
+        if (btnSubmit) {
+            btnSubmit.addEventListener('click', async () => {
+                const answeredCount = Object.keys(userAnswers).length;
+                if (answeredCount < quizzes.length) {
+                    alert(`Silakan pilih jawaban untuk semua ${quizzes.length} soal kuis.`);
+                    return;
+                }
+
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Memvalidasi...</span>`;
+
+                try {
+                    const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('milo_token');
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+
+                    const submitResp = await fetch('/api/v1/curriculum/quiz/submit', {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({
+                            topic_id: topicId,
+                            answers: userAnswers,
+                            session_id: sessionId,
+                        }),
+                    });
+
+                    if (!submitResp.ok) {
+                        throw new Error(`Server returned ${submitResp.status}`);
+                    }
+
+                    const res = await submitResp.json();
+
+                    res.results.forEach(r => {
+                        const qCard = document.getElementById(`quizQCard_${r.question_index}`);
+                        if (!qCard) return;
+
+                        const optItems = qCard.querySelectorAll('.quiz-option-item');
+                        optItems.forEach(item => {
+                            const key = item.getAttribute('data-optkey');
+                            if (key === r.correct_option) {
+                                item.classList.add('correct');
+                            } else if (key === r.selected_option && !r.is_correct) {
+                                item.classList.add('wrong');
+                            }
+                        });
+
+                        const expBox = document.getElementById(`quizExp_${r.question_index}`);
+                        if (expBox) {
+                            expBox.style.display = 'block';
+                            expBox.innerHTML = `<strong>Penjelasan:</strong> ${escapeHtml(r.explanation || '')}`;
+                        }
+                    });
+
+                    if (badgeEl && scoreText) {
+                        badgeEl.style.display = 'inline-flex';
+                        scoreText.textContent = `Skor: ${res.score} / 100`;
+                    }
+
+                    if (resultNotice) {
+                        resultNotice.style.display = 'block';
+                        resultNotice.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-circle-check" style="color: #059669; font-size: 20px;"></i>
+                                <div>
+                                    <div style="font-weight: 800; color: #065F46; font-size: 14px;">
+                                        Kuis Selesai! Benar ${res.correct_count} dari ${res.total_questions} Soal
+                                    </div>
+                                    <div style="font-size: 12.5px; color: #047857; margin-top: 2px;">
+                                        Selamat! Kamu memperoleh <strong>+${res.bonus_points} Poin Gamifikasi</strong> untuk modul ini.
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    btnSubmit.innerHTML = `<i class="fa-solid fa-check"></i> <span>Kuis Selesai</span>`;
+                } catch (subErr) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<i class="fa-solid fa-arrow-rotate-right"></i> <span>Coba Kirim Lagi</span>`;
+                    alert('Gagal mengirim jawaban kuis: ' + subErr.message);
+                }
+            });
+        }
+
+    } catch (err) {
+        console.error('Failed to load micro-quiz:', err);
+    }
+}
+
+// ─── Post-Session Evaluation Survey (Thesis/PA Engagement & UEQ) ─────────────
+function initEvaluationSurvey(sessionId) {
+    const form = document.getElementById('evaluationSurveyForm');
+    if (!form) return;
+
+    const scores = {
+        behavioral: 5.0,
+        emotional: 5.0,
+        cognitive: 5.0,
+    };
+
+    // Rating buttons interaction
+    document.querySelectorAll('.survey-rating-options').forEach(group => {
+        const dim = group.getAttribute('data-dim');
+        const btns = group.querySelectorAll('.survey-rate-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                scores[dim] = parseFloat(btn.getAttribute('data-val'));
+            });
+        });
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSubmit = document.getElementById('btnSubmitSurvey');
+        const noticeEl = document.getElementById('surveyFeedbackNotice');
+        const feedbackInput = document.getElementById('surveyFeedbackInput');
+        const feedbackText = feedbackInput ? feedbackInput.value.trim() : '';
+
+        if (btnSubmit) {
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Mengirim...</span>`;
+        }
+
+        try {
+            const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('milo_token');
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+
+            const payload = {
+                session_id: sessionId || null,
+                behavioral_score: scores.behavioral,
+                emotional_score: scores.emotional,
+                cognitive_score: scores.cognitive,
+                feedback_text: feedbackText || null,
+            };
+
+            const resp = await fetch('/api/v1/feedback/survey', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(payload),
+            });
+
+            if (!resp.ok) {
+                throw new Error(`Server returned ${resp.status}`);
+            }
+
+            const result = await resp.json();
+            if (noticeEl) {
+                noticeEl.style.display = 'block';
+                noticeEl.textContent = `Terima kasih! +${result.bonus_xp || 30} XP berhasil ditambahkan ke akun Anda.`;
+            }
+            if (btnSubmit) {
+                btnSubmit.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Terkirim (+30 XP)</span>`;
+            }
+        } catch (err) {
+            console.error('Survey submit error:', err);
+            if (btnSubmit) {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-paper-plane"></i> <span>Kirim Lagi</span>`;
+            }
+            alert('Gagal mengirim evaluasi: ' + err.message);
+        }
+    });
+}
+
+// ─── RAG Grounded Reading Recommendations & Formatting ────────────────────────
+
+function formatRagSourceLabel(src) {
+    if (!src) return '';
+    let s = src.trim();
+    if (s.includes('Cambridge English Vocabulary in Use')) return 'Cambridge Vocabulary in Use (B2)';
+    if (s.includes('The Cambridge Guide to English Usage')) return 'Cambridge Guide to English Usage';
+    if (s.includes('Collins Speaking for IELTS')) return 'Collins Speaking for IELTS';
+    if (s.includes('Council of Europe') || s.includes('CEFR Companion Volume')) return 'CEFR Companion Volume';
+    
+    s = s.replace(/\.md$/i, '').replace(/_/g, ' ');
+    if (s.toLowerCase().startsWith('unit ')) {
+        return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+    return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function renderRagRecommendations(data) {
+    const grid = document.getElementById('ragRecBooksGrid');
+    if (!grid) return;
+
+    const corrs = data.all_corrections || [];
+    const hasGrammarErrors = corrs.some(c => (c.error_type || '').toLowerCase().includes('grammar'));
+    const hasVocabErrors = corrs.some(c => (c.error_type || '').toLowerCase().includes('vocab'));
+
+    const recommendations = [];
+
+    if (hasGrammarErrors || (data.avg_grammar_score && data.avg_grammar_score < 78)) {
+        recommendations.push({
+            book: "The Cambridge Guide to English Usage",
+            tag: "Tata Bahasa & Dilema Kata",
+            unit: "Unit: Confusing Words & Common Dilemmas",
+            desc: "Pelajari perbedaan kata berpasangan yang sering tertukar (seperti borrow vs lend, affect vs effect, used to) untuk meningkatkan akurasi struktur kalimat.",
+            badge: "Cambridge Press"
+        });
+    }
+
+    if (hasVocabErrors || (data.avg_vocabulary_score && data.avg_vocabulary_score < 78)) {
+        recommendations.push({
+            book: "Cambridge English Vocabulary in Use (B2)",
+            tag: "Kekayaan Kosakata & Kolokasi",
+            unit: "Unit: Professional Careers & Topic Collocations",
+            desc: "Perkaya variasi idiom dan pilihan frasa alami agar tuturan terdengar lebih matang dan tidak monoton mengulang kata dasar.",
+            badge: "B2 Lexical Resource"
+        });
+    }
+
+    recommendations.push({
+        book: "Collins Speaking for IELTS",
+        tag: "Kelancaran & Pola Jawaban",
+        unit: "Unit: Fluency Strategies & Coherence",
+        desc: "Latihan teknik menyusun jawaban runtut menggunakan STAR method dan discourse markers untuk mengurangi jeda hening dan keraguan saat berbicara.",
+        badge: "IELTS Speaking Standard"
+    });
+
+    grid.innerHTML = recommendations.map(rec => `
+        <div style="background: #FFFFFF; border: 1px solid #E2D9CC; border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 11px; font-weight: 700; color: #8C6239; background: #FFF4E5; padding: 3px 8px; border-radius: 999px; border: 1px solid #FBD38D;">
+                        ${escapeHtml(rec.badge)}
+                    </span>
+                    <span style="font-size: 11px; font-weight: 600; color: #718096;">${escapeHtml(rec.tag)}</span>
+                </div>
+                <h4 style="margin: 0; font-size: 14.5px; font-weight: 800; color: #1A202C;">${escapeHtml(rec.book)}</h4>
+                <div style="font-size: 12px; font-weight: 700; color: #C87D55; margin-top: 3px;">${escapeHtml(rec.unit)}</div>
+                <p style="font-size: 12.5px; color: #4A5568; margin: 6px 0 0 0; line-height: 1.45;">${escapeHtml(rec.desc)}</p>
+            </div>
+            <div style="padding-top: 8px; border-top: 1px solid #F0EAE1; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 11px; color: #718096;"><i class="fa-solid fa-check-circle" style="color: #38A169;"></i> Terverifikasi di RAG Store</span>
+                <span style="font-size: 11.5px; font-weight: 700; color: #C87D55;">Disarankan</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+

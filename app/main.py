@@ -28,7 +28,7 @@ try:
 except ImportError:
     pass
 
-from app.api import chat, evaluation, feedback, voice
+from app.api import auth, chat, curriculum, evaluation, feedback, voice
 from app.config import settings
 from app.core.asr import whisper_asr
 from app.core.rag import rag_retriever
@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     Application startup and shutdown lifecycle handler.
     
     Startup:
-      - Initialize PostgreSQL tables (dev mode)
+      - Initialize database tables (MySQL/SQLite)
       - Load Whisper model into memory
       - Load ChromaDB vector store
     """
@@ -125,33 +125,12 @@ app.add_middleware(
 
 # ─── Routers ──────────────────────────────────────────────────────────────────
 
+app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(voice.router)
 app.include_router(feedback.router)
 app.include_router(evaluation.router)
-
-from app.models.schemas import TranslateRequest, TranslateResponse
-from app.core.translator import translate_to_indonesian
-
-@app.post(
-    "/api/v1/translate",
-    response_model=TranslateResponse,
-    tags=["Chat"],
-    summary="Translate text from English to Indonesian",
-)
-@app.post(
-    "/api/v1/chat/translate",
-    response_model=TranslateResponse,
-    include_in_schema=False,
-)
-async def translate_text_endpoint(request: TranslateRequest) -> TranslateResponse:
-    try:
-        translated = await translate_to_indonesian(request.text)
-        return TranslateResponse(text=request.text, translation=translated)
-    except Exception as e:
-        logger.error(f"Translation API error: {e}")
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=str(e))
+app.include_router(curriculum.router)
 
 
 

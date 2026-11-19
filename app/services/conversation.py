@@ -17,7 +17,15 @@ from typing import Optional
 from sqlalchemy import select, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Session as DBSession, Message as DBMessage, LearningProgress, User
+from app.db.models import (
+    Session as DBSession,
+    Message as DBMessage,
+    LearningProgress,
+    User,
+    UserGamification,
+    UserBadge,
+    SystemLogAnalytics,
+)
 from app.core.feedback import FeedbackResult
 
 logger = logging.getLogger(__name__)
@@ -72,6 +80,18 @@ class ConversationService:
         )
         self._db.add(session)
         await self._db.flush()
+
+        if session.user_id:
+            start_log = SystemLogAnalytics(
+                user_id=session.user_id,
+                session_id=session.id,
+                event_type="session_start",
+                duration_seconds=0,
+                turns_count=0,
+                extra_meta={"topic": topic, "cefr_level": cefr_level, "learning_goal": learning_goal},
+            )
+            self._db.add(start_log)
+
         logger.info(f"Created session {session.id} (topic={topic}, level={cefr_level})")
         return session
 
@@ -84,8 +104,8 @@ class ConversationService:
 
     async def end_session(self, session_id: str) -> DBSession:
         """
-        Mark a session as ended and compute final scores.
-        Returns the updated session with scores.
+        Mark a session as ended, compute final scores, and update gamification.
+        Returns the updated session with scores and gamification_info attribute.
         """
         session = await self.get_session(session_id)
         if not session:
@@ -123,7 +143,14 @@ class ConversationService:
             )
         )
 
+        gamification_info = {
+            "xp_earned": 0,
+            "current_streak": 0,
+            "unlocked_badges": [],
+        }
+
         if session.user_id:
+            # 1. Update skill-by-skill progress
             for skill, score in [
                 ("grammar", summary["avg_grammar_score"]),
                 ("vocabulary", summary["avg_vocabulary_score"]),
@@ -152,10 +179,101 @@ class ConversationService:
                         )
                         self._db.add(new_prog)
 
+            # 2. Gamification: calculate earned XP and streak
+            session_xp = 50 + int(overall * 0.5)
+            gamification_info["xp_earned"] = session_xp
+
+            now_utc = datetime.now(timezone.utc)
+            today_date = now_utc.date()
+
+            gam_res = await self._db.execute(
+                select(UserGamification).where(UserGamification.user_id == session.user_id)
+            )
+            gam = gam_res.scalar_one_or_none()
+
+            if not gam:
+                gam = UserGamification(
+                    user_id=session.user_id,
+                    points=session_xp,
+                    current_streak=1,
+                    highest_streak=1,
+                    last_practice_date=now_utc,
+                )
+                self._db.add(gam)
+                gamification_info["current_streak"] = 1
+            else:
+                last_date = gam.last_practice_date.date() if gam.last_practice_date else None
+                if last_date is None:
+                    gam.current_streak = 1
+                elif last_date == today_date:
+                    pass
+                elif (today_date - last_date).days == 1:
+                    gam.current_streak += 1
+                else:
+                    gam.current_streak = 1
+
+                gam.points += session_xp
+                gam.highest_streak = max(gam.highest_streak, gam.current_streak)
+                gam.last_practice_date = now_utc
+                gamification_info["current_streak"] = gam.current_streak
+
+            # 3. Badge milestone evaluations
+            existing_badges_res = await self._db.execute(
+                select(UserBadge.badge_key).where(UserBadge.user_id == session.user_id)
+            )
+            existing_badge_keys = set(existing_badges_res.scalars().all())
+
+            candidate_badges = []
+            if "first_step" not in existing_badge_keys:
+                candidate_badges.append(("first_step", "First Conversation"))
+
+            if gam.current_streak >= 3 and "streak_3" not in existing_badge_keys:
+                candidate_badges.append(("streak_3", "3-Day Consistency"))
+
+            if gam.current_streak >= 7 and "streak_7" not in existing_badge_keys:
+                candidate_badges.append(("streak_7", "Weekly Champion"))
+
+            if summary["avg_grammar_score"] >= 85 and "grammar_master" not in existing_badge_keys:
+                candidate_badges.append(("grammar_master", "Grammar Ace"))
+
+            if summary["avg_fluency_score"] >= 85 and "fluency_star" not in existing_badge_keys:
+                candidate_badges.append(("fluency_star", "Fluency Star"))
+
+            if cefr_result in ("B2", "C1", "C2") and "cefr_b2_achieved" not in existing_badge_keys:
+                candidate_badges.append(("cefr_b2_achieved", "B2 Level Mastery"))
+
+            for key, title in candidate_badges:
+                self._db.add(UserBadge(user_id=session.user_id, badge_key=key, badge_title=title))
+                gamification_info["unlocked_badges"].append(title)
+
+            # 4. System Log Analytics record for research tracking
+            duration_sec = 0
+            if session.created_at:
+                s_created = session.created_at.replace(tzinfo=timezone.utc) if session.created_at.tzinfo is None else session.created_at
+                duration_sec = max(int((now_utc - s_created).total_seconds()), 1)
+
+            analytics_log = SystemLogAnalytics(
+                user_id=session.user_id,
+                session_id=session.id,
+                event_type="session_complete",
+                duration_seconds=duration_sec,
+                turns_count=summary["total_turns"],
+                extra_meta={
+                    "overall_score": overall,
+                    "cefr_result": cefr_result,
+                    "topic": session.topic,
+                    "xp_earned": session_xp,
+                    "unlocked_badges": gamification_info["unlocked_badges"],
+                },
+            )
+            self._db.add(analytics_log)
+
         await self._db.flush()
 
-        # Reload session with updated values
-        return await self.get_session(session_id)
+        updated_session = await self.get_session(session_id)
+        if updated_session:
+            setattr(updated_session, "gamification_info", gamification_info)
+        return updated_session
 
     # ─── Message Management ────────────────────────────────────────────────────
 
@@ -211,6 +329,18 @@ class ConversationService:
             feedback=feedback_dict,
         )
         self._db.add(msg)
+        if role == "user" and input_type == "voice":
+            try:
+                audio_log = SystemLogAnalytics(
+                    session_id=uuid.UUID(session_id),
+                    event_type="audio_turn",
+                    duration_seconds=0,
+                    turns_count=0,
+                    extra_meta={"transcript_length": len(transcript or "")},
+                )
+                self._db.add(audio_log)
+            except Exception:
+                pass
         await self._db.flush()
         return msg
 
@@ -318,13 +448,17 @@ class ConversationService:
 
     # ─── Dashboard Data ────────────────────────────────────────────────────────
 
-    async def get_recent_sessions(self, limit: int = 10) -> list[DBSession]:
+    async def get_recent_sessions(self, limit: int = 10, user_id: Optional[str] = None) -> list[DBSession]:
         """Get recent completed sessions for the dashboard."""
+        query = select(DBSession).where(DBSession.is_active == False)  # noqa: E712
+        if user_id:
+            try:
+                user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+                query = query.where(DBSession.user_id == user_uuid)
+            except (ValueError, TypeError):
+                pass
         result = await self._db.execute(
-            select(DBSession)
-            .where(DBSession.is_active == False)  # noqa: E712
-            .order_by(DBSession.ended_at.desc())
-            .limit(limit)
+            query.order_by(DBSession.ended_at.desc()).limit(limit)
         )
         return list(result.scalars().all())
 

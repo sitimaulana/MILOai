@@ -30,6 +30,7 @@ Usage:
 
 import asyncio
 import logging
+import re
 import time
 from dataclasses import dataclass, field
 from typing import Optional
@@ -40,7 +41,7 @@ from app.config import settings
 from app.core.asr import transcribe_audio, TranscriptionResult
 from app.core.feedback import analyze_utterance, FeedbackResult
 from app.core.llm import generate_response, LLMResponse
-from app.core.rag import rag_retriever, retrieve_context, RetrievedContext
+from app.core.rag import rag_retriever, retrieve_adaptive, retrieve_context, RetrievedContext
 from app.core.translator import translate_to_indonesian
 from app.core.tts import synthesize_speech
 from app.services.conversation import ConversationService
@@ -58,8 +59,47 @@ class PipelineResult:
     audio_base64: Optional[str] = None
     feedback: Optional[FeedbackResult] = None
     rag_sources: list[str] = field(default_factory=list)
+    rag_details: list[dict] = field(default_factory=list)
     transcript: Optional[str] = None  # Only set for voice input
     avatar_emotion: str = "friendly"
+    is_session_closed: bool = False
+
+
+def format_friendly_rag_meta(ctx: RetrievedContext) -> dict:
+    """Format rich human-readable metadata for frontend RAG inspection."""
+    src = (ctx.source or "").lower()
+    clean_title = (ctx.source or "").replace(".md", "").replace("_", " ").title()
+    category = "Curriculum Material"
+    if "vocabulary" in src or src.startswith("unit_"):
+        book = "Cambridge English Vocabulary in Use (B2)"
+        category = "Vocabulary & Collocations"
+    elif "collins" in src or re.match(r"^[abc][1-6]", src):
+        book = "Collins Speaking for IELTS"
+        category = "Speaking & Fluency Strategies"
+    elif "usage_" in src or "english usage" in src:
+        book = "The Cambridge Guide to English Usage"
+        category = "Grammar & Confusing Words"
+    elif "cefr_" in src or "council" in src:
+        book = "CEFR Companion Volume"
+        category = "CEFR Spoken Descriptors"
+    else:
+        book = "MILO Grounded Knowledge Base"
+
+    clean_snippet = re.sub(r"#+\s*", "", ctx.content or "")
+    clean_snippet = re.sub(r"\s+", " ", clean_snippet).strip()
+    if len(clean_snippet) > 260:
+        clean_snippet = clean_snippet[:257] + "..."
+
+    return {
+        "source": ctx.source,
+        "book": book,
+        "title": clean_title,
+        "category": category,
+        "skill": ctx.skill_type or "general",
+        "level": ctx.cefr_level or "B1-B2",
+        "score": round(float(ctx.relevance_score), 3) if ctx.relevance_score else 0.0,
+        "snippet": clean_snippet,
+    }
 
 
 class MILOPipeline:
@@ -84,6 +124,8 @@ class MILOPipeline:
         user_id: Optional[str] = None,
         input_type: str = "text",
         transcript: Optional[str] = None,
+        is_closing: bool = False,
+        trigger: Optional[str] = None,
     ) -> PipelineResult:
         """
         Process a text input through the full pipeline.
@@ -121,26 +163,30 @@ class MILOPipeline:
 
         t_start = time.perf_counter()
 
-        # 3. Retrieve conversation history and (if relevant) RAG context concurrently
+        # 3. Retrieve conversation history and Adaptive Hybrid RAG context concurrently
         t_rag_start = time.perf_counter()
+
+        # Extract optional topic_id if stored in session or learning goal (e.g. A1, B2, C3)
+        topic_id = getattr(session, "topic_id", None)
+        if not topic_id and session and session.learning_goal:
+            match = re.search(r"\b([A-C][1-6])\b", session.learning_goal)
+            if match:
+                topic_id = match.group(1)
+
+        # Detect if user asks about an error, mistake, or previous correction
         user_lower = user_message.lower().strip()
-        is_knowledge_query = any(
-            trigger in user_lower
-            for trigger in (
-                "what is", "what does", "how do", "how to", "difference between",
-                "can you explain", "explain", "meaning of", "grammar rule", "why do",
-                "is it correct", "how should i say", "vocabulary for", "cefr"
-            )
-        )
+        detected_error = None
+        if any(w in user_lower for w in ("why is that wrong", "why was that wrong", "what did i do wrong", "my mistake", "my error", "why did you correct", "is it incorrect")):
+            detected_error = "error_remediation"
 
         async def _fetch_rag():
-            if not is_knowledge_query and not topic_name:
-                return []
-            min_score = 0.68 if is_knowledge_query else 0.76
-            return await retrieve_context(
+            return await retrieve_adaptive(
                 query=user_message,
                 cefr_level=effective_cefr_level,
-                min_score=min_score,
+                topic_name=topic_name,
+                topic_id=topic_id,
+                detected_error=detected_error,
+                k=settings.rag_top_k,
             )
 
         history, rag_contexts = await asyncio.gather(
@@ -153,6 +199,7 @@ class MILOPipeline:
         t_rag = time.perf_counter() - t_rag_start
         rag_context_str = rag_retriever.format_context_for_prompt(rag_contexts)
         rag_sources = [ctx.source for ctx in rag_contexts]
+        rag_details = [format_friendly_rag_meta(ctx) for ctx in rag_contexts]
 
         # Extract preceding assistant turn to give context to feedback engine
         last_assistant_turn = next(
@@ -160,15 +207,18 @@ class MILOPipeline:
             None,
         )
 
-        # 4. Concurrently kick off feedback analysis with topic and preceding context
-        feedback_task = asyncio.create_task(
-            analyze_utterance(
-                user_text=user_message,
-                cefr_level=effective_cefr_level,
-                topic=topic_name,
-                context=last_assistant_turn,
+        # 4. Concurrently kick off feedback analysis with topic and preceding context (skip if auto-close trigger)
+        is_auto_close_trigger = (trigger == "time_limit_reached")
+        feedback_task = None
+        if not is_auto_close_trigger:
+            feedback_task = asyncio.create_task(
+                analyze_utterance(
+                    user_text=user_message,
+                    cefr_level=effective_cefr_level,
+                    topic=topic_name,
+                    context=last_assistant_turn,
+                )
             )
-        )
 
         # 5. LLM response generation (runs while feedback_task is computing)
         t_llm_start = time.perf_counter()
@@ -178,6 +228,7 @@ class MILOPipeline:
             rag_context=rag_context_str,
             learning_goal=effective_learning_goal,
             cefr_level=effective_cefr_level,
+            is_closing=is_closing,
         )
         t_llm = time.perf_counter() - t_llm_start
 
@@ -193,40 +244,45 @@ class MILOPipeline:
         )
 
         # 7. Await feedback and TTS (and optional translation) in parallel
-        tasks = [feedback_task, tts_task]
+        tasks_map = {"tts": tts_task}
+        if feedback_task:
+            tasks_map["feedback"] = feedback_task
         if translation_task:
-            tasks.append(translation_task)
+            tasks_map["translation"] = translation_task
 
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        results_list = await asyncio.gather(*tasks_map.values(), return_exceptions=True)
+        results = dict(zip(tasks_map.keys(), results_list))
         t_tts_fb = time.perf_counter() - t_tts_fb_start
 
-        feedback_raw = results[0]
-        if isinstance(feedback_raw, Exception):
-            logger.warning(f"Feedback analysis encountered an error: {feedback_raw}")
-            feedback_result: Optional[FeedbackResult] = None
-        else:
-            feedback_result = feedback_raw
+        feedback_result: Optional[FeedbackResult] = None
+        if "feedback" in results:
+            feedback_raw = results["feedback"]
+            if isinstance(feedback_raw, Exception):
+                logger.warning(f"Feedback analysis encountered an error: {feedback_raw}")
+            else:
+                feedback_result = feedback_raw
 
-        audio_raw = results[1]
+        audio_b64: Optional[str] = None
+        audio_raw = results.get("tts")
         if isinstance(audio_raw, Exception):
             logger.warning(f"TTS synthesis failed (falling back to text): {audio_raw}")
-            audio_b64: Optional[str] = None
         else:
             audio_b64 = audio_raw
 
         translation_id: Optional[str] = None
-        if translation_task:
-            tr_raw = results[2]
+        if "translation" in results:
+            tr_raw = results["translation"]
             if isinstance(tr_raw, Exception):
                 logger.warning(f"Translation failed: {tr_raw}")
             else:
                 translation_id = tr_raw
 
         # 8. Persist to database
+        saved_user_content = "(Practice time ended)" if is_auto_close_trigger else user_message
         user_msg = await self._conv.add_message(
             session_id=actual_session_id,
             role="user",
-            content=user_message,
+            content=saved_user_content,
             input_type=input_type,
             transcript=transcript if input_type == "voice" else None,
             feedback=feedback_result,
@@ -243,13 +299,13 @@ class MILOPipeline:
         )
 
         # Contextual emotion state for avatar animation (Three.js blendshapes / visemes)
-        avatar_emotion = "friendly"
-        if feedback_result:
+        avatar_emotion = "happy" if is_closing else "friendly"
+        if not is_closing and feedback_result:
             if feedback_result.overall_score >= 88:
                 avatar_emotion = "happy"
             elif feedback_result.corrections:
                 avatar_emotion = "supportive"
-        if "?" in llm_response.content and avatar_emotion == "friendly":
+        if not is_closing and "?" in llm_response.content and avatar_emotion == "friendly":
             avatar_emotion = "curious"
 
         return PipelineResult(
@@ -260,7 +316,9 @@ class MILOPipeline:
             audio_base64=audio_b64,
             feedback=feedback_result,
             rag_sources=rag_sources,
+            rag_details=rag_details,
             avatar_emotion=avatar_emotion,
+            is_session_closed=is_closing,
         )
 
     async def process_voice(
@@ -272,6 +330,7 @@ class MILOPipeline:
         cefr_level: str = "B1",
         return_audio: bool = True,
         user_id: Optional[str] = None,
+        is_closing: bool = False,
     ) -> PipelineResult:
         """
         Process voice input through the full pipeline.
@@ -309,6 +368,7 @@ class MILOPipeline:
                 audio_base64=audio_b64,
                 transcript="(Inaudible speech)",
                 feedback=None,
+                is_session_closed=is_closing,
             )
 
         logger.info(f"ASR result: '{transcript[:80]}...' (lang={asr_result.language})")
@@ -323,6 +383,7 @@ class MILOPipeline:
             user_id=user_id,
             input_type="voice",
             transcript=transcript,
+            is_closing=is_closing,
         )
 
         # Attach transcript to the result

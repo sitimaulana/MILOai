@@ -63,7 +63,7 @@ CEFR_LEVEL_GUIDELINES = {
 }
 
 MILO_SYSTEM_PROMPT = """\
-You are MILO — a warm, lively, and supportive English speaking companion and tutor for CEFR {cefr_level} learners.
+You are MILO, a warm, lively, and supportive English speaking companion and tutor for CEFR {cefr_level} learners.
 
 ## Level Adaptation ({cefr_level})
 {cefr_guidelines}
@@ -90,7 +90,7 @@ You are MILO — a warm, lively, and supportive English speaking companion and t
 
 ## Important Rules:
 - ALWAYS respond in English.
-- NEVER mention that you are an AI language model — you are MILO.
+- NEVER mention that you are an AI language model: you are MILO.
 - Keep responses conversational, engaging, and friendly.
 
 ## Current Learning Goal & Scenario:
@@ -100,8 +100,23 @@ You are MILO — a warm, lively, and supportive English speaking companion and t
 SYSTEM_PROMPT_WITH_RAG = """\
 {base_system_prompt}
 
-## Reference Materials (Use ONLY if the student asked a specific question about this topic; do NOT lecture or quote unprompted):
+## Verified Reference Knowledge & Strict Grounding Rules:
 {rag_context}
+
+## Strict Grounding & Pedagogical Directives:
+1. STRICT FACTUAL GROUNDING: Base your grammatical, lexical, and pedagogical explanations strictly on the verified reference material above. Do NOT invent, assume, or hallucinate non-standard grammatical rules.
+2. NATURAL SPOKEN RECASTING: Provide a clear, natural explanation (1-2 sentences), give 1 practical conversational example, and always conclude with exactly ONE engaging question for the student to practice.
+3. CAUTIOUS FALLBACK: If the student asks about a concept not covered in the reference material, answer courteously using standard CEFR {cefr_level} conversational English without making up unsupported textbook citations.
+"""
+
+CLOSING_DIRECTIVE = """\
+## CRITICAL DIRECTIVE - SESSION TIME LIMIT REACHED:
+The practice session duration has ended. This is the FINAL turn of the conversation.
+You MUST conclude the conversation:
+1. STRICT OVERRIDE OF RULE 2 (NO QUESTIONS): DO NOT ask any questions! Do not ask "What about you?", "How about you?", or anything that invites a reply. Under NO circumstances should you include a question mark (?).
+2. ACKNOWLEDGE TIME: State warmly and naturally that our practice time for today has finished.
+3. PRAISE & ENCOURAGE: Commend the student for their spoken participation and effort today in 1-2 natural, spoken sentences.
+4. SIGN OFF: Conclude with a warm sign-off (e.g., "Take care, and see you next time!").
 """
 
 
@@ -177,6 +192,7 @@ class MILOConversationLLM:
         rag_context: str = "",
         learning_goal: str = "Practice everyday English conversation.",
         cefr_level: str = "B1",
+        is_closing: bool = False,
     ) -> LLMResponse:
         """
         Generate a MILO response given user input and context.
@@ -188,6 +204,7 @@ class MILOConversationLLM:
             rag_context: Formatted CEFR materials string from RAG retrieval.
             learning_goal: The session's learning goal string.
             cefr_level: Target CEFR level ("A2", "B1", "B2").
+            is_closing: Whether to instruct MILO to conclude the session without questions.
 
         Returns:
             LLMResponse with content and token usage.
@@ -209,6 +226,9 @@ class MILOConversationLLM:
             )
         else:
             system_content = base_system
+
+        if is_closing:
+            system_content = f"{system_content}\n\n{CLOSING_DIRECTIVE}"
 
         # Build messages array
         messages: list[dict] = [{"role": "system", "content": system_content}]
@@ -320,6 +340,7 @@ async def generate_response(
     rag_context: str = "",
     learning_goal: str = "",
     cefr_level: str = "B1",
+    is_closing: bool = False,
 ) -> LLMResponse:
     """High-level helper used by the pipeline service."""
     return await milo_llm.generate(
@@ -328,4 +349,5 @@ async def generate_response(
         rag_context=rag_context,
         learning_goal=learning_goal,
         cefr_level=cefr_level,
+        is_closing=is_closing,
     )

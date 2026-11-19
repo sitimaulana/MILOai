@@ -1,7 +1,7 @@
 """
 MILO AI Backend - Voice API Route
 
-POST /api/v1/voice — Process voice input (audio file upload) and return MILO's response.
+POST /api/v1/voice: Process voice input (audio file upload) and return MILO's response.
 """
 
 import logging
@@ -10,8 +10,10 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.database import get_db
 from app.core.asr import transcribe_audio
+from app.core.security import get_current_user_optional
+from app.db.database import get_db
+from app.db.models import User
 from app.models.schemas import (
     FeedbackResponse,
     GrammarCorrection,
@@ -46,6 +48,8 @@ async def voice(
     learning_goal: Optional[str] = Form(None, description="e.g. 'Practice job interview English'"),
     cefr_level: str = Form("B1", description="Target CEFR level: A2, B1, B2"),
     return_audio: bool = Form(True, description="Whether to return TTS audio"),
+    is_closing: bool = Form(False, description="Whether this turn concludes the session due to time limit"),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: AsyncSession = Depends(get_db),
 ) -> VoiceResponse:
     """
@@ -77,6 +81,7 @@ async def voice(
     pipeline = MILOPipeline(db)
 
     try:
+        effective_user_id = user_id or (str(current_user.id) if current_user else None)
         result = await pipeline.process_voice(
             session_id=session_id or "new",
             audio_bytes=audio_bytes,
@@ -84,7 +89,8 @@ async def voice(
             learning_goal=learning_goal or "",
             cefr_level=cefr_level,
             return_audio=return_audio,
-            user_id=user_id,
+            user_id=effective_user_id,
+            is_closing=bool(is_closing),
         )
     except ValueError as e:
         raise HTTPException(
@@ -133,7 +139,9 @@ async def voice(
         audio_base64=result.audio_base64,
         feedback=feedback_response,
         rag_sources=result.rag_sources,
+        rag_details=getattr(result, "rag_details", []),
         avatar_emotion=getattr(result, "avatar_emotion", "friendly"),
+        is_session_closed=getattr(result, "is_session_closed", False),
     )
 
 
