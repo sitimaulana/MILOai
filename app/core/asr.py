@@ -34,6 +34,43 @@ logger = logging.getLogger(__name__)
 SUPPORTED_FORMATS = {".wav", ".mp3", ".webm", ".ogg", ".m4a", ".flac"}
 
 
+def _ensure_ffmpeg_in_path() -> None:
+    """Ensure ffmpeg executable is available in PATH for Whisper."""
+    import shutil
+    import sys
+
+    # If ffmpeg is already reachable, nothing to do
+    if shutil.which("ffmpeg") is not None:
+        return
+
+    project_root = Path(__file__).resolve().parent.parent.parent
+    candidates = [
+        str(project_root),
+        str(project_root / ".venv" / "Scripts"),
+    ]
+    try:
+        import imageio_ffmpeg
+        img_ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        img_dir = os.path.dirname(img_ffmpeg)
+        target_name = "ffmpeg.exe" if sys.platform == "win32" else "ffmpeg"
+        target_path = os.path.join(img_dir, target_name)
+        if not os.path.exists(target_path) and os.path.exists(img_ffmpeg):
+            try:
+                shutil.copy2(img_ffmpeg, target_path)
+            except Exception:
+                pass
+        candidates.append(img_dir)
+    except Exception:
+        pass
+
+    for d in candidates:
+        if os.path.isdir(d) and d not in os.environ.get("PATH", ""):
+            os.environ["PATH"] = d + os.pathsep + os.environ.get("PATH", "")
+
+
+_ensure_ffmpeg_in_path()
+
+
 @dataclass
 class TranscriptionResult:
     text: str
@@ -184,6 +221,9 @@ class WhisperASR:
         # English-only models (like small.en or base.en) reject or don't need a language arg
         if getattr(self._model, "is_multilingual", True):
             options["language"] = language or "en"
+
+        # Ensure ffmpeg is in PATH before whisper subprocess calls
+        _ensure_ffmpeg_in_path()
 
         # Redirect stderr and stdout to prevent OSError [Errno 22] Invalid argument on Windows consoles
         with contextlib.redirect_stderr(io.StringIO()), contextlib.redirect_stdout(io.StringIO()):

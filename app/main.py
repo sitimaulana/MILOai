@@ -19,14 +19,34 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 import os
 import sys
 
-# Ensure ffmpeg from imageio-ffmpeg is in PATH for Whisper
-try:
-    import imageio_ffmpeg
-    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-    ffmpeg_dir = os.path.dirname(ffmpeg_exe)
-    os.environ["PATH"] = ffmpeg_dir + os.pathsep + os.environ["PATH"]
-except ImportError:
-    pass
+# Ensure ffmpeg is accessible in PATH for Whisper
+def _ensure_ffmpeg():
+    import shutil
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    candidates = [
+        project_root,
+        os.path.join(project_root, ".venv", "Scripts"),
+    ]
+    try:
+        import imageio_ffmpeg
+        img_ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+        img_dir = os.path.dirname(img_ffmpeg)
+        target_name = "ffmpeg.exe" if sys.platform == "win32" else "ffmpeg"
+        target_path = os.path.join(img_dir, target_name)
+        if not os.path.exists(target_path) and os.path.exists(img_ffmpeg):
+            try:
+                shutil.copy2(img_ffmpeg, target_path)
+            except Exception:
+                pass
+        candidates.append(img_dir)
+    except Exception:
+        pass
+
+    for d in candidates:
+        if os.path.isdir(d) and d not in os.environ.get("PATH", ""):
+            os.environ["PATH"] = d + os.pathsep + os.environ.get("PATH", "")
+
+_ensure_ffmpeg()
 
 from app.api import auth, chat, curriculum, evaluation, feedback, voice
 from app.config import settings
