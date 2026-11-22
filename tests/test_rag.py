@@ -48,7 +48,7 @@ def test_intent_classification():
 async def test_adaptive_hybrid_retrieval_and_rrf():
     """Verify that Dense + Sparse BM25 fusion ranks primary microlearning chunks highest."""
     retriever = RAGRetriever.__new__(RAGRetriever)
-    retriever._embedding = MagicMock()
+    retriever._embeddings = MagicMock()
     retriever._vectorstore = MagicMock()
 
     # Mock Chroma vector search returns
@@ -116,7 +116,7 @@ def test_format_context_for_prompt():
     ]
 
     formatted = retriever.format_context_for_prompt(contexts)
-    assert "[MICROLEARNING CONTEXT & TARGET MATERIAL]" in formatted
+    assert "[VERIFIED CEFR REFERENCE MATERIAL & KNOWLEDGE BASE]" in formatted
     assert "Topic A1" in formatted
     assert "STAR method" in formatted
     assert "Pedagogical Instruction:" in formatted

@@ -86,6 +86,17 @@ async def _ensure_mysql_db_exists() -> None:
         logger.warning(f"Could not auto-create MySQL database (it may already exist or require manual creation): {e}")
 
 
+async def _migrate_columns(conn) -> None:
+    """Ensure any newly added schema columns exist in existing database tables."""
+    try:
+        res = await conn.execute(text("SHOW COLUMNS FROM users LIKE 'placement_score'"))
+        if not res.fetchone():
+            await conn.execute(text("ALTER TABLE users ADD COLUMN placement_score FLOAT NULL"))
+            logger.info("Migrated: added 'placement_score' column to 'users' table.")
+    except Exception as e:
+        logger.warning(f"Column migration check failed (non-critical): {e}")
+
+
 async def init_db() -> None:
     """Create all tables on startup (for dev/testing/production)."""
     if _is_mysql:
@@ -94,3 +105,5 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         from app.db import models  # noqa: F401 — import models to register them
         await conn.run_sync(Base.metadata.create_all)
+        if _is_mysql:
+            await _migrate_columns(conn)

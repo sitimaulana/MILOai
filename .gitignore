@@ -82,3 +82,6 @@ milo_dev.db
 # DeepEval Cache
 .deepeval/
 
+# UV Cache
+.uv_cache/
+

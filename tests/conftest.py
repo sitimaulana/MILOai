@@ -10,3 +10,4 @@ async def cleanup_db_engine():
         await engine.dispose()
     except Exception:
         pass
+

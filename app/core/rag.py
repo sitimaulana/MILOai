@@ -59,7 +59,7 @@ class AdaptiveQueryRouter:
         "what is", "what are", "what does", "how do", "how to", "difference between",
         "can you explain", "could you explain", "explain", "meaning of", "grammar rule", "why do",
         "is it correct", "how should i say", "vocabulary for", "cefr",
-        "what means", "tell me the difference", "tell me about", "which tense", "example of",
+        "what means", "tell me the difference", "which tense", "example of",
         "which is correct", "which one is correct", "how to say", "what does that mean",
         "give me an example", "can you teach me", "how can i use",
         "i don't understand", "i don't know when to use", "i'm confused about",
@@ -156,7 +156,7 @@ class RAGRetriever:
     _vectorstore: Optional[Chroma] = None
     _bm25_retriever: Optional[BM25Retriever] = None
     _embeddings: Optional[OpenAIEmbeddings | HuggingFaceEmbeddings] = None
-    _indexed_docs: List[Document] = field(default_factory=list)
+    _indexed_docs: List[Document] = []
 
     def __new__(cls) -> "RAGRetriever":
         if cls._instance is None:

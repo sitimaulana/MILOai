@@ -101,6 +101,15 @@ async def test_pipeline_process_text_closing():
 @pytest.mark.asyncio
 async def test_chat_endpoint_closing_response():
     """Verify /api/v1/chat returns is_session_closed=True when is_closing=True."""
+    from app.db.models import User as DBUser
+    import uuid
+
+    mock_user = MagicMock(spec=DBUser)
+    mock_user.id = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+    mock_user.username = "testuser"
+    mock_user.full_name = "Test User"
+    mock_user.cefr_level = "B1"
+
     with (
         patch("app.db.database.init_db", new_callable=AsyncMock),
         patch("app.core.asr.whisper_asr.load"),
@@ -123,22 +132,27 @@ async def test_chat_endpoint_closing_response():
         ),
     ):
         from app.main import app
+        from app.api.chat import get_current_user
+        app.dependency_overrides[get_current_user] = lambda: mock_user
 
-        async with AsyncClient(
-            transport=ASGITransport(app=app),
-            base_url="http://test",
-        ) as client:
-            response = await client.post(
-                "/api/v1/chat",
-                json={
-                    "session_id": "test-session",
-                    "message": "Time is up for today's practice session.",
-                    "is_closing": True,
-                    "trigger": "time_limit_reached",
-                    "cefr_level": "B1",
-                    "return_audio": True,
-                },
-            )
+        try:
+            async with AsyncClient(
+                transport=ASGITransport(app=app),
+                base_url="http://test",
+            ) as client:
+                response = await client.post(
+                    "/api/v1/chat",
+                    json={
+                        "session_id": "test-session",
+                        "message": "Time is up for today's practice session.",
+                        "is_closing": True,
+                        "trigger": "time_limit_reached",
+                        "cefr_level": "B1",
+                        "return_audio": True,
+                    },
+                )
+        finally:
+            app.dependency_overrides.clear()
 
         assert response.status_code == 200
         data = response.json()
