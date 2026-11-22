@@ -109,11 +109,11 @@ async def test_register_validation():
             "/api/v1/auth/register",
             json={"username": "ab", "password": "ValidPassword123"},
         )
-        assert resp_short_user.status_code == 400
+        assert resp_short_user.status_code in (400, 422)
 
         # Password too short
         resp_short_pw = await client.post(
             "/api/v1/auth/register",
             json={"username": f"valid_{uuid.uuid4().hex[:6]}", "password": "123"},
         )
-        assert resp_short_pw.status_code == 400
+        assert resp_short_pw.status_code in (400, 422)

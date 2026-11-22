@@ -448,18 +448,82 @@ class ConversationService:
 
     # ─── Dashboard Data ────────────────────────────────────────────────────────
 
-    async def get_recent_sessions(self, limit: int = 10, user_id: Optional[str] = None) -> list[DBSession]:
-        """Get recent completed sessions for the dashboard."""
-        query = select(DBSession).where(DBSession.is_active == False)  # noqa: E712
-        if user_id:
-            try:
-                user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
-                query = query.where(DBSession.user_id == user_uuid)
-            except (ValueError, TypeError):
-                pass
-        result = await self._db.execute(
-            query.order_by(DBSession.ended_at.desc()).limit(limit)
+    async def get_user_session_stats(self, user_id: Optional[str] = None) -> dict:
+        """
+        Aggregate full history metrics for a specific user across all completed sessions.
+        Strictly isolated to user_id; returns zeroed stats if user_id is empty or invalid.
+        """
+        if not user_id:
+            return {
+                "total_sessions": 0,
+                "avg_overall_score": 0.0,
+                "avg_grammar_score": 0.0,
+                "avg_vocabulary_score": 0.0,
+                "avg_fluency_score": 0.0,
+            }
+        try:
+            user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        except (ValueError, TypeError):
+            return {
+                "total_sessions": 0,
+                "avg_overall_score": 0.0,
+                "avg_grammar_score": 0.0,
+                "avg_vocabulary_score": 0.0,
+                "avg_fluency_score": 0.0,
+            }
+
+        query = select(
+            func.count(DBSession.id),
+            func.avg(DBSession.overall_score),
+            func.avg(DBSession.avg_grammar_score),
+            func.avg(DBSession.avg_vocabulary_score),
+            func.avg(DBSession.avg_fluency_score),
+        ).where(
+            DBSession.user_id == user_uuid,
+            DBSession.is_active == False,  # noqa: E712
         )
+        result = await self._db.execute(query)
+        row = result.first()
+        if not row or not row[0]:
+            return {
+                "total_sessions": 0,
+                "avg_overall_score": 0.0,
+                "avg_grammar_score": 0.0,
+                "avg_vocabulary_score": 0.0,
+                "avg_fluency_score": 0.0,
+            }
+
+        count, avg_overall, avg_grammar, avg_vocab, avg_fluency = row
+        return {
+            "total_sessions": int(count or 0),
+            "avg_overall_score": round(float(avg_overall or 0.0), 1),
+            "avg_grammar_score": round(float(avg_grammar or 0.0), 1),
+            "avg_vocabulary_score": round(float(avg_vocab or 0.0), 1),
+            "avg_fluency_score": round(float(avg_fluency or 0.0), 1),
+        }
+
+    async def get_recent_sessions(self, limit: int = 10, user_id: Optional[str] = None) -> list[DBSession]:
+        """
+        Get recent completed sessions strictly for a given user.
+        If user_id is not provided or invalid, returns an empty list to prevent cross-user leakage.
+        """
+        if not user_id:
+            return []
+        try:
+            user_uuid = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+        except (ValueError, TypeError):
+            return []
+
+        query = (
+            select(DBSession)
+            .where(
+                DBSession.user_id == user_uuid,
+                DBSession.is_active == False,  # noqa: E712
+            )
+            .order_by(DBSession.ended_at.desc())
+            .limit(limit)
+        )
+        result = await self._db.execute(query)
         return list(result.scalars().all())
 
     async def get_session_with_messages(self, session_id: str) -> Optional[dict]:

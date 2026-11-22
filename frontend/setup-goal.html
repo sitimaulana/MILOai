@@ -108,6 +108,13 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('milo_token');
+            const user = localStorage.getItem('milo_user');
+            if (!token || !user) {
+                window.location.href = 'login.html?redirect=setup-goal.html';
+                return;
+            }
+
             const form = document.getElementById('goalForm');
             const submitBtn = document.getElementById('btnSubmitGoal');
 

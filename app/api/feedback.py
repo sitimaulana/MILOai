@@ -19,7 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.llm import generate_response
-from app.core.security import get_current_user_optional
+from app.core.security import get_current_user, get_current_user_optional
 from app.core.tts import synthesize_speech
 from app.db.database import get_db
 from app.db.models import (
@@ -200,12 +200,13 @@ TOPIC_GOALS = {
 )
 async def start_session(
     request: SessionStartRequest,
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> SessionStartResponse:
     """
     Create a new practice session with selected topic, daily goal, and CEFR level.
     Returns MILO's greeting message adapted to the user's level and chosen topic.
+    Guaranteed to be linked to the authenticated user.
     """
     topic = request.topic
     if topic not in TOPIC_GREETINGS:
@@ -246,7 +247,7 @@ async def start_session(
         except Exception as e:
             logger.warning(f"Could not load topic metadata for '{topic_id}': {e}")
 
-    effective_user_id = request.user_id or (str(current_user.id) if current_user else None)
+    effective_user_id = str(current_user.id)
     session = await conv.create_session(
         user_id=effective_user_id,
         learning_goal=learning_goal,
@@ -292,6 +293,7 @@ async def start_session(
 )
 async def end_session(
     request: SessionEndRequest,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> SessionEndResponse:
     """
@@ -308,6 +310,12 @@ async def end_session(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Session '{request.session_id}' not found.",
+        )
+
+    if session.user_id and str(session.user_id) != str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akses ditolak: Sesi latihan ini bukan milik akun Anda.",
         )
 
     session = await conv.end_session(request.session_id)
@@ -397,22 +405,18 @@ async def end_session(
     summary="Get dashboard data",
 )
 async def get_dashboard(
-    user_id: Optional[str] = None,
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> DashboardResponse:
-    """Get recent sessions and aggregate statistics for the dashboard."""
-    active_user_id = str(current_user.id) if current_user else user_id
+    """Get recent sessions and aggregate statistics strictly for the authenticated user's dashboard."""
+    active_user_id = str(current_user.id)
     conv = ConversationService(db)
+
+    # 1. Full aggregate statistics across ALL completed sessions of this user
+    stats = await conv.get_user_session_stats(active_user_id)
     recent = await conv.get_recent_sessions(limit=10, user_id=active_user_id)
 
     sessions_items = []
-    total_score = 0.0
-    score_count = 0
-    grammar_sum = 0.0
-    vocab_sum = 0.0
-    fluency_sum = 0.0
-
     for s in recent:
         topic = s.topic or "daily_conversation"
         duration = _calc_duration_minutes(s.created_at, s.ended_at)
@@ -429,104 +433,66 @@ async def get_dashboard(
             duration_minutes=duration,
         ))
 
-        if s.overall_score:
-            total_score += s.overall_score
-            score_count += 1
-        if s.avg_grammar_score:
-            grammar_sum += s.avg_grammar_score
-        if s.avg_vocabulary_score:
-            vocab_sum += s.avg_vocabulary_score
-        if s.avg_fluency_score:
-            fluency_sum += s.avg_fluency_score
+    # 2. Gamification & Badges
+    user_uuid = current_user.id if isinstance(current_user.id, uuid.UUID) else uuid.UUID(str(current_user.id))
+    gam_res = await db.execute(
+        select(UserGamification).where(UserGamification.user_id == user_uuid)
+    )
+    gam = gam_res.scalar_one_or_none()
 
-    avg_score = round(total_score / max(score_count, 1), 1)
+    badges_res = await db.execute(
+        select(UserBadge).where(UserBadge.user_id == user_uuid).order_by(UserBadge.earned_at.desc())
+    )
+    badges = badges_res.scalars().all()
+    badge_items = [
+        UserBadgeItem(
+            badge_key=b.badge_key,
+            badge_title=b.badge_title,
+            earned_at=b.earned_at,
+        )
+        for b in badges
+    ]
 
-    gam_stats = None
+    gam_stats = UserGamificationStats(
+        points=gam.points if gam else 0,
+        current_streak=gam.current_streak if gam else 0,
+        highest_streak=gam.highest_streak if gam else 0,
+        last_practice_date=gam.last_practice_date if gam else None,
+        badges=badge_items,
+    )
+
+    # 3. Skill Progress
     skill_progress_items = []
-    user_profile_data = None
-
-    if active_user_id:
-        try:
-            user_uuid = uuid.UUID(active_user_id) if isinstance(active_user_id, str) else active_user_id
-
-            # 1. Gamification & Badges
-            gam_res = await db.execute(
-                select(UserGamification).where(UserGamification.user_id == user_uuid)
+    lp_res = await db.execute(
+        select(LearningProgress).where(LearningProgress.user_id == user_uuid).order_by(LearningProgress.skill)
+    )
+    for lp in lp_res.scalars().all():
+        skill_progress_items.append(
+            SkillProgressItem(
+                skill=lp.skill,
+                score=lp.score,
+                sessions_count=lp.sessions_count,
+                total_corrections=lp.total_corrections,
+                last_updated=lp.last_updated,
             )
-            gam = gam_res.scalar_one_or_none()
+        )
 
-            badges_res = await db.execute(
-                select(UserBadge).where(UserBadge.user_id == user_uuid).order_by(UserBadge.earned_at.desc())
-            )
-            badges = badges_res.scalars().all()
-            badge_items = [
-                UserBadgeItem(
-                    badge_key=b.badge_key,
-                    badge_title=b.badge_title,
-                    earned_at=b.earned_at,
-                )
-                for b in badges
-            ]
-
-            if gam:
-                gam_stats = UserGamificationStats(
-                    points=gam.points,
-                    current_streak=gam.current_streak,
-                    highest_streak=gam.highest_streak,
-                    last_practice_date=gam.last_practice_date,
-                    badges=badge_items,
-                )
-            else:
-                gam_stats = UserGamificationStats(
-                    points=0,
-                    current_streak=0,
-                    highest_streak=0,
-                    badges=badge_items,
-                )
-
-            # 2. Skill Progress
-            lp_res = await db.execute(
-                select(LearningProgress).where(LearningProgress.user_id == user_uuid).order_by(LearningProgress.skill)
-            )
-            for lp in lp_res.scalars().all():
-                skill_progress_items.append(
-                    SkillProgressItem(
-                        skill=lp.skill,
-                        score=lp.score,
-                        sessions_count=lp.sessions_count,
-                        total_corrections=lp.total_corrections,
-                        last_updated=lp.last_updated,
-                    )
-                )
-
-            # 3. User profile data
-            if current_user:
-                user_profile_data = {
-                    "id": str(current_user.id),
-                    "username": current_user.username,
-                    "full_name": current_user.full_name,
-                    "cefr_level": current_user.cefr_level,
-                }
-            else:
-                user_obj = await db.get(User, user_uuid)
-                if user_obj:
-                    user_profile_data = {
-                        "id": str(user_obj.id),
-                        "username": user_obj.username,
-                        "full_name": user_obj.full_name,
-                        "cefr_level": user_obj.cefr_level,
-                    }
-        except Exception as e:
-            logger.warning(f"Failed to query gamification/progress data: {e}")
+    # 4. User profile data
+    user_profile_data = {
+        "id": str(current_user.id),
+        "username": current_user.username,
+        "full_name": current_user.full_name,
+        "cefr_level": current_user.cefr_level,
+    }
 
     return DashboardResponse(
-        total_sessions=len(recent),
-        avg_overall_score=avg_score,
+        total_sessions=stats["total_sessions"],
+        avg_overall_score=stats["avg_overall_score"],
         recent_sessions=sessions_items,
         skill_averages={
-            "grammar": round(grammar_sum / max(score_count, 1), 1),
-            "vocabulary": round(vocab_sum / max(score_count, 1), 1),
-            "fluency": round(fluency_sum / max(score_count, 1), 1),
+            "grammar": stats["avg_grammar_score"],
+            "vocabulary": stats["avg_vocabulary_score"],
+            "fluency": stats["avg_fluency_score"],
         },
         gamification=gam_stats,
         skill_progress=skill_progress_items,
@@ -625,12 +591,13 @@ async def submit_evaluation_survey(
 )
 async def create_session(
     request: SessionCreateRequest,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> SessionInfo:
     """Pre-create a session before starting a conversation."""
     conv = ConversationService(db)
     session = await conv.create_session(
-        user_id=request.user_id,
+        user_id=str(current_user.id),
         learning_goal=request.learning_goal,
         topic=request.topic,
         cefr_level=request.cefr_level,
@@ -652,6 +619,7 @@ async def create_session(
 )
 async def get_session(
     session_id: str,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> SessionInfo:
     """Retrieve metadata about an existing session."""
@@ -662,6 +630,12 @@ async def get_session(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Session '{session_id}' not found.",
+        )
+
+    if session.user_id and str(session.user_id) != str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akses ditolak: Sesi ini bukan milik akun Anda.",
         )
 
     count = await conv.get_message_count(session_id)
@@ -681,6 +655,7 @@ async def get_session(
 )
 async def get_session_feedback(
     session_id: str,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> SessionFeedbackResponse:
     """Compute and return a comprehensive feedback summary for a completed session."""
@@ -691,6 +666,12 @@ async def get_session_feedback(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Session '{session_id}' not found.",
+        )
+
+    if session.user_id and str(session.user_id) != str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akses ditolak: Data evaluasi sesi ini bukan milik akun Anda.",
         )
 
     summary_data = await conv.get_session_feedback_summary(session_id)
@@ -860,6 +841,7 @@ Write in natural, encouraging Indonesian with English terms in quotes or bold wh
 )
 async def export_session_obsidian(
     session_id: str,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     from fastapi.responses import Response
@@ -870,6 +852,12 @@ async def export_session_obsidian(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Session '{session_id}' not found.",
+        )
+
+    if session.user_id and str(session.user_id) != str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Akses ditolak: Data sesi ini bukan milik akun Anda.",
         )
 
     summary_data = await conv.get_session_feedback_summary(session_id)

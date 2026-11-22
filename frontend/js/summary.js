@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    if (typeof requireAuth === 'function' && !requireAuth()) {
+        return;
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id') || sessionStorage.getItem('milo_session_id');
     const topicId = urlParams.get('topic_id') || sessionStorage.getItem('milo_topic_id') || 'A1';
@@ -6,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = typeof getAuthToken === 'function' ? getAuthToken() : localStorage.getItem('milo_token');
     const guestCard = document.getElementById('summaryGuestSaveCard');
     if (guestCard) {
-        guestCard.style.display = token ? 'none' : 'flex';
+        guestCard.style.display = 'none';
     }
 
     // Load Micro-Quiz for this topic
@@ -16,7 +20,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cachedSummary = sessionStorage.getItem('milo_summary_data');
     if (cachedSummary) {
         try {
-            data = JSON.parse(cachedSummary);
+            const parsed = JSON.parse(cachedSummary);
+            if (!sessionId || parsed.session_id === sessionId) {
+                data = parsed;
+            }
         } catch (e) {
             console.error('Parse error:', e);
         }
@@ -29,6 +36,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             const res = await fetch(`/api/v1/session/${sessionId}/feedback`, { headers: authHeaders });
             if (res.ok) {
                 data = await res.json();
+            } else if (res.status === 401 && typeof logoutUser === 'function') {
+                logoutUser();
+                return;
+            } else if (res.status === 403) {
+                document.getElementById('summaryCoachAssessment').textContent = 
+                    'Akses ditolak: Data evaluasi sesi ini bukan milik akun yang sedang aktif.';
+                return;
             }
         } catch (e) {
             console.error('Fetch error:', e);

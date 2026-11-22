@@ -64,6 +64,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(255), default="")
     full_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     cefr_level: Mapped[str] = mapped_column(String(10), default="B1")
+    placement_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     last_login: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -72,6 +73,9 @@ class User(Base):
     progress: Mapped[list["LearningProgress"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     gamification: Mapped[Optional["UserGamification"]] = relationship(back_populates="user", uselist=False, cascade="all, delete-orphan")
     badges: Mapped[list["UserBadge"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    placement_results: Mapped[list["PlacementTestResult"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan", order_by="PlacementTestResult.created_at.desc()"
+    )
 
 
 # ─── Session ──────────────────────────────────────────────────────────────────
@@ -226,4 +230,35 @@ class EvaluationSurvey(Base):
     ueq_scores: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     feedback_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+# ─── Placement Test Result (CEFR B1 vs B2 Diagnostic) ─────────────────────────
+
+class PlacementTestResult(Base):
+    """Stores placement test attempts and domain competency scores for progress tracking."""
+    __tablename__ = "placement_test_results"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[str] = mapped_column(
+        GUID(), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    total_questions: Mapped[int] = mapped_column(Integer, default=20)
+    correct_count: Mapped[int] = mapped_column(Integer, default=0)
+    score_percentage: Mapped[float] = mapped_column(Float, default=0.0)
+
+    # 4 CEFR Domain Competency Scores (0.0 – 100.0)
+    grammar_score: Mapped[float] = mapped_column(Float, default=0.0)
+    vocabulary_score: Mapped[float] = mapped_column(Float, default=0.0)
+    discourse_score: Mapped[float] = mapped_column(Float, default=0.0)
+    pragmatics_score: Mapped[float] = mapped_column(Float, default=0.0)
+
+    recommended_level: Mapped[str] = mapped_column(String(10), nullable=False)  # "B1" | "B2"
+    selected_level: Mapped[str] = mapped_column(String(10), nullable=False)     # "B1" | "B2"
+
+    # Detailed item answers & rationale
+    answers_detail: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    user: Mapped["User"] = relationship(back_populates="placement_results")
+
 

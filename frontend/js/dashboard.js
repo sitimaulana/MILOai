@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function fetchDashboardMetrics() {
+    if (typeof requireAuth === 'function' && !requireAuth()) {
+        return;
+    }
+
     const container = document.getElementById('historySessionsContainer');
     const badge = document.getElementById('sessionCountBadge');
 
@@ -14,25 +18,25 @@ async function fetchDashboardMetrics() {
         const user = typeof getAuthUser === 'function' ? getAuthUser() : null;
 
         const guestPrompt = document.getElementById('guestAuthPrompt');
+        if (guestPrompt) guestPrompt.style.display = 'none';
+
         const subtitleElem = document.getElementById('dashSubtitleText');
-
-        if (user && token) {
-            if (guestPrompt) guestPrompt.style.display = 'none';
-            if (subtitleElem) {
-                const displayName = user.full_name || user.username;
-                subtitleElem.textContent = `Halo, ${displayName}! Pantau peningkatan kompetensi Grammar, Vocabulary, dan Fluency dari setiap sesi percakapan Anda bersama MILO.`;
-            }
-        } else {
-            if (guestPrompt) guestPrompt.style.display = 'flex';
+        if (subtitleElem && user) {
+            const displayName = user.full_name || user.username;
+            subtitleElem.textContent = `Halo, ${displayName}! Pantau peningkatan kompetensi Grammar, Vocabulary, dan Fluency dari setiap sesi percakapan Anda bersama MILO.`;
         }
 
-        const headers = {};
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-        const url = user && user.id ? `/api/v1/dashboard?user_id=${encodeURIComponent(user.id)}` : '/api/v1/dashboard';
-        const response = await fetch(url, { headers });
+        const response = typeof miloFetch === 'function' 
+            ? await miloFetch('/api/v1/dashboard')
+            : await fetch('/api/v1/dashboard', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+
         if (!response.ok) {
+            if (response.status === 401 && typeof logoutUser === 'function') {
+                logoutUser();
+                return;
+            }
             throw new Error(`Dashboard API error: ${response.status}`);
         }
 
@@ -56,6 +60,27 @@ async function fetchDashboardMetrics() {
         if (elGrammar) elGrammar.textContent = grammar;
         if (elVocab) elVocab.textContent = vocab;
         if (elFluency) elFluency.textContent = fluency;
+
+        // 1b. Check Placement Baseline Score
+        try {
+            const placementResp = await fetch('/api/v1/curriculum/placement/history', {
+                headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            if (placementResp.ok) {
+                const historyData = await placementResp.json();
+                if (Array.isArray(historyData) && historyData.length > 0) {
+                    const latest = historyData[0];
+                    const placementPill = document.getElementById('dashPlacementText');
+                    if (placementPill) {
+                        placementPill.textContent = `Baseline: ${Math.round(latest.score_percentage)}% (${latest.selected_level})`;
+                    }
+                    const cefrDesc = document.getElementById('cefrTrackDescText');
+                    if (cefrDesc) {
+                        cefrDesc.textContent = `Level aktif Anda: Level ${latest.selected_level} (Skor Tes Awal: ${Math.round(latest.score_percentage)}%).`;
+                    }
+                }
+            }
+        } catch {}
 
         // 2. Gamification & Badges
         const gamSection = document.getElementById('gamificationSection');

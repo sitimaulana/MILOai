@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, s
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.asr import transcribe_audio
-from app.core.security import get_current_user_optional
+from app.core.security import get_current_user
 from app.db.database import get_db
 from app.db.models import User
 from app.models.schemas import (
@@ -49,7 +49,7 @@ async def voice(
     cefr_level: str = Form("B1", description="Target CEFR level: A2, B1, B2"),
     return_audio: bool = Form(True, description="Whether to return TTS audio"),
     is_closing: bool = Form(False, description="Whether this turn concludes the session due to time limit"),
-    current_user: Optional[User] = Depends(get_current_user_optional),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> VoiceResponse:
     """
@@ -81,7 +81,7 @@ async def voice(
     pipeline = MILOPipeline(db)
 
     try:
-        effective_user_id = user_id or (str(current_user.id) if current_user else None)
+        effective_user_id = str(current_user.id)
         result = await pipeline.process_voice(
             session_id=session_id or "new",
             audio_bytes=audio_bytes,

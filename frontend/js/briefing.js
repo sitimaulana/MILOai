@@ -13,6 +13,10 @@ let isTestingMic = false;
 let activeTab = 1;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    if (typeof requireAuth === 'function' && !requireAuth()) {
+        return;
+    }
+
     // 1. Resolve Session ID, Topic ID, Category & Level
     const urlParams = new URLSearchParams(window.location.search);
     sessionId = urlParams.get('session_id') || sessionStorage.getItem('milo_session_id');

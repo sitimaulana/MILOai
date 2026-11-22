@@ -278,6 +278,7 @@ class UserProfileResponse(BaseModel):
     email: Optional[str] = None
     full_name: Optional[str] = None
     cefr_level: str
+    placement_score: Optional[float] = None
     created_at: datetime
     last_login: Optional[datetime] = None
     is_active: bool

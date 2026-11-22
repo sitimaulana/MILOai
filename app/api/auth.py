@@ -37,6 +37,7 @@ def _serialize_user(user: User) -> UserProfileResponse:
         email=user.email,
         full_name=user.full_name,
         cefr_level=user.cefr_level,
+        placement_score=user.placement_score,
         created_at=user.created_at,
         last_login=user.last_login,
         is_active=user.is_active,

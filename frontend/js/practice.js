@@ -47,6 +47,10 @@ window.setCompanionState = setCompanionState;
 const evalInitialPlaceholder = document.getElementById('evalInitialPlaceholder');
 
 document.addEventListener('DOMContentLoaded', async () => {
+    if (typeof requireAuth === 'function' && !requireAuth()) {
+        return;
+    }
+
     // 1. Resolve Session ID
     const urlParams = new URLSearchParams(window.location.search);
     sessionId = urlParams.get('session_id') || sessionStorage.getItem('milo_session_id');

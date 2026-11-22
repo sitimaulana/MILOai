@@ -47,3 +47,9 @@ uv run pytest
 # Run DeepEval quantitative benchmarks (for thesis/PA data)
 uv run python -m evaluations.run_evaluation
 ```
+
+## 5. Final Project & Progress Book Guidelines (PENS TRM)
+- Detailed academic writing rules are located at `.agents/rules/buku-pa-trm.md`.
+- Generated manuscript: `buku/BUKU_PROGRES_PA_AI_MILO.md`.
+- Ensure all chapters strictly adhere to PENS TRM 5-chapter format and reference IEEE citation style.
+

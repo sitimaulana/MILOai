@@ -52,6 +52,10 @@ const FALLBACK_CURRICULUM = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
+    if (typeof requireAuth === 'function' && !requireAuth()) {
+        return;
+    }
+
     // ─── DOM References ────────────────────────────────────────────────────────
     const step1Container = document.getElementById('step1CategoryContainer');
     const step2Container = document.getElementById('step2SpecificContainer');

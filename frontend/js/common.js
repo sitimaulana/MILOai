@@ -124,8 +124,48 @@ function getAuthUser() {
 function logoutUser() {
     localStorage.removeItem('milo_token');
     localStorage.removeItem('milo_user');
-    const redirectTarget = window.location.pathname.includes('/ui/') ? '/ui/login.html' : 'login.html';
-    window.location.href = redirectTarget;
+    sessionStorage.clear();
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const isLoginPage = currentPage === 'login.html' || currentPage === 'register.html';
+    const redirectTarget = resolvePageUrl('login.html');
+    if (!isLoginPage && currentPage !== 'index.html') {
+        window.location.href = `${redirectTarget}?redirect=${encodeURIComponent(currentPage)}`;
+    } else {
+        window.location.href = redirectTarget;
+    }
+}
+
+function requireAuth() {
+    const token = getAuthToken();
+    const user = getAuthUser();
+    if (!token || !user) {
+        logoutUser();
+        return false;
+    }
+    return true;
+}
+
+function getAuthHeaders(extraHeaders = {}) {
+    const token = getAuthToken();
+    const headers = { ...extraHeaders };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+}
+
+async function miloFetch(url, options = {}) {
+    options.headers = options.headers || {};
+    const token = getAuthToken();
+    if (token && !options.headers['Authorization'] && !options.headers['authorization']) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(url, options);
+    if (response.status === 401) {
+        logoutUser();
+        throw new Error('Sesi autentikasi telah berakhir. Silakan login kembali.');
+    }
+    return response;
 }
 
 function resolvePageUrl(filename) {

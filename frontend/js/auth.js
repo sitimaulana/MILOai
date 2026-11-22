@@ -165,6 +165,7 @@ function initLoginForm() {
                 return;
             }
 
+            sessionStorage.clear();
             localStorage.setItem('milo_token', data.access_token);
             localStorage.setItem('milo_user', JSON.stringify(data.user));
 
@@ -253,6 +254,7 @@ function initRegisterForm() {
             }
 
             const userObj = data.user || {};
+            sessionStorage.clear();
             localStorage.setItem('milo_token', data.access_token);
             localStorage.setItem('milo_user', JSON.stringify(userObj));
 

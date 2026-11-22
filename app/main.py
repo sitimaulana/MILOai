@@ -48,7 +48,7 @@ def _ensure_ffmpeg():
 
 _ensure_ffmpeg()
 
-from app.api import auth, chat, curriculum, evaluation, feedback, voice
+from app.api import auth, chat, curriculum, evaluation, feedback, placement, voice
 from app.config import settings
 from app.core.asr import whisper_asr
 from app.core.rag import rag_retriever
@@ -151,6 +151,7 @@ app.include_router(voice.router)
 app.include_router(feedback.router)
 app.include_router(evaluation.router)
 app.include_router(curriculum.router)
+app.include_router(placement.router)
 
 
 

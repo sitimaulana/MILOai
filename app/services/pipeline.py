@@ -413,6 +413,12 @@ class MILOPipeline:
         if session_id and session_id.lower() != "new":
             existing = await self._conv.get_session(session_id)
             if existing:
+                # Security check: prevent cross-user session pollution
+                if existing.user_id and user_id and str(existing.user_id) != str(user_id):
+                    raise ValueError("Akses ditolak: Sesi percakapan ini bukan milik akun Anda.")
+                if not existing.user_id and user_id:
+                    existing.user_id = uuid.UUID(user_id) if isinstance(user_id, str) else user_id
+                    await self._conv._db.flush()
                 return existing
 
         # Create new session

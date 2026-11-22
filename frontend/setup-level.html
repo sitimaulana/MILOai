@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/auth.css?v=20261119b">
+    <link rel="stylesheet" href="css/auth.css?v=20261120a">
 </head>
 <body class="auth-body">
 
@@ -27,60 +27,187 @@
 
             <!-- Stepper Pill -->
             <div style="text-align: center;">
-                <div class="onboarding-step-pill">
+                <div class="onboarding-step-pill" id="stepperPill">
                     <i class="fa-solid fa-compass" aria-hidden="true"></i>
-                    <span>Langkah 1 dari 2: Penentuan Level</span>
+                    <span id="stepperText">Langkah 1 dari 2: Penentuan Level</span>
                 </div>
             </div>
 
-            <h1 class="auth-card-title">Berapa Target Level Kemampuanmu?</h1>
-            <p class="auth-card-subtitle">Pilih level awal yang paling mendekati target percakapanmu. Level ini dapat ditingkatkan kapan saja seiring kemajuan latihan.</p>
-
             <!-- Dynamic Alert Container -->
-            <div id="levelAlertContainer" class="auth-alert-box"></div>
+            <div id="levelAlertContainer" class="auth-alert-box" style="margin-top: 10px;"></div>
 
-            <form id="levelForm" novalidate style="margin-top: 20px;">
-                <div class="onboarding-choice-list" role="radiogroup" aria-label="Pilihan Level CEFR">
-                    <!-- Option B1 -->
-                    <label class="onboarding-card-option">
-                        <input type="radio" name="cefrLevel" value="B1" checked>
-                        <div class="onboarding-card">
-                            <div class="onboarding-card-radio" aria-hidden="true"></div>
-                            <div class="onboarding-card-content">
-                                <div class="onboarding-card-header">
-                                    <span class="onboarding-card-title">Level B1</span>
-                                    <span class="onboarding-card-tag">Intermediate</span>
-                                </div>
-                                <p class="onboarding-card-desc">
-                                    Mampu menyampaikan ide sehari-hari, pengalaman, opini umum, dan percakapan kerja dengan kalimat terhubung.
-                                </p>
-                            </div>
-                        </div>
-                    </label>
+            <!-- ═══════════════════════════════════════════════════════════════════
+                 VIEW 1: DIRECT SELECTION & PROMO DIAGNOSTIC
+                 ═══════════════════════════════════════════════════════════════════ -->
+            <div id="levelSelectionView">
+                <h1 class="auth-card-title">Berapa Target Level Kemampuanmu?</h1>
+                <p class="auth-card-subtitle">Pilih level awal yang paling mendekati target percakapanmu, atau ikuti tes diagnostik terstandar CEFR untuk rekomendasi level otomatis.</p>
 
-                    <!-- Option B2 -->
-                    <label class="onboarding-card-option">
-                        <input type="radio" name="cefrLevel" value="B2">
-                        <div class="onboarding-card">
-                            <div class="onboarding-card-radio" aria-hidden="true"></div>
-                            <div class="onboarding-card-content">
-                                <div class="onboarding-card-header">
-                                    <span class="onboarding-card-title">Level B2</span>
-                                    <span class="onboarding-card-tag">Upper-Int.</span>
-                                </div>
-                                <p class="onboarding-card-desc">
-                                    Mampu berdiskusi secara mendalam tentang topik abstrak, teknis, argumentasi profesional, dan berbicara spontan.
-                                </p>
-                            </div>
-                        </div>
-                    </label>
+                <!-- Placement Diagnostic Test Promo Banner -->
+                <div class="diagnostic-promo-card">
+                    <div class="diagnostic-promo-badge">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Rekomendasi Cerdas</span>
+                    </div>
+                    <h3 class="diagnostic-promo-title">Bingung Menentukan Level?</h3>
+                    <p class="diagnostic-promo-desc">
+                        Ikuti tes diagnostik cepat (20 soal CEFR) untuk mengukur penguasaan Grammar, Vocabulary, Discourse, dan Pragmatics. Sistem akan menyarankan level yang paling pas untukmu.
+                    </p>
+                    <button type="button" id="btnLaunchDiagnostic" class="btn-start-diagnostic">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span>Mulai Tes Diagnostik CEFR (20 Soal)</span>
+                    </button>
                 </div>
 
-                <button type="submit" id="btnSubmitLevel" class="btn-auth-submit">
-                    <span>Lanjut ke Target Waktu Harian</span>
-                    <i class="fa-solid fa-arrow-right"></i>
+                <div class="diagnostic-divider">
+                    <span>Atau Pilih Langsung Tanpa Tes</span>
+                </div>
+
+                <form id="levelForm" novalidate style="margin-top: 14px;">
+                    <div class="onboarding-choice-list" role="radiogroup" aria-label="Pilihan Level CEFR">
+                        <!-- Option B1 -->
+                        <label class="onboarding-card-option">
+                            <input type="radio" name="cefrLevel" value="B1" checked>
+                            <div class="onboarding-card">
+                                <div class="onboarding-card-radio" aria-hidden="true"></div>
+                                <div class="onboarding-card-content">
+                                    <div class="onboarding-card-header">
+                                        <span class="onboarding-card-title">Level B1</span>
+                                        <span class="onboarding-card-tag">Intermediate</span>
+                                    </div>
+                                    <p class="onboarding-card-desc">
+                                        Mampu menyampaikan ide sehari-hari, pengalaman, opini umum, dan percakapan kerja dengan kalimat terhubung.
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option B2 -->
+                        <label class="onboarding-card-option">
+                            <input type="radio" name="cefrLevel" value="B2">
+                            <div class="onboarding-card">
+                                <div class="onboarding-card-radio" aria-hidden="true"></div>
+                                <div class="onboarding-card-content">
+                                    <div class="onboarding-card-header">
+                                        <span class="onboarding-card-title">Level B2</span>
+                                        <span class="onboarding-card-tag">Upper-Int.</span>
+                                    </div>
+                                    <p class="onboarding-card-desc">
+                                        Mampu berdiskusi secara mendalam tentang topik abstrak, teknis, argumentasi profesional, dan berbicara spontan.
+                                    </p>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="btnSubmitLevel" class="btn-auth-submit" style="margin-top: 16px;">
+                        <span>Lanjut ke Target Waktu Harian</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+                 VIEW 2: INTERACTIVE 20-QUESTION DIAGNOSTIC QUIZ
+                 ═══════════════════════════════════════════════════════════════════ -->
+            <div id="placementQuizView" style="display: none;">
+                <div class="quiz-container">
+                    <div class="quiz-header-row">
+                        <span class="quiz-domain-badge" id="quizDomainBadge">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span id="quizDomainName">Grammar & Complex Syntax</span>
+                        </span>
+                        <span class="quiz-counter-badge" id="quizCounterText">Soal 1 dari 20</span>
+                    </div>
+
+                    <div class="quiz-progress-track">
+                        <div class="quiz-progress-fill" id="quizProgressBar" style="width: 5%;"></div>
+                    </div>
+
+                    <div class="quiz-question-box" id="quizQuestionText">
+                        Memuat pertanyaan...
+                    </div>
+
+                    <div class="quiz-options-list" id="quizOptionsList">
+                        <!-- Dynamically populated options A, B, C, D -->
+                    </div>
+
+                    <div class="quiz-nav-row">
+                        <button type="button" class="btn-quiz-nav" id="btnQuizPrev" disabled>
+                            <i class="fa-solid fa-arrow-left"></i>
+                            <span>Sebelumnya</span>
+                        </button>
+                        <button type="button" class="btn-quiz-nav primary" id="btnQuizNext">
+                            <span>Selanjutnya</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 6px;">
+                        <button type="button" id="btnCancelQuiz" style="background:none; border:none; color:var(--muted); font-size:12px; cursor:pointer; text-decoration:underline;">
+                            Batalkan tes &amp; kembali ke pilihan manual
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════════════════════════════════════════════════════════
+                 VIEW 3: SMART RECOMMENDATION RESULTS DASHBOARD
+                 ═══════════════════════════════════════════════════════════════════ -->
+            <div id="placementResultsView" style="display: none;">
+                <div class="results-header-card">
+                    <div class="results-score-circle">
+                        <span class="results-score-number" id="resultScorePct">0%</span>
+                        <span class="results-score-label">Skor CEFR</span>
+                    </div>
+                    <div class="results-level-pill" id="resultLevelPill">
+                        <i class="fa-solid fa-award"></i>
+                        <span id="resultRecommendedLevelText">Rekomendasi: Level B1</span>
+                    </div>
+                    <p style="font-size: 13px; color: var(--muted); margin: 0;" id="resultCorrectCountText">
+                        Menjawab benar 0 dari 20 butir soal
+                    </p>
+                </div>
+
+                <!-- Pedagogical Summary -->
+                <div class="smart-summary-box" id="resultSummaryBox">
+                    Memuat ulasan rekomendasi...
+                </div>
+
+                <!-- 4-Domain Breakdown Bars -->
+                <h4 style="font-size: 13.5px; font-weight: 800; color: var(--ink-dark); margin-bottom: 8px;">
+                    Penguasaan 4 Domain Kompetensi:
+                </h4>
+                <div class="domain-bars-wrapper" id="domainBarsContainer">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Pedagogical Strengths & Growth Areas -->
+                <div class="insights-list" id="insightsContainer">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Action CTA Buttons -->
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+                    <button type="button" id="btnApplyRecommendedLevel" class="btn-auth-submit">
+                        <span id="btnApplyLevelText">Gunakan Rekomendasi &amp; Lanjut</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <button type="button" id="btnToggleOtherLevel" class="btn-quiz-nav" style="justify-content: center; font-size: 13px;">
+                        <span id="btnToggleOtherLevelText">Pilih Level Alternatif</span>
+                    </button>
+                </div>
+
+                <!-- Review Accordion (View Explanations & Citations) -->
+                <button type="button" class="review-accordion-btn" id="btnToggleReview">
+                    <span>Lihat Ulasan Pembahasan 20 Soal</span>
+                    <i class="fa-solid fa-chevron-down" id="reviewChevron"></i>
                 </button>
-            </form>
+                <div class="review-accordion-content" id="reviewAccordionContent">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
 
         </div>
 
@@ -92,13 +219,56 @@
         </div>
     </main>
 
+    <!-- Placement Diagnostic Script -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('milo_token');
+            const user = localStorage.getItem('milo_user');
+            if (!token || !user) {
+                window.location.href = 'login.html?redirect=setup-level.html';
+                return;
+            }
+
+            // View Containers
+            const viewSelection = document.getElementById('levelSelectionView');
+            const viewQuiz = document.getElementById('placementQuizView');
+            const viewResults = document.getElementById('placementResultsView');
+            const alertBox = document.getElementById('levelAlertContainer');
+            const stepperPill = document.getElementById('stepperPill');
+            const stepperText = document.getElementById('stepperText');
+
+            // Form elements
             const form = document.getElementById('levelForm');
             const submitBtn = document.getElementById('btnSubmitLevel');
-            const alertBox = document.getElementById('levelAlertContainer');
+            const btnLaunchDiagnostic = document.getElementById('btnLaunchDiagnostic');
+            const btnCancelQuiz = document.getElementById('btnCancelQuiz');
 
-            // Pre-select existing level if present in local session
+            // Quiz elements
+            const quizDomainBadge = document.getElementById('quizDomainBadge');
+            const quizDomainName = document.getElementById('quizDomainName');
+            const quizCounterText = document.getElementById('quizCounterText');
+            const quizProgressBar = document.getElementById('quizProgressBar');
+            const quizQuestionText = document.getElementById('quizQuestionText');
+            const quizOptionsList = document.getElementById('quizOptionsList');
+            const btnQuizPrev = document.getElementById('btnQuizPrev');
+            const btnQuizNext = document.getElementById('btnQuizNext');
+
+            // Result elements
+            const resultScorePct = document.getElementById('resultScorePct');
+            const resultRecommendedLevelText = document.getElementById('resultRecommendedLevelText');
+            const resultCorrectCountText = document.getElementById('resultCorrectCountText');
+            const resultSummaryBox = document.getElementById('resultSummaryBox');
+            const domainBarsContainer = document.getElementById('domainBarsContainer');
+            const insightsContainer = document.getElementById('insightsContainer');
+            const btnApplyRecommendedLevel = document.getElementById('btnApplyRecommendedLevel');
+            const btnApplyLevelText = document.getElementById('btnApplyLevelText');
+            const btnToggleOtherLevel = document.getElementById('btnToggleOtherLevel');
+            const btnToggleOtherLevelText = document.getElementById('btnToggleOtherLevelText');
+            const btnToggleReview = document.getElementById('btnToggleReview');
+            const reviewAccordionContent = document.getElementById('reviewAccordionContent');
+            const reviewChevron = document.getElementById('reviewChevron');
+
+            // Pre-select existing level in view 1 if set
             try {
                 const authUser = JSON.parse(localStorage.getItem('milo_user'));
                 if (authUser && authUser.cefr_level) {
@@ -107,25 +277,276 @@
                 }
             } catch {}
 
+            // State management for quiz
+            let quizQuestions = [];
+            let userAnswers = {}; // { "1": "B", "2": "A", ... }
+            let currentQuestionIndex = 0;
+            let lastSubmissionResult = null;
+
+            // ─── Direct Form Submit ──────────────────────────────────────────
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                alertBox.innerHTML = '';
-
                 const selectedRadio = document.querySelector('input[name="cefrLevel"]:checked');
                 const level = selectedRadio ? selectedRadio.value : 'B1';
+                await saveLevelAndProceed(level, submitBtn, 'Menyimpan level...');
+            });
 
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan level...';
+            // ─── Start Placement Quiz ────────────────────────────────────────
+            btnLaunchDiagnostic.addEventListener('click', async () => {
+                alertBox.innerHTML = '';
+                btnLaunchDiagnostic.disabled = true;
+                btnLaunchDiagnostic.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memuat 20 Soal CEFR...';
 
-                // Update local storage user profile
+                try {
+                    const resp = await fetch('/api/v1/curriculum/placement/questions');
+                    if (!resp.ok) throw new Error('Gagal memuat soal placement.');
+                    const data = await resp.json();
+                    quizQuestions = data.questions || [];
+
+                    if (quizQuestions.length === 0) {
+                        throw new Error('Bank soal belum tersedia.');
+                    }
+
+                    // Reset quiz state
+                    userAnswers = {};
+                    currentQuestionIndex = 0;
+
+                    // Switch views
+                    viewSelection.style.display = 'none';
+                    viewQuiz.style.display = 'block';
+                    stepperText.textContent = 'Tes Diagnostik CEFR (20 Soal)';
+
+                    renderQuestion(0);
+                } catch (err) {
+                    alertBox.innerHTML = `<div class="auth-alert error"><i class="fa-solid fa-circle-exclamation"></i> ${err.message}</div>`;
+                } finally {
+                    btnLaunchDiagnostic.disabled = false;
+                    btnLaunchDiagnostic.innerHTML = '<i class="fa-solid fa-clipboard-check"></i> <span>Mulai Tes Diagnostik CEFR (20 Soal)</span>';
+                }
+            });
+
+            // ─── Cancel Quiz & Return ────────────────────────────────────────
+            btnCancelQuiz.addEventListener('click', () => {
+                viewQuiz.style.display = 'none';
+                viewSelection.style.display = 'block';
+                stepperText.textContent = 'Langkah 1 dari 2: Penentuan Level';
+            });
+
+            // ─── Render Single Question ──────────────────────────────────────
+            function renderQuestion(index) {
+                if (index < 0 || index >= quizQuestions.length) return;
+                currentQuestionIndex = index;
+                const q = quizQuestions[index];
+
+                // Progress & Header
+                const total = quizQuestions.length;
+                const pct = Math.round(((index + 1) / total) * 100);
+                quizProgressBar.style.width = `${pct}%`;
+                quizCounterText.textContent = `Soal ${index + 1} dari ${total}`;
+                quizDomainName.textContent = q.domain_name || q.domain.toUpperCase();
+
+                // Question Text
+                quizQuestionText.textContent = q.question;
+
+                // Options
+                quizOptionsList.innerHTML = '';
+                const selectedOpt = userAnswers[String(q.id)];
+
+                const letters = ['A', 'B', 'C', 'D'];
+                letters.forEach(letter => {
+                    const optText = q.options[letter];
+                    if (!optText) return;
+
+                    const card = document.createElement('div');
+                    card.className = `quiz-option-card ${selectedOpt === letter ? 'selected' : ''}`;
+                    card.tabIndex = 0;
+                    card.role = 'button';
+                    card.innerHTML = `
+                        <div class="quiz-option-letter">${letter}</div>
+                        <div class="quiz-option-text">${optText}</div>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        userAnswers[String(q.id)] = letter;
+                        // re-render selection highlight
+                        Array.from(quizOptionsList.children).forEach(c => c.classList.remove('selected'));
+                        card.classList.add('selected');
+                    });
+
+                    quizOptionsList.appendChild(card);
+                });
+
+                // Navigation Buttons
+                btnQuizPrev.disabled = (index === 0);
+                if (index === total - 1) {
+                    btnQuizNext.innerHTML = '<span>Kirim &amp; Lihat Hasil</span> <i class="fa-solid fa-check-double"></i>';
+                } else {
+                    btnQuizNext.innerHTML = '<span>Selanjutnya</span> <i class="fa-solid fa-arrow-right"></i>';
+                }
+            }
+
+            // ─── Quiz Navigation ─────────────────────────────────────────────
+            btnQuizPrev.addEventListener('click', () => {
+                if (currentQuestionIndex > 0) {
+                    renderQuestion(currentQuestionIndex - 1);
+                }
+            });
+
+            btnQuizNext.addEventListener('click', async () => {
+                const total = quizQuestions.length;
+                const currentQ = quizQuestions[currentQuestionIndex];
+
+                if (!userAnswers[String(currentQ.id)]) {
+                    // Alert gently if not selected
+                    alertBox.innerHTML = '<div class="auth-alert info"><i class="fa-solid fa-circle-info"></i> Silakan pilih salah satu jawaban sebelum lanjut.</div>';
+                    setTimeout(() => { alertBox.innerHTML = ''; }, 2500);
+                    return;
+                }
+
+                if (currentQuestionIndex < total - 1) {
+                    renderQuestion(currentQuestionIndex + 1);
+                } else {
+                    // Final Question: Submit answers to backend
+                    await submitQuizAnswers();
+                }
+            });
+
+            // ─── Submit Quiz to Backend ──────────────────────────────────────
+            async function submitQuizAnswers() {
+                btnQuizNext.disabled = true;
+                btnQuizNext.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menghitung Skor...';
+
+                try {
+                    const token = localStorage.getItem('milo_token');
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                    const resp = await fetch('/api/v1/curriculum/placement/submit', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ answers: userAnswers })
+                    });
+
+                    if (!resp.ok) throw new Error('Gagal mengevaluasi jawaban placement.');
+                    const result = await resp.json();
+                    lastSubmissionResult = result;
+
+                    displayQuizResults(result);
+                } catch (err) {
+                    alertBox.innerHTML = `<div class="auth-alert error"><i class="fa-solid fa-circle-exclamation"></i> ${err.message}</div>`;
+                    btnQuizNext.disabled = false;
+                    btnQuizNext.innerHTML = '<span>Kirim &amp; Lihat Hasil</span> <i class="fa-solid fa-check-double"></i>';
+                }
+            }
+
+            // ─── Display Results & Smart Recommendation ──────────────────────
+            function displayQuizResults(res) {
+                viewQuiz.style.display = 'none';
+                viewResults.style.display = 'block';
+                stepperText.textContent = 'Hasil & Rekomendasi Level CEFR';
+
+                // Score & Level
+                resultScorePct.textContent = `${Math.round(res.score_percentage)}%`;
+                resultRecommendedLevelText.textContent = `Rekomendasi: Level ${res.recommended_level}`;
+                resultCorrectCountText.textContent = `Menjawab benar ${res.correct_count} dari ${res.total_questions} butir soal`;
+
+                // Pedagogical Summary
+                resultSummaryBox.innerHTML = `<strong>${res.level_title}</strong><br><span style="margin-top:4px; display:inline-block;">${res.recommendation_summary}</span>`;
+
+                // 4-Domain Breakdown
+                domainBarsContainer.innerHTML = '';
+                (res.domain_breakdown || []).forEach(d => {
+                    const barItem = document.createElement('div');
+                    barItem.className = 'domain-bar-item';
+                    const isWarn = d.score_percentage < 60;
+                    barItem.innerHTML = `
+                        <div class="domain-bar-label-row">
+                            <span>${d.domain_name}</span>
+                            <span>${d.correct_count}/${d.total_count} (${Math.round(d.score_percentage)}%)</span>
+                        </div>
+                        <div class="domain-bar-track">
+                            <div class="domain-bar-fill ${isWarn ? 'warning' : ''}" style="width: ${d.score_percentage}%;"></div>
+                        </div>
+                    `;
+                    domainBarsContainer.appendChild(barItem);
+                });
+
+                // Insights List
+                insightsContainer.innerHTML = '';
+                (res.strengths || []).forEach(s => {
+                    const item = document.createElement('div');
+                    item.className = 'insight-pill strength';
+                    item.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#2e7d32; margin-top:2px;"></i> <span>${s}</span>`;
+                    insightsContainer.appendChild(item);
+                });
+                (res.growth_areas || []).forEach(g => {
+                    const item = document.createElement('div');
+                    item.className = 'insight-pill growth';
+                    item.innerHTML = `<i class="fa-solid fa-compass-drafting" style="color:var(--orange); margin-top:2px;"></i> <span>${g}</span>`;
+                    insightsContainer.appendChild(item);
+                });
+
+                // Setup CTA Buttons
+                const recLevel = res.recommended_level;
+                const altLevel = recLevel === 'B2' ? 'B1' : 'B2';
+
+                btnApplyLevelText.textContent = `Gunakan Rekomendasi (Level ${recLevel}) & Lanjut`;
+                btnToggleOtherLevelText.textContent = `Pilih Level Alternatif (Level ${altLevel})`;
+
+                btnApplyRecommendedLevel.onclick = async () => {
+                    await saveLevelAndProceed(recLevel, btnApplyRecommendedLevel, 'Menerapkan Level ' + recLevel + '...');
+                };
+
+                btnToggleOtherLevel.onclick = async () => {
+                    await saveLevelAndProceed(altLevel, btnToggleOtherLevel, 'Menerapkan Level ' + altLevel + '...');
+                };
+
+                // Populate Review Accordion
+                renderReviewAccordion(res.question_results || []);
+            }
+
+            // ─── Render Review Accordion ─────────────────────────────────────
+            function renderReviewAccordion(questions) {
+                reviewAccordionContent.innerHTML = '';
+                questions.forEach(q => {
+                    const card = document.createElement('div');
+                    card.className = `review-item-card ${q.is_correct ? 'correct' : 'incorrect'}`;
+                    card.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:4px;">
+                            <span>Soal ${q.id} (${q.domain_name})</span>
+                            <span style="color:${q.is_correct ? '#2e7d32' : '#d32f2f'};">
+                                ${q.is_correct ? '✓ Benar' : '✗ Salah (Jawabanmu: ' + q.selected_option + ', Kunci: ' + q.correct_option + ')'}
+                            </span>
+                        </div>
+                        <div style="font-weight:600; color:var(--ink-dark); margin-bottom:4px;">${q.question}</div>
+                        <div style="font-size:12px; color:var(--muted); line-height:1.4;">${q.explanation}</div>
+                        ${q.reference_source ? `<div style="font-size:11px; color:var(--blue); margin-top:4px; font-style:italic;">Sumber: ${q.reference_source}</div>` : ''}
+                    `;
+                    reviewAccordionContent.appendChild(card);
+                });
+
+                btnToggleReview.onclick = () => {
+                    const isOpen = reviewAccordionContent.style.display === 'flex';
+                    reviewAccordionContent.style.display = isOpen ? 'none' : 'flex';
+                    reviewChevron.className = isOpen ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-up';
+                };
+            }
+
+            // ─── Save Level to Profile and Transition ────────────────────────
+            async function saveLevelAndProceed(level, buttonElement, loadingText) {
+                const originalHtml = buttonElement.innerHTML;
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${loadingText}`;
+
+                // Update localStorage and sessionStorage
                 try {
                     let authUser = JSON.parse(localStorage.getItem('milo_user')) || {};
                     authUser.cefr_level = level;
                     localStorage.setItem('milo_user', JSON.stringify(authUser));
+                    sessionStorage.setItem('milo_cefr_level', level);
                 } catch {}
 
-                // If authenticated, sync with backend API
+                // Update backend via API if token available
                 const token = localStorage.getItem('milo_token');
                 if (token) {
                     try {
@@ -137,13 +558,15 @@
                             },
                             body: JSON.stringify({ cefr_level: level })
                         });
-                    } catch {}
+                    } catch (err) {
+                        console.warn('Could not sync level with auth API:', err);
+                    }
                 }
 
                 setTimeout(() => {
                     window.location.href = 'setup-goal.html';
-                }, 350);
-            });
+                }, 300);
+            }
         });
     </script>
 </body>

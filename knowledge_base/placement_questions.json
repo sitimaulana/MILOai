@@ -1,0 +1,352 @@
+{
+  "title": "MILO CEFR B1 vs B2 Placement Diagnostic Test",
+  "total_questions": 20,
+  "domains": [
+    {
+      "key": "grammar",
+      "name": "Grammar & Complex Syntax",
+      "question_count": 5,
+      "reference": "Hewings, M. Advanced Grammar in Use & Murphy, R. English Grammar in Use (Cambridge)"
+    },
+    {
+      "key": "vocabulary",
+      "name": "Vocabulary & Collocations",
+      "question_count": 5,
+      "reference": "McCarthy & O'Dell. English Collocations in Use & English Vocabulary Profile (Cambridge)"
+    },
+    {
+      "key": "discourse",
+      "name": "Discourse Cohesion & Linking Markers",
+      "question_count": 5,
+      "reference": "Council of Europe (2020). CEFR Companion Volume Descriptors for Coherence & Cohesion"
+    },
+    {
+      "key": "pragmatics",
+      "name": "Situational Pragmatics, Tone & Register",
+      "question_count": 5,
+      "reference": "Downes, C. Cambridge English for Job-hunting & CEFR Sociolinguistic Appropriateness"
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "domain": "grammar",
+      "domain_name": "Grammar & Complex Syntax",
+      "cefr_target": "B1-B2",
+      "question": "Over the last two years at university, our research team _____ on three separate machine learning projects.",
+      "options": {
+        "A": "worked",
+        "B": "has worked",
+        "C": "is working",
+        "D": "had worked"
+      },
+      "answer": "B",
+      "explanation": "Use the Present Perfect ('has worked') because 'over the last two years' refers to an unfinished time period connecting past experiences to the present.",
+      "reference_source": "Murphy, R. English Grammar in Use (Unit 14: Present Perfect & Past)."
+    },
+    {
+      "id": 2,
+      "domain": "grammar",
+      "domain_name": "Grammar & Complex Syntax",
+      "cefr_target": "B1-B2",
+      "question": "Before the new software update was deployed, every single test case _____ by the quality assurance team.",
+      "options": {
+        "A": "was thoroughly examined",
+        "B": "thoroughly examines",
+        "C": "had thoroughly examined",
+        "D": "is thoroughly examining"
+      },
+      "answer": "A",
+      "explanation": "Passive voice ('was thoroughly examined') is required because the test cases receive the action, which is a standard B1-B2 formal register structure.",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 24: Passive Structures in Formal Writing)."
+    },
+    {
+      "id": 3,
+      "domain": "grammar",
+      "domain_name": "Grammar & Complex Syntax",
+      "cefr_target": "B2",
+      "question": "If our capstone team _____ the user feedback earlier in the semester, we wouldn't be struggling with major revisions right now.",
+      "options": {
+        "A": "collected",
+        "B": "had collected",
+        "C": "has collected",
+        "D": "would collect"
+      },
+      "answer": "B",
+      "explanation": "This is a mixed conditional: an unreal past condition ('had collected', past perfect) with a present consequence ('wouldn't be struggling'), characteristic of CEFR B2 mastery.",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 84: Mixed Conditionals)."
+    },
+    {
+      "id": 4,
+      "domain": "grammar",
+      "domain_name": "Grammar & Complex Syntax",
+      "cefr_target": "B2",
+      "question": "The production server crashed right after the demo started. There _____ a sudden spike in network traffic that overwhelmed memory.",
+      "options": {
+        "A": "must have been",
+        "B": "should be",
+        "C": "will have been",
+        "D": "might be"
+      },
+      "answer": "A",
+      "explanation": "'Must have been' expresses a logical deduction about a past event with high certainty based on available evidence (CEFR B2 modal deduction).",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 17: Past Modals of Deduction)."
+    },
+    {
+      "id": 5,
+      "domain": "grammar",
+      "domain_name": "Grammar & Complex Syntax",
+      "cefr_target": "B2",
+      "question": "_____ their primary project milestones ahead of schedule, the interns were asked to assist the cloud infrastructure team.",
+      "options": {
+        "A": "Having accomplished",
+        "B": "Accomplished",
+        "C": "To accomplish",
+        "D": "Have accomplished"
+      },
+      "answer": "A",
+      "explanation": "The perfect participle clause ('Having accomplished') is used to express an action completed before the main clause action, a key syntactic marker of B2 discourse.",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 58: Participle Clauses with Having Done)."
+    },
+    {
+      "id": 6,
+      "domain": "vocabulary",
+      "domain_name": "Vocabulary & Collocations",
+      "cefr_target": "B1-B2",
+      "question": "Before introducing the new feature, the product team decided to _____ thorough market research among undergraduate students.",
+      "options": {
+        "A": "make",
+        "B": "conduct",
+        "C": "practice",
+        "D": "produce"
+      },
+      "answer": "B",
+      "explanation": "In academic and professional English, the verb 'conduct' collocates naturally with 'research', 'survey', or 'investigation', whereas 'make research' is an unnatural learner error.",
+      "reference_source": "McCarthy, M. English Collocations in Use: Advanced (Unit 12: Academic Research)."
+    },
+    {
+      "id": 7,
+      "domain": "vocabulary",
+      "domain_name": "Vocabulary & Collocations",
+      "cefr_target": "B2",
+      "question": "When choosing between studying abroad and taking an internship, you should carefully _____ the pros and cons.",
+      "options": {
+        "A": "count",
+        "B": "weigh",
+        "C": "calculate",
+        "D": "measure"
+      },
+      "answer": "B",
+      "explanation": "'Weigh the pros and cons' is the established idiomatic collocation meaning to carefully consider advantages and disadvantages before making a decision.",
+      "reference_source": "Cambridge English Vocabulary Profile (B2 Idioms: Weighing Options)."
+    },
+    {
+      "id": 8,
+      "domain": "vocabulary",
+      "domain_name": "Vocabulary & Collocations",
+      "cefr_target": "B2",
+      "question": "The introduction of generative AI tools has _____ significant changes in how university students write and evaluate research.",
+      "options": {
+        "A": "brought about",
+        "B": "carried out",
+        "C": "taken over",
+        "D": "put forward"
+      },
+      "answer": "A",
+      "explanation": "'Bring about' is a B2 phrasal verb meaning to cause something to happen or produce a notable transformation.",
+      "reference_source": "McCarthy & O'Dell. English Phrasal Verbs in Use: Advanced (Unit 22: Change & Cause)."
+    },
+    {
+      "id": 9,
+      "domain": "vocabulary",
+      "domain_name": "Vocabulary & Collocations",
+      "cefr_target": "B2",
+      "question": "While the proposed algorithm is theoretically sound, its high computational complexity makes it hardly _____ for real-time mobile devices.",
+      "options": {
+        "A": "feasible",
+        "B": "comfortable",
+        "C": "convenient",
+        "D": "approachable"
+      },
+      "answer": "A",
+      "explanation": "'Feasible' (B2 academic adjective) means possible and practical to do easily or conveniently under realistic constraints.",
+      "reference_source": "English Vocabulary Profile (B2 Academic Lexis: Feasibility & Viability)."
+    },
+    {
+      "id": 10,
+      "domain": "vocabulary",
+      "domain_name": "Vocabulary & Collocations",
+      "cefr_target": "B1-B2",
+      "question": "To overcome this technical bottleneck, our development team had to think _____ and explore unconventional system architectures.",
+      "options": {
+        "A": "off the wall",
+        "B": "outside the box",
+        "C": "across the board",
+        "D": "over the top"
+      },
+      "answer": "B",
+      "explanation": "'Think outside the box' is an essential workplace and academic idiom meaning to think creatively from a fresh, unconventional perspective.",
+      "reference_source": "Downes, C. Cambridge English for Job-hunting (Unit 4: Problem Solving & Innovation)."
+    },
+    {
+      "id": 11,
+      "domain": "discourse",
+      "domain_name": "Discourse Cohesion & Linking Markers",
+      "cefr_target": "B1-B2",
+      "question": "_____ the technical team encountered several unexpected server failures, they managed to deliver the prototype on schedule.",
+      "options": {
+        "A": "In spite of",
+        "B": "Although",
+        "C": "Despite of",
+        "D": "Because"
+      },
+      "answer": "B",
+      "explanation": "'Although' correctly introduces a subordinate finite clause with a subject ('the technical team') and verb ('encountered'). 'In spite of' requires a noun phrase or gerund.",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 81: Concession & Contrast Connectors)."
+    },
+    {
+      "id": 12,
+      "domain": "discourse",
+      "domain_name": "Discourse Cohesion & Linking Markers",
+      "cefr_target": "B2",
+      "question": "The survey results clearly show high student enthusiasm. _____, financial constraints will prevent the department from purchasing new lab servers this year.",
+      "options": {
+        "A": "Furthermore",
+        "B": "Nevertheless",
+        "C": "In addition",
+        "D": "For instance"
+      },
+      "answer": "B",
+      "explanation": "'Nevertheless' is a formal B2 adversative discourse adverb used to signal a contrast with what has just been stated.",
+      "reference_source": "Council of Europe (2020). CEFR Companion Volume (Coherence and Cohesion B2 Descriptors)."
+    },
+    {
+      "id": 13,
+      "domain": "discourse",
+      "domain_name": "Discourse Cohesion & Linking Markers",
+      "cefr_target": "B2",
+      "question": "Traditional lectures primarily focus on passive listening, _____ interactive workshops encourage collaborative problem-solving.",
+      "options": {
+        "A": "whereas",
+        "B": "despite",
+        "C": "unless",
+        "D": "in case"
+      },
+      "answer": "A",
+      "explanation": "'Whereas' is used to highlight a direct comparison or contrast between two facts or ideas in two balanced clauses (characteristic B2 marker).",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 82: Comparative Connectors)."
+    },
+    {
+      "id": 14,
+      "domain": "discourse",
+      "domain_name": "Discourse Cohesion & Linking Markers",
+      "cefr_target": "B2",
+      "question": "The database connection was inadvertently left unindexed; _____, the query execution time multiplied by ten during peak hours.",
+      "options": {
+        "A": "consequently",
+        "B": "although",
+        "C": "otherwise",
+        "D": "on the contrary"
+      },
+      "answer": "A",
+      "explanation": "'Consequently' is a formal transition adverb introducing an inevitable result or logical consequence of the previous statement.",
+      "reference_source": "Council of Europe (2020). CEFR Companion Volume: Discourse Structuring & Propositional Logic."
+    },
+    {
+      "id": 15,
+      "domain": "discourse",
+      "domain_name": "Discourse Cohesion & Linking Markers",
+      "cefr_target": "B1-B2",
+      "question": "_____ the implementation costs are notably high, the long-term energy savings make the renewable campus initiative worthwhile.",
+      "options": {
+        "A": "Even though",
+        "B": "However",
+        "C": "Despite",
+        "D": "In spite"
+      },
+      "answer": "A",
+      "explanation": "'Even though' connects a concession clause to a main clause with emphasis on reality (unlike 'however', which cannot subordinate a clause directly).",
+      "reference_source": "Murphy, R. English Grammar in Use (Unit 113: Although, Even though, In spite of)."
+    },
+    {
+      "id": 16,
+      "domain": "pragmatics",
+      "domain_name": "Situational Pragmatics, Tone & Register",
+      "cefr_target": "B2",
+      "question": "Dalam rapat kerja, rekanmu mengusulkan solusi yang menurutmu melebihi anggaran. Kalimat manakah yang paling mencerminkan kesantunan dan profesionalisme tingkat B2 (tactful disagreement)?",
+      "options": {
+        "A": "I disagree with you because your calculation is totally wrong.",
+        "B": "I see your point, but we might want to evaluate the budget implications before finalizing this.",
+        "C": "No, I think my idea is much better for our team.",
+        "D": "That proposal is too expensive, let's stop talking about it."
+      },
+      "answer": "B",
+      "explanation": "B2 pragmatic competence requires diplomatic hedging ('I see your point, but we might want to...') rather than abrupt personal dismissal, maintaining collaboration while critically evaluating constraints.",
+      "reference_source": "Downes, C. Cambridge English for Job-hunting (Unit 6: Managing Disagreements Tactfully)."
+    },
+    {
+      "id": 17,
+      "domain": "pragmatics",
+      "domain_name": "Situational Pragmatics, Tone & Register",
+      "cefr_target": "B2",
+      "question": "Ketika pewawancara kerja menanyakan: 'Tell me about a time you resolved a conflict within your team', pembuka manakah yang menerapkan kerangka STAR (Situation/Task) secara terstruktur?",
+      "options": {
+        "A": "I always get along with everyone because I am a very friendly person.",
+        "B": "During our final semester capstone project, our team had conflicting views on the database architecture, so I organized an evaluation session to compare options.",
+        "C": "Conflict is bad, but my friend made a mistake and I fixed it for him.",
+        "D": "I don't really remember any conflict, everything was always smooth."
+      },
+      "answer": "B",
+      "explanation": "Effective professional communication requires establishing context (Situation), identifying the challenge (Task), and outlining proactive steps (Action), which is the foundation of the STAR method at B2.",
+      "reference_source": "Downes, C. Cambridge English for Job-hunting (Unit 5: Behavioral Interview Responses)."
+    },
+    {
+      "id": 18,
+      "domain": "pragmatics",
+      "domain_name": "Situational Pragmatics, Tone & Register",
+      "cefr_target": "B2",
+      "question": "Dalam seminar skripsi, kamu ingin meminta pembicara menjelaskan metodologi pengujian datanya tanpa terdengar meremehkan. Ungkapan yang paling tepat adalah:",
+      "options": {
+        "A": "Explain your data again, it is very confusing.",
+        "B": "Could you elaborate on how you validated your training data sample? I would appreciate more context on that.",
+        "C": "I don't understand anything about your research methodology.",
+        "D": "Why did you use that method? It seems weird."
+      },
+      "answer": "B",
+      "explanation": "'Could you elaborate on... I would appreciate more context' combines indirect questioning and polite hedging, standard in scholarly B2 academic discourse.",
+      "reference_source": "Council of Europe (2020). CEFR Sociolinguistic Appropriateness & Academic Politeness."
+    },
+    {
+      "id": 19,
+      "domain": "pragmatics",
+      "domain_name": "Situational Pragmatics, Tone & Register",
+      "cefr_target": "B2",
+      "question": "Kalimat manakah yang menunjukkan penggunaan 'academic hedging' (menyampaikan klaim ilmiah secara hati-hati, objektif, dan proporsional sesuai bukti)?",
+      "options": {
+        "A": "The experiment definitely proves that all existing solutions are useless.",
+        "B": "The experimental results suggest that this approach may improve speaking fluency under certain conditions.",
+        "C": "My algorithm is 100% the best in the entire field.",
+        "D": "Everyone knows that AI will replace human teachers tomorrow."
+      },
+      "answer": "B",
+      "explanation": "Academic hedging uses tentative verbs ('suggest') and modal qualification ('may improve ... under certain conditions') to make defensible, scientifically honest claims.",
+      "reference_source": "Hewings, M. Advanced Grammar in Use (Unit 95: Hedging in Scholarly Writing)."
+    },
+    {
+      "id": 20,
+      "domain": "pragmatics",
+      "domain_name": "Situational Pragmatics, Tone & Register",
+      "cefr_target": "B2",
+      "question": "Di akhir presentasi proyek akhir, ungkapan manakah yang paling ringkas dan profesional untuk merangkum rekomendasi utama tim?",
+      "options": {
+        "A": "That's all from me, thank you.",
+        "B": "To sum up, investing in automated unit testing will not only reduce future bugs but also significantly enhance developer velocity.",
+        "C": "I am finished talking now, any questions?",
+        "D": "Finally, I hope you like my presentation."
+      },
+      "answer": "B",
+      "explanation": "Using a formal conclusion marker ('To sum up') combined with correlative structure ('not only ... but also') produces an articulate, persuasive B2 summary.",
+      "reference_source": "Downes, C. Cambridge English for Job-hunting (Unit 7: Concluding Professional Presentations)."
+    }
+  ]
+}
