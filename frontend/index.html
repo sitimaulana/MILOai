@@ -24,13 +24,18 @@
         :root {
             --cream: #faf5eb;
             --paper: #fffdf8;
+            --sand-bg: #f5efe3;
             --ink: #344557;
+            --ink-dark: #233342;
             --muted: #586875;
             --blue: #778aa4;
-            --teal: #a8d9d1;
             --deep-teal: #407e79;
+            --deep-teal-dark: #2f605c;
             --orange: #e99965;
+            --orange-hover: #f0a879;
             --line: #e9e5dc;
+            --line-subtle: #f0ede6;
+            --danger: #d86662;
         }
 
         * {
@@ -75,8 +80,8 @@
         a:focus-visible,
         button:focus-visible,
         input:focus-visible {
-            outline: 3px solid #d87942;
-            outline-offset: 3px;
+            outline: 2px solid var(--deep-teal);
+            outline-offset: 2px;
         }
 
         .wrap {
@@ -204,7 +209,7 @@
 
         .nav-cta:hover,
         .nav-cta-btn:hover {
-            background: #243545;
+            background: var(--ink-dark);
             transform: translateY(-2px);
             color: white;
         }
@@ -280,7 +285,7 @@
         }
 
         .btn-nav-logout:hover {
-            color: #d86662;
+            color: var(--danger);
         }
 
         /* Mobile Nav Toggle & Drawer */
@@ -339,12 +344,11 @@
         .hero::after {
             content: "";
             position: absolute;
-            bottom: -1px;
+            bottom: 0;
             left: 0;
             width: 100%;
-            height: 52px;
-            background: var(--blue);
-            clip-path: polygon(0 60%, 10% 70%, 23% 46%, 35% 54%, 48% 32%, 60% 51%, 73% 36%, 86% 56%, 100% 31%, 100% 100%, 0 100%);
+            height: 1px;
+            background: var(--line);
         }
 
         .hero-grid {
@@ -409,7 +413,7 @@
         }
 
         .accent {
-            color: #4c7b67;
+            color: var(--deep-teal);
         }
 
         .hero-copy>p {
@@ -429,7 +433,7 @@
 
         .primary-btn {
             background: var(--orange);
-            color: #342f2b;
+            color: var(--ink-dark);
             padding: 12px 24px;
             font-weight: 800;
             box-shadow: 0 4px 14px rgba(233, 153, 101, 0.35);
@@ -443,7 +447,7 @@
         }
 
         .primary-btn:hover {
-            background: #f0a879;
+            background: var(--orange-hover);
             transform: translateY(-2px);
             box-shadow: 0 6px 18px rgba(233, 153, 101, 0.45);
         }
@@ -470,7 +474,8 @@
 
         .secondary-link:hover {
             background: var(--cream);
-            border-color: #d8d2c4;
+            border-color: var(--deep-teal);
+            color: var(--deep-teal);
             transform: translateY(-2px);
         }
 
@@ -516,20 +521,20 @@
             z-index: 2;
             width: 100%;
             max-width: 525px;
-            background: #fff;
-            border: 1px solid #eee9e1;
+            background: var(--paper);
+            border: 1px solid var(--line);
             border-radius: 25px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(52, 69, 87, 0.1);
+            box-shadow: 0 20px 40px rgba(52, 69, 87, 0.08);
         }
 
         .studio-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: #fffdf9;
+            background: var(--paper);
             padding: 12px 18px;
-            border-bottom: 3px solid #83ab91;
+            border-bottom: 1px solid var(--line);
             font-size: 11px;
             font-weight: 900;
             letter-spacing: 0.05em;
@@ -542,11 +547,11 @@
         }
 
         .level-chip {
-            border: 1px solid #d8b596;
+            border: 1px solid rgba(64, 126, 121, 0.22);
             border-radius: 999px;
             padding: 3px 9px;
-            color: #956342;
-            background: white;
+            color: var(--deep-teal);
+            background: rgba(64, 126, 121, 0.08);
             font-size: 10px;
         }
 
@@ -570,7 +575,7 @@
 
         /* Studio Stage */
         .studio-stage {
-            background: #f4f0e7;
+            background: var(--cream);
             min-height: 310px;
             padding: 16px;
             display: grid;
@@ -634,7 +639,8 @@
         }
 
         .avatar-status {
-            background: #fff;
+            background: var(--paper);
+            border: 1px solid var(--line);
             border-radius: 999px;
             padding: 4px 10px;
             white-space: nowrap;
@@ -652,12 +658,14 @@
         }
 
         .chat-bubble.milo-bubble {
-            background: #8d613f;
+            background: var(--deep-teal);
             color: white;
         }
 
         .chat-bubble.user-bubble {
-            background: #fff;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            color: var(--ink);
         }
 
         .waveform {
@@ -674,7 +682,7 @@
             display: block;
             width: 2px;
             height: 8px;
-            background: #6d9c89;
+            background: var(--deep-teal);
             border-radius: 3px;
         }
 
@@ -722,7 +730,7 @@
             border-radius: 50%;
             display: grid;
             place-items: center;
-            background: #f8f8f5;
+            background: var(--paper);
             color: var(--deep-teal);
             pointer-events: none;
             user-select: none;
@@ -735,13 +743,15 @@
         }
 
         .round-control.mic {
-            background: #7da58e;
+            background: var(--deep-teal);
             color: white;
+            border-color: var(--deep-teal);
         }
 
         .round-control.end {
-            background: #fff0ec;
-            color: #d86662;
+            background: rgba(216, 102, 98, 0.1);
+            color: var(--danger);
+            border-color: rgba(216, 102, 98, 0.25);
         }
 
         .studio-note {
@@ -757,8 +767,8 @@
         }
 
         .benefits {
-            background: var(--blue);
-            color: white;
+            background: var(--sand-bg);
+            color: var(--ink);
             position: relative;
         }
 
@@ -770,22 +780,13 @@
         .section-heading h2 {
             font-size: clamp(32px, 4vw, 54px);
             margin: 14px 0;
+            color: var(--ink);
         }
 
         .section-heading p {
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--muted);
             font-size: 15.5px;
             line-height: 1.75;
-        }
-
-        .benefits .eyebrow {
-            color: #fff0db;
-            background: rgba(255, 240, 219, 0.14);
-            border-color: rgba(255, 240, 219, 0.28);
-        }
-
-        .benefits .eyebrow::before {
-            background: #f4cfad;
         }
 
         .benefit-grid {
@@ -795,67 +796,70 @@
         }
 
         .benefit-card {
-            background: #f8f5ed;
+            background: var(--paper);
             color: var(--ink);
-            border-radius: 26px;
+            border: 1px solid var(--line);
+            border-radius: 24px;
             padding: 28px;
             min-height: 300px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            box-shadow: 0 4px 16px rgba(52, 69, 87, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
         }
 
-        .benefit-card:nth-child(2) {
-            background: #d9e7e1;
-        }
-
-        .benefit-card:nth-child(3) {
-            background: #e4e9ee;
+        .benefit-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(52, 69, 87, 0.07);
+            border-color: rgba(64, 126, 121, 0.3);
         }
 
         .card-icon {
-            width: 68px;
-            height: 68px;
-            border-radius: 24px;
-            background: #f4cfad;
+            width: 58px;
+            height: 58px;
+            border-radius: 18px;
+            background: rgba(64, 126, 121, 0.1);
+            border: 1px solid rgba(64, 126, 121, 0.18);
             display: grid;
             place-items: center;
-            color: #9b643d;
+            color: var(--deep-teal);
             margin-bottom: auto;
-            transform: rotate(-7deg);
         }
 
         .benefit-card:nth-child(2) .card-icon {
-            background: #a9d4c9;
-            color: #31756e;
-            transform: rotate(7deg);
+            background: rgba(233, 153, 101, 0.12);
+            border-color: rgba(233, 153, 101, 0.24);
+            color: var(--orange);
         }
 
         .benefit-card:nth-child(3) .card-icon {
-            background: #bacbd7;
-            color: #4e6a84;
+            background: rgba(64, 126, 121, 0.1);
+            border-color: rgba(64, 126, 121, 0.18);
+            color: var(--deep-teal);
         }
 
         .card-icon svg {
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
         }
 
         .benefit-card h3 {
-            font-size: 23px;
-            margin: 24px 0 8px;
+            font-size: 22px;
+            margin: 22px 0 8px;
+            color: var(--ink);
         }
 
         .benefit-card p {
             font-size: 14px;
-            color: #52616d;
+            color: var(--muted);
             margin: 0;
             line-height: 1.7;
         }
 
         /* Scenarios / Mood Section */
         .mood-section {
-            background: #f7f4ed;
+            background: var(--cream);
             position: relative;
             overflow: hidden;
         }
@@ -871,7 +875,8 @@
             position: relative;
             min-height: 440px;
             border-radius: 48% 52% 43% 57% / 43% 40% 60% 57%;
-            background: #d8e6e2;
+            background: var(--sand-bg);
+            border: 1px solid var(--line);
             display: grid;
             place-items: end center;
             overflow: hidden;
@@ -886,7 +891,7 @@
             width: 270px;
             height: 270px;
             border-radius: 50%;
-            background: #b9d8d3;
+            background: rgba(64, 126, 121, 0.08);
             top: 25px;
             left: 50%;
             transform: translateX(-50%);
@@ -898,12 +903,13 @@
             max-width: 90%;
             object-fit: contain;
             object-position: bottom;
-            filter: drop-shadow(0 8px 3px rgba(37, 77, 71, 0.1));
+            filter: drop-shadow(0 8px 3px rgba(52, 69, 87, 0.08));
         }
 
         .mood-content h2 {
             font-size: clamp(32px, 4vw, 54px);
             margin: 15px 0;
+            color: var(--ink);
         }
 
         .mood-content>p {
@@ -920,8 +926,8 @@
         }
 
         .mood-button {
-            border: 1px solid #d7ded9;
-            background: white;
+            border: 1.5px solid var(--line);
+            background: var(--paper);
             color: var(--ink);
             padding: 11px 18px;
             border-radius: 999px;
@@ -945,12 +951,13 @@
         }
 
         .mood-message {
-            background: #fff;
+            background: var(--paper);
+            border: 1px solid var(--line);
             border-left: 4px solid var(--orange);
             padding: 20px 22px;
             border-radius: 0 18px 18px 0;
             min-height: 115px;
-            box-shadow: 0 10px 30px rgba(52, 69, 87, 0.05);
+            box-shadow: 0 8px 24px rgba(52, 69, 87, 0.04);
         }
 
         .mood-title {
@@ -985,13 +992,13 @@
         }
 
         .mood-launch-cta:hover {
-            background: #243545;
+            background: var(--ink-dark);
             transform: translateY(-2px);
         }
 
         /* CEFR Framework Section */
         .breath {
-            background: #e9f1ed;
+            background: var(--sand-bg);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -1004,7 +1011,7 @@
             width: 270px;
             height: 270px;
             border-radius: 50%;
-            background: #d7e9e2;
+            background: rgba(64, 126, 121, 0.06);
             opacity: 0.8;
         }
 
@@ -1043,18 +1050,20 @@
         }
 
         .level-card {
-            border: 2px solid transparent;
-            background: white;
-            border-radius: 25px;
+            border: 1.5px solid var(--line);
+            background: var(--paper);
+            border-radius: 24px;
             padding: 28px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            transition: border-color 0.2s;
+            box-shadow: 0 4px 16px rgba(52, 69, 87, 0.03);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .level-card.selected {
             border-color: var(--deep-teal);
+            box-shadow: 0 8px 24px rgba(64, 126, 121, 0.12);
         }
 
         .level-card h3 {
@@ -1105,7 +1114,8 @@
 
         /* CTA Section */
         .cta {
-            background: #f7efe1;
+            background: var(--cream);
+            border-top: 1px solid var(--line);
             overflow: hidden;
         }
 
@@ -1143,7 +1153,8 @@
             width: 340px;
             max-width: 100%;
             height: 300px;
-            background: #d8e7dd;
+            background: var(--sand-bg);
+            border: 1px solid var(--line);
             border-radius: 50% 50% 12% 12%;
         }
 
@@ -1165,7 +1176,8 @@
 
         /* Footer */
         .site-footer {
-            background: #fbfaf7;
+            background: var(--paper);
+            border-top: 1px solid var(--line);
             padding: 50px 0 30px;
         }
 
@@ -1202,7 +1214,7 @@
         .footer-bottom {
             border-top: 1px solid var(--line);
             padding-top: 20px;
-            color: #687784;
+            color: var(--muted);
             font-size: 12px;
             display: flex;
             justify-content: space-between;
@@ -1473,7 +1485,7 @@
                 line-height: 1.65;
                 max-width: 360px;
                 margin: 0 auto 20px;
-                color: #556573;
+                color: var(--muted);
             }
 
             .hero-actions {
@@ -1592,7 +1604,7 @@
             }
 
             .avatar-status {
-                background: #fff;
+                background: var(--paper);
                 border: 1px solid var(--line);
                 border-radius: 999px;
                 padding: 4px 12px;
@@ -1609,8 +1621,8 @@
                 justify-content: space-between;
                 align-items: flex-start;
                 padding: 11px 14px;
-                background: #ffffff;
-                border: 1px solid rgba(52, 69, 87, 0.08);
+                background: var(--paper);
+                border: 1px solid var(--line);
                 border-radius: 14px;
                 gap: 12px;
                 box-sizing: border-box;
@@ -2091,7 +2103,7 @@
         </section>
 
         <!-- Dashboard Section -->
-        <section id="dashboard" class="section" style="background:#fffdf8">
+        <section id="dashboard" class="section" style="background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
             <div class="wrap section-heading" style="margin-bottom:0">
                 <span class="eyebrow">Dashboard Progres</span>
                 <h2>Setiap percakapan adalah langkah maju</h2>

@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Masuk ke Akun: MILO English Speaking Practice</title>
-    <meta name="description" content="Masuk ke akun MILO Anda untuk melanjutkan latihan percakapan bahasa Inggris dan memantau riwayat progres CEFR.">
+    <meta name="description"
+        content="Masuk ke akun MILO Anda untuk melanjutkan latihan percakapan bahasa Inggris dan memantau riwayat progres CEFR.">
     <!-- Google Fonts & Dedicated Auth CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/auth.css?v=20261119b">
 </head>
+
 <body class="auth-body">
 
     <!-- Main Card Stage -->
@@ -28,11 +33,13 @@
 
             <!-- Segmented Mode Tabs -->
             <div class="auth-segmented-tabs" role="tablist" aria-label="Pilihan Autentikasi">
-                <button type="button" class="auth-tab-btn active" id="tabBtnLogin" role="tab" aria-selected="true" aria-controls="panelLogin">
+                <button type="button" class="auth-tab-btn active" id="tabBtnLogin" role="tab" aria-selected="true"
+                    aria-controls="panelLogin">
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     <span>Masuk</span>
                 </button>
-                <button type="button" class="auth-tab-btn" id="tabBtnRegister" role="tab" aria-selected="false" aria-controls="panelRegister">
+                <button type="button" class="auth-tab-btn" id="tabBtnRegister" role="tab" aria-selected="false"
+                    aria-controls="panelRegister">
                     <i class="fa-regular fa-user"></i>
                     <span>Daftar Akun</span>
                 </button>
@@ -53,17 +60,9 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-envelope input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="text"
-                                id="loginIdentifier"
-                                name="username"
-                                class="form-input"
-                                placeholder="budi atau budi@email.com"
-                                required
-                                autocomplete="username"
-                                autocapitalize="none"
-                                spellcheck="false"
-                            >
+                            <input type="text" id="loginIdentifier" name="username" class="form-input"
+                                placeholder="Masukkan Username atau Email Anda" required autocomplete="username"
+                                autocapitalize="none" spellcheck="false">
                         </div>
                     </div>
 
@@ -73,21 +72,10 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-lock input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="password"
-                                id="loginPassword"
-                                name="password"
-                                class="form-input has-right-icon"
-                                placeholder="Masukkan kata sandi"
-                                required
-                                autocomplete="current-password"
-                            >
-                            <button
-                                type="button"
-                                class="btn-toggle-password"
-                                data-target="loginPassword"
-                                aria-label="Tampilkan kata sandi"
-                            >
+                            <input type="password" id="loginPassword" name="password" class="form-input has-right-icon"
+                                placeholder="Masukkan kata sandi" required autocomplete="current-password">
+                            <button type="button" class="btn-toggle-password" data-target="loginPassword"
+                                aria-label="Tampilkan kata sandi">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
@@ -118,17 +106,9 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-at input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="text"
-                                id="regUsername"
-                                name="username"
-                                class="form-input"
-                                placeholder="milolearner"
-                                required
-                                autocomplete="username"
-                                autocapitalize="none"
-                                spellcheck="false"
-                            >
+                            <input type="text" id="regUsername" name="username" class="form-input"
+                                placeholder="Masukkan Username Anda" required autocomplete="username"
+                                autocapitalize="none" spellcheck="false">
                         </div>
                     </div>
 
@@ -139,14 +119,8 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-id-badge input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="text"
-                                id="regFullName"
-                                name="fullName"
-                                class="form-input"
-                                placeholder="Budi Setiawan"
-                                autocomplete="name"
-                            >
+                            <input type="text" id="regFullName" name="fullName" class="form-input"
+                                placeholder="Masukkan Nama Anda" autocomplete="name">
                         </div>
                     </div>
 
@@ -157,14 +131,8 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-regular fa-envelope input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="email"
-                                id="regEmail"
-                                name="email"
-                                class="form-input"
-                                placeholder="nama@email.com"
-                                autocomplete="email"
-                            >
+                            <input type="email" id="regEmail" name="email" class="form-input"
+                                placeholder="Masukkan Email Anda" autocomplete="email">
                         </div>
                     </div>
 
@@ -175,21 +143,10 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-lock input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="password"
-                                id="regPassword"
-                                name="password"
-                                class="form-input has-right-icon"
-                                placeholder="Buat kata sandi aman"
-                                required
-                                autocomplete="new-password"
-                            >
-                            <button
-                                type="button"
-                                class="btn-toggle-password"
-                                data-target="regPassword"
-                                aria-label="Tampilkan kata sandi"
-                            >
+                            <input type="password" id="regPassword" name="password" class="form-input has-right-icon"
+                                placeholder="Buat kata sandi aman" required autocomplete="new-password">
+                            <button type="button" class="btn-toggle-password" data-target="regPassword"
+                                aria-label="Tampilkan kata sandi">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
@@ -201,21 +158,11 @@
                         </label>
                         <div class="input-wrapper">
                             <i class="fa-solid fa-shield-halved input-icon-left" aria-hidden="true"></i>
-                            <input
-                                type="password"
-                                id="regConfirmPassword"
-                                name="confirmPassword"
-                                class="form-input has-right-icon"
-                                placeholder="Ulangi kata sandi"
-                                required
-                                autocomplete="new-password"
-                            >
-                            <button
-                                type="button"
-                                class="btn-toggle-password"
-                                data-target="regConfirmPassword"
-                                aria-label="Tampilkan konfirmasi kata sandi"
-                            >
+                            <input type="password" id="regConfirmPassword" name="confirmPassword"
+                                class="form-input has-right-icon" placeholder="Ulangi kata sandi" required
+                                autocomplete="new-password">
+                            <button type="button" class="btn-toggle-password" data-target="regConfirmPassword"
+                                aria-label="Tampilkan konfirmasi kata sandi">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                         </div>
@@ -247,4 +194,5 @@
     <!-- Scripts -->
     <script src="js/auth.js?v=20261119b"></script>
 </body>
+
 </html>
