@@ -12,6 +12,44 @@ let animationFrameId = null;
 let isTestingMic = false;
 let activeTab = 1;
 
+// Format human-friendly topic labels (e.g. "Academic #1", "Interview #2", "Daily #3")
+if (typeof formatTopicDisplay !== 'function') {
+    window.formatTopicDisplay = function(topic) {
+        if (!topic) return { label: 'Topik', icon: 'fa-book-open', shortTrack: 'Topik', number: 1 };
+        const code = (topic.track_code || '').toUpperCase();
+        const key = (topic.track_key || '').toLowerCase();
+        const id = (topic.topic_id || '').toUpperCase();
+
+        let shortTrack = 'Topik';
+        let icon = 'fa-book-open';
+
+        if (code === 'TRACK_A' || key.includes('interview') || id.startsWith('A')) {
+            shortTrack = 'Interview';
+            icon = 'fa-briefcase';
+        } else if (code === 'TRACK_B' || key.includes('academic') || id.startsWith('B')) {
+            shortTrack = 'Academic';
+            icon = 'fa-graduation-cap';
+        } else if (code === 'TRACK_C' || key.includes('daily') || id.startsWith('C')) {
+            shortTrack = 'Daily';
+            icon = 'fa-comments';
+        }
+
+        let num = topic.topic_number;
+        if (!num && id) {
+            const match = id.match(/\d+$/);
+            if (match) num = parseInt(match[0], 10);
+        }
+        num = num || 1;
+
+        return {
+            label: `${shortTrack} #${num}`,
+            icon: icon,
+            shortTrack: shortTrack,
+            number: num,
+        };
+    };
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (typeof requireAuth === 'function' && !requireAuth()) {
         return;
@@ -32,7 +70,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update Header Badges
     const badgeTopicId = document.getElementById('briefingTopicIdBadge');
-    if (badgeTopicId) badgeTopicId.textContent = `Modul ${currentTopicId}`;
+    const initialTopicDisplay = sessionStorage.getItem('milo_topic_label_display') || (
+        typeof formatTopicDisplay === 'function'
+            ? formatTopicDisplay({ topic_id: currentTopicId, track_key: currentTopic }).label
+            : `Topik ${currentTopicId}`
+    );
+    if (badgeTopicId) badgeTopicId.textContent = initialTopicDisplay;
 
     const badgeLevel = document.getElementById('briefingLevelBadge');
     if (badgeLevel) badgeLevel.textContent = `Level ${currentLevel}`;
@@ -151,8 +194,14 @@ async function loadModuleDetail(topicId) {
         const data = await resp.json();
 
         // 1. Populate Tab 1: Sasaran Belajar
+        const topicDisplay = (typeof formatTopicDisplay === 'function')
+            ? formatTopicDisplay(data)
+            : { label: `Topik #${data.topic_number || data.topic_id}` };
+
         const titleEl = document.getElementById('lessonTitleText');
-        if (titleEl) titleEl.textContent = `[${data.topic_id}] ${data.title}`;
+        if (titleEl) titleEl.textContent = `[${topicDisplay.label}] ${data.title}`;
+
+        if (badgeTopicId) badgeTopicId.textContent = topicDisplay.label;
 
         const candoEl = document.getElementById('lessonCanDoText');
         if (candoEl) candoEl.textContent = data.can_do_statement;

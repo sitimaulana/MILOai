@@ -8,6 +8,44 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Format human-friendly topic labels (e.g. "Academic #1", "Interview #2", "Daily #3")
+// Avoids confusion between technical module codes and CEFR proficiency levels.
+function formatTopicDisplay(topic) {
+    if (!topic) return { label: 'Topik', icon: 'fa-book-open', shortTrack: 'Topik', number: 1 };
+
+    const code = (topic.track_code || '').toUpperCase();
+    const key = (topic.track_key || '').toLowerCase();
+    const id = (topic.topic_id || '').toUpperCase();
+
+    let shortTrack = 'Topik';
+    let icon = 'fa-book-open';
+
+    if (code === 'TRACK_A' || key.includes('interview') || id.startsWith('A')) {
+        shortTrack = 'Interview';
+        icon = 'fa-briefcase';
+    } else if (code === 'TRACK_B' || key.includes('academic') || id.startsWith('B')) {
+        shortTrack = 'Academic';
+        icon = 'fa-graduation-cap';
+    } else if (code === 'TRACK_C' || key.includes('daily') || id.startsWith('C')) {
+        shortTrack = 'Daily';
+        icon = 'fa-comments';
+    }
+
+    let num = topic.topic_number;
+    if (!num && id) {
+        const match = id.match(/\d+$/);
+        if (match) num = parseInt(match[0], 10);
+    }
+    num = num || 1;
+
+    return {
+        label: `${shortTrack} #${num}`,
+        icon: icon,
+        shortTrack: shortTrack,
+        number: num,
+    };
+}
+
 // Audio Player Map
 const audioStore = new Map();
 let audioIdCounter = 0;

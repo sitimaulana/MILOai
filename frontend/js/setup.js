@@ -24,6 +24,44 @@ const GOAL_DETAILS = {
     '15_min': { badge: '15 Menit / Hari', label: 'Latihan Lanjutan' }
 };
 
+// Format human-friendly topic labels (e.g. "Academic #1", "Interview #2", "Daily #3")
+if (typeof formatTopicDisplay !== 'function') {
+    window.formatTopicDisplay = function(topic) {
+        if (!topic) return { label: 'Topik', icon: 'fa-book-open', shortTrack: 'Topik', number: 1 };
+        const code = (topic.track_code || '').toUpperCase();
+        const key = (topic.track_key || '').toLowerCase();
+        const id = (topic.topic_id || '').toUpperCase();
+
+        let shortTrack = 'Topik';
+        let icon = 'fa-book-open';
+
+        if (code === 'TRACK_A' || key.includes('interview') || id.startsWith('A')) {
+            shortTrack = 'Interview';
+            icon = 'fa-briefcase';
+        } else if (code === 'TRACK_B' || key.includes('academic') || id.startsWith('B')) {
+            shortTrack = 'Academic';
+            icon = 'fa-graduation-cap';
+        } else if (code === 'TRACK_C' || key.includes('daily') || id.startsWith('C')) {
+            shortTrack = 'Daily';
+            icon = 'fa-comments';
+        }
+
+        let num = topic.topic_number;
+        if (!num && id) {
+            const match = id.match(/\d+$/);
+            if (match) num = parseInt(match[0], 10);
+        }
+        num = num || 1;
+
+        return {
+            label: `${shortTrack} #${num}`,
+            icon: icon,
+            shortTrack: shortTrack,
+            number: num,
+        };
+    };
+}
+
 // ─── Instant Fallback Curriculum Topics (Ensures 100% Offline / Fast Reliability) ──
 const FALLBACK_CURRICULUM = [
     // Track A: Job Interview
@@ -261,9 +299,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
+            const topicDisplay = (typeof formatTopicDisplay === 'function')
+                ? formatTopicDisplay(top)
+                : { label: `Topik #${top.topic_number || top.topic_id}`, icon: 'fa-book-open' };
+
             card.innerHTML = `
                 <div class="specific-topic-header">
-                    <span class="topic-id-badge"><i class="fa-solid fa-graduation-cap"></i> Modul ${escapeHtml(top.topic_id)}</span>
+                    <span class="topic-id-badge"><i class="fa-solid ${topicDisplay.icon}"></i> ${escapeHtml(topicDisplay.label)}</span>
                     <div class="topic-meta-badges">
                         <span class="topic-meta-pill"><i class="fa-regular fa-clock"></i> ${escapeHtml(top.duration_minutes)} Mnt</span>
                         <span class="topic-meta-pill level-pill"><i class="fa-solid fa-layer-group"></i> ${escapeHtml(top.cefr_level)}</span>
@@ -308,7 +350,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateShelfTopicInfo(topic) {
         if (!topic) return;
-        if (shelfSpecificTopicBadge) shelfSpecificTopicBadge.textContent = `[${topic.topic_id}]`;
+        const topicDisplay = (typeof formatTopicDisplay === 'function')
+            ? formatTopicDisplay(topic)
+            : { label: `Topik #${topic.topic_number || topic.topic_id}` };
+        if (shelfSpecificTopicBadge) shelfSpecificTopicBadge.textContent = topicDisplay.label;
         if (shelfSpecificTopicTitle) shelfSpecificTopicTitle.textContent = topic.title;
     }
 
@@ -318,6 +363,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!selectedLevel || !selectedCategory || !selectedTopicId) {
                 alert('Silakan pilih kategori dan topik microlearning terlebih dahulu.');
                 return;
+            }
+
+            // Save user-friendly topic display label for subsequent screens
+            if (selectedTopicData) {
+                const topicDisplay = (typeof formatTopicDisplay === 'function')
+                    ? formatTopicDisplay(selectedTopicData)
+                    : null;
+                if (topicDisplay) {
+                    sessionStorage.setItem('milo_topic_label_display', topicDisplay.label);
+                }
             }
 
             btnLaunchPractice.disabled = true;

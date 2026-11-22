@@ -116,9 +116,21 @@ body.auth-body {
 }
 
 .brand-flower {
-    font-size: 15px;
-    color: var(--orange);
-    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.brand-flower img,
+.auth-brand-logo {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
 }
 
 .brand-title-text {

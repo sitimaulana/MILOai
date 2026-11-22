@@ -135,17 +135,19 @@ h1, h2, h3, h4, .stat-big-val, .nav-brand-title, .dash-header-title-box h1 {
 }
 
 .brand-mark {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     flex: none;
-    background: var(--orange);
-    border-radius: 50% 50% 43% 43%;
-    display: grid;
-    place-items: center;
-    color: white;
-    font-size: 17px;
-    transform: rotate(-12deg);
-    box-shadow: 0 3px 10px rgba(233, 153, 101, 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-mark-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .nav-links {

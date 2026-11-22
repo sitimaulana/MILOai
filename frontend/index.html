@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#faf5eb">
+    <link rel="icon" type="image/svg+xml" href="assets/Icon logo milo.svg">
     <title>MILO (Speaking Companion): Latihan Bicara Bahasa Inggris</title>
     <meta name="description"
         content="Latihan berbicara bahasa Inggris interaktif bersama MILO, teman virtual 2D dengan evaluasi CEFR langsung dan bantuan terjemahan.">
@@ -134,16 +135,19 @@
         }
 
         .brand-mark {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             flex: none;
-            background: var(--orange);
-            border-radius: 50% 50% 43% 43%;
-            display: grid;
-            place-items: center;
-            color: white;
-            font-size: 17px;
-            transform: rotate(-12deg);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .brand-mark-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
         .nav-links {
@@ -1401,7 +1405,6 @@
             .brand-mark {
                 width: 28px;
                 height: 28px;
-                font-size: 16px;
             }
 
             .brand small {
@@ -1871,8 +1874,10 @@
     <!-- Header & Navigation -->
     <header class="site-header">
         <nav class="nav-inner wrap" aria-label="Navigasi utama">
-            <a id="brand-link" class="brand" href="index.html">
-                <span class="brand-mark" aria-hidden="true">✿</span>
+            <a id="brand-link" class="brand" href="index.html" aria-label="MILO Speaking Companion">
+                <span class="brand-mark">
+                    <img src="assets/Icon logo milo.svg" alt="" width="32" height="32" class="brand-mark-img">
+                </span>
                 MILO <small>(Speaking Companion)</small>
             </a>
             <div class="nav-links">
@@ -1932,8 +1937,10 @@
                     <div class="trust-strip">
                         <span><i data-lucide="shield-check" aria-hidden="true"></i> Bebas takut salah</span>
                         <span><i data-lucide="mic" aria-hidden="true"></i> Pengenalan suara Whisper AI</span>
-                        <span><i data-lucide="book-open" aria-hidden="true"></i> RAG Grounding Cambridge & Collins</span>
-                        <span><i data-lucide="languages" aria-hidden="true"></i> Terjemahan Bahasa Indonesia instan</span>
+                        <span><i data-lucide="book-open" aria-hidden="true"></i> RAG Grounding Cambridge &
+                            Collins</span>
+                        <span><i data-lucide="languages" aria-hidden="true"></i> Terjemahan Bahasa Indonesia
+                            instan</span>
                     </div>
                 </div>
 
@@ -1991,7 +1998,6 @@
                                 <i data-lucide="phone-off" aria-hidden="true"></i>
                             </span>
                         </div>
-                        <p class="studio-note">Pratinjau antarmuka Ruang Latihan MILO.</p>
                     </div>
                 </div>
             </div>
@@ -2039,7 +2045,7 @@
         <section id="perasaan" class="mood-section section">
             <div class="wrap mood-layout">
                 <div class="mood-portrait">
-                    <img id="mood-milo" class="mood-milo" src="assets/milo_companion.png"
+                    <img id="mood-milo" class="mood-milo" src="assets/milo_2.png"
                         alt="Milo menyambutmu untuk memilih situasi percakapan" width="280" height="430" loading="lazy">
                 </div>
                 <div class="mood-content">
@@ -2103,7 +2109,8 @@
         </section>
 
         <!-- Dashboard Section -->
-        <section id="dashboard" class="section" style="background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+        <section id="dashboard" class="section"
+            style="background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
             <div class="wrap section-heading" style="margin-bottom:0">
                 <span class="eyebrow">Dashboard Progres</span>
                 <h2>Setiap percakapan adalah langkah maju</h2>
@@ -2129,7 +2136,7 @@
                 </div>
                 <div class="cta-art">
                     <span class="cta-star" aria-hidden="true">✳</span>
-                    <img id="cta-milo" class="cta-milo" src="assets/milo_companion.png"
+                    <img id="cta-milo" class="cta-milo" src="assets/milo_3.png"
                         alt="Milo mengajakmu berlatih berbicara bahasa Inggris" width="260" height="345" loading="lazy">
                 </div>
             </div>
@@ -2141,11 +2148,14 @@
         <div class="wrap">
             <div class="footer-top">
                 <div>
-                    <a class="brand" href="index.html">
-                        <span class="brand-mark" aria-hidden="true">✿</span>
+                    <a class="brand" href="index.html" aria-label="MILO Speaking Companion">
+                        <span class="brand-mark">
+                            <img src="assets/Icon logo milo.svg" alt="" width="32" height="32" class="brand-mark-img">
+                        </span>
                         MILO <small>(Speaking Companion)</small>
                     </a>
-                    <p>Tempat yang ramah untuk mencoba, belajar dari kesalahan, dan menemukan keberanian bicara bahasa
+                    <p>Tempat yang ramah untuk mencoba, belajar dari kesalahan, dan menemukan keberanian bicara
+                        bahasa
                         Inggris.</p>
                 </div>
                 <nav class="footer-links" aria-label="Navigasi bagian bawah">
