@@ -185,14 +185,62 @@ function switchTab(targetNum) {
 
 // ─── Load Module Detail from Backend API ──────────────────────────────────────
 async function loadModuleDetail(topicId) {
+    const normTopicId = (topicId || 'A1').toUpperCase();
+    let data = null;
+
+    // 1. Try fetching from Backend API
     try {
-        const resp = await fetch(`/api/v1/curriculum/topic/${encodeURIComponent(topicId)}`);
-        if (!resp.ok) {
-            throw new Error(`Server returned ${resp.status}`);
+        const apiUrl = `/api/v1/curriculum/topic/${encodeURIComponent(normTopicId)}`;
+        let resp = null;
+        try {
+            resp = await fetch(apiUrl);
+        } catch (fetchErr) {
+            // If running on a different port (e.g. Live Server on 5500), try localhost:8000
+            if (window.location.port && window.location.port !== '8000') {
+                try {
+                    resp = await fetch(`http://localhost:8000${apiUrl}`);
+                } catch (e2) {}
+            }
         }
 
-        const data = await resp.json();
+        if (resp && resp.ok) {
+            data = await resp.json();
+        }
+    } catch (err) {
+        console.warn('API fetch for topic details failed, checking fallback:', err);
+    }
 
+    // 2. Fallback to local curriculum data if API unavailable
+    if (!data && window.MILO_CURRICULUM_DATA) {
+        data = window.MILO_CURRICULUM_DATA[normTopicId] || window.MILO_CURRICULUM_DATA['A1'];
+    }
+
+    if (!data) {
+        console.error('No module data available for topic:', normTopicId);
+        const titleEl = document.getElementById('lessonTitleText');
+        if (titleEl) titleEl.textContent = 'Pengenalan Skenario Latihan';
+
+        const renderError = (containerId, typeName) => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 32px 20px; background: #FFF5F5; border-radius: 14px; border: 1.5px dashed #FEB2B2; color: #9B2C2C;">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 26px; margin-bottom: 10px; color: #E53E3E;"></i>
+                        <p style="font-weight: 800; font-size: 15px; margin-bottom: 4px;">Gagal memuat ${typeName}</p>
+                        <p style="font-size: 13px; color: #742A2A; margin-bottom: 14px;">Terjadi kendala saat mengambil data modul dari server.</p>
+                        <button type="button" onclick="loadModuleDetail('${topicId}')" class="btn-deck-nav prev" style="display: inline-flex; margin: 0 auto; padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                            <i class="fa-solid fa-rotate-right"></i> Coba Muat Ulang
+                        </button>
+                    </div>
+                `;
+            }
+        };
+        renderError('vocabCardsDeck', 'daftar kosakata inti');
+        renderError('idiomsCardsDeck', 'daftar idiom & ekspresi alami');
+        return;
+    }
+
+    try {
         // 1. Populate Tab 1: Sasaran Belajar
         const topicDisplay = (typeof formatTopicDisplay === 'function')
             ? formatTopicDisplay(data)
@@ -201,6 +249,7 @@ async function loadModuleDetail(topicId) {
         const titleEl = document.getElementById('lessonTitleText');
         if (titleEl) titleEl.textContent = `[${topicDisplay.label}] ${data.title}`;
 
+        const badgeTopicId = document.getElementById('briefingTopicIdBadge');
         if (badgeTopicId) badgeTopicId.textContent = topicDisplay.label;
 
         const candoEl = document.getElementById('lessonCanDoText');
@@ -258,29 +307,8 @@ async function loadModuleDetail(topicId) {
                 ragSourceDesc.textContent = 'Menekankan ekspresi percakapan kasual, kolokasi tematik, dan deskriptor kelancaran berbicara spontan.';
             }
         }
-
     } catch (err) {
-        console.error('Failed to load module details:', err);
-        const titleEl = document.getElementById('lessonTitleText');
-        if (titleEl) titleEl.textContent = 'Pengenalan Skenario Latihan';
-
-        const renderError = (containerId, typeName) => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 32px 20px; background: #FFF5F5; border-radius: 14px; border: 1.5px dashed #FEB2B2; color: #9B2C2C;">
-                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 26px; margin-bottom: 10px; color: #E53E3E;"></i>
-                        <p style="font-weight: 800; font-size: 15px; margin-bottom: 4px;">Gagal memuat ${typeName}</p>
-                        <p style="font-size: 13px; color: #742A2A; margin-bottom: 14px;">Terjadi kendala saat mengambil data modul dari server.</p>
-                        <button type="button" onclick="loadModuleDetail('${topicId}')" class="btn-deck-nav prev" style="display: inline-flex; margin: 0 auto; padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer;">
-                            <i class="fa-solid fa-rotate-right"></i> Coba Muat Ulang
-                        </button>
-                    </div>
-                `;
-            }
-        };
-        renderError('vocabCardsDeck', 'daftar kosakata inti');
-        renderError('idiomsCardsDeck', 'daftar idiom & ekspresi alami');
+        console.error('Failed to populate module details:', err);
     }
 }
 
@@ -457,12 +485,23 @@ async function toggleMicTest() {
             micStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color: var(--secondary);"></i> <span>Mendengarkan... Silakan ucapkan kalimat panduan di atas!</span>`;
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: false,
+                autoGainControl: true
+            }
+        });
         micStream = stream;
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+
         analyser = audioContext.createAnalyser();
-        analyser.fftSize = 64; // 32 frequency bins for crisp bar equalizer
+        analyser.fftSize = 128; // 64 frequency bins for detailed resolution
+        analyser.smoothingTimeConstant = 0.4;
 
         const source = audioContext.createMediaStreamSource(stream);
         source.connect(analyser);
@@ -484,7 +523,8 @@ async function toggleMicTest() {
                 let x = 2;
 
                 for (let i = 0; i < barCount; i++) {
-                    const barHeight = Math.max(4, (dataArray[i] / 255) * (canvas.height - 12));
+                    const val = dataArray[i] || 0;
+                    const barHeight = Math.max(4, (val / 255) * (canvas.height - 10));
 
                     // Dynamic bar gradient from mint green to sage to warm amber
                     const grad = canvasCtx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
@@ -501,24 +541,37 @@ async function toggleMicTest() {
                 }
             }
 
-            // Energy meter update
-            let sum = 0;
-            for (let i = 0; i < dataArray.length; i++) {
-                sum += dataArray[i];
+            // Vocal Range Analysis (Human speech fundamental + formants lie in bins 0-16)
+            const vocalRange = Math.min(16, dataArray.length);
+            let vocalSum = 0;
+            let peakVal = 0;
+            for (let i = 0; i < vocalRange; i++) {
+                vocalSum += dataArray[i];
+                if (dataArray[i] > peakVal) peakVal = dataArray[i];
             }
-            const average = sum / dataArray.length;
+            const vocalAvg = vocalSum / vocalRange;
 
+            let totalPeak = peakVal;
+            for (let i = vocalRange; i < dataArray.length; i++) {
+                if (dataArray[i] > totalPeak) totalPeak = dataArray[i];
+            }
+
+            // Real-time energy gauge with natural voice scaling
             if (energyGaugeFill) {
-                const percent = Math.min(100, Math.round((average / 140) * 100));
+                const effectiveVolume = Math.max(vocalAvg * 1.6, totalPeak * 0.7);
+                const percent = Math.min(100, Math.max(0, Math.round((effectiveVolume / 65) * 100)));
                 energyGaugeFill.style.width = `${percent}%`;
             }
 
-            if (average > 14) {
-                speechEnergySum += average;
+            // Voice Activity Detection (VAD)
+            // Trigger when vocal frequency average > 7 or peak amplitude > 22
+            if (vocalAvg > 7 || totalPeak > 22) {
                 audioSamplesCount++;
+                speechEnergySum += vocalAvg;
             }
 
-            if (audioSamplesCount >= 18 && speechEnergySum > 280) {
+            // Validated after ~100-150ms of clear vocal energy
+            if (audioSamplesCount >= 6 && speechEnergySum > 40) {
                 validateMicSuccess(false);
                 return;
             }
@@ -528,23 +581,31 @@ async function toggleMicTest() {
 
         checkLevel();
 
-        // 8-second safety timeout
+        // 9-second safety timeout with friendly hint
         setTimeout(() => {
             if (isTestingMic && !isMicValidated) {
                 stopMicTest();
                 if (micStatus) {
                     micStatus.className = 'studio-status-box';
-                    micStatus.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color: #F59E0B;"></i> <span>Suara belum terdeteksi jelas. Coba bersuara lebih dekat ke mic dan tekan uji lagi.</span>`;
+                    micStatus.innerHTML = `<i class="fa-solid fa-circle-exclamation" style="color: #F59E0B;"></i> <span>Suara belum terdeteksi. Silakan coba bicara lebih dekat ke mikrofon, atau klik tombol <strong>Lewati tes ini</strong> di bawah jika mic sudah aktif.</span>`;
                 }
             }
-        }, 8000);
+        }, 9000);
 
     } catch (err) {
         console.error('Mic check error:', err);
         stopMicTest();
         if (micStatus) {
             micStatus.className = 'studio-status-box';
-            micStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #EF4444;"></i> <span>Akses mic tidak tersedia: ${escapeHtml(err.message)}</span>`;
+            let msg = 'Izin mikrofon belum diberikan pada browser.';
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                msg = 'Izin mikrofon ditolak oleh browser. Klik ikon gembok/kamera di address bar browser untuk mengizinkan, atau gunakan tombol Lewati tes di bawah.';
+            } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                msg = 'Perangkat mikrofon tidak ditemukan. Sambungkan headset/mic atau gunakan tombol Lewati tes di bawah.';
+            } else {
+                msg = `Kendala akses mic: ${escapeHtml(err.message)}`;
+            }
+            micStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation" style="color: #EF4444;"></i> <span>${msg}</span>`;
         }
     }
 }

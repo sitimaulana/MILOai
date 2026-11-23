@@ -477,11 +477,36 @@ async function loadMicroQuiz(topicId, sessionId) {
     const resultNotice = document.getElementById('quizResultNotice');
     if (!quizCard || !container) return;
 
-    try {
-        const resp = await fetch(`/api/v1/curriculum/topic/${encodeURIComponent(topicId)}`);
-        if (!resp.ok) return;
+    const normTopicId = (topicId || 'A1').toUpperCase();
+    let detail = null;
 
-        const detail = await resp.json();
+    try {
+        const apiUrl = `/api/v1/curriculum/topic/${encodeURIComponent(normTopicId)}`;
+        let resp = null;
+        try {
+            resp = await fetch(apiUrl);
+        } catch (e1) {
+            if (window.location.port && window.location.port !== '8000') {
+                try {
+                    resp = await fetch(`http://localhost:8000${apiUrl}`);
+                } catch (e2) {}
+            }
+        }
+
+        if (resp && resp.ok) {
+            detail = await resp.json();
+        }
+    } catch (err) {
+        console.warn('Failed to fetch quiz from API, trying local curriculum data:', err);
+    }
+
+    if (!detail && window.MILO_CURRICULUM_DATA) {
+        detail = window.MILO_CURRICULUM_DATA[normTopicId] || window.MILO_CURRICULUM_DATA['A1'];
+    }
+
+    if (!detail) return;
+
+    try {
         const quizzes = detail.quizzes || [];
         if (quizzes.length === 0) return;
 
