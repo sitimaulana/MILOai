@@ -40,6 +40,9 @@ function setCompanionState(state, text) {
     if (miloStatusText && text) {
         miloStatusText.textContent = text;
     }
+    if (window.miloLive2D && typeof window.miloLive2D.setState === 'function') {
+        window.miloLive2D.setState(state);
+    }
 }
 window.setCompanionState = setCompanionState;
 

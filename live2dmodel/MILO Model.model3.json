@@ -3,7 +3,7 @@
 	"FileReferences": {
 		"Moc": "MILO Model.moc3",
 		"Textures": [
-			"MILO Model.1024/texture_00.png"
+			"MILO Model.1024/texture_2048.png"
 		],
 		"DisplayInfo": "MILO Model.cdi3.json"
 	},
@@ -11,12 +11,17 @@
 		{
 			"Target": "Parameter",
 			"Name": "EyeBlink",
-			"Ids": []
+			"Ids": [
+				"ParamEyeLOpen",
+				"ParamEyeROpen"
+			]
 		},
 		{
 			"Target": "Parameter",
 			"Name": "LipSync",
-			"Ids": []
+			"Ids": [
+				"ParamMouthOpenY"
+			]
 		}
 	]
 }

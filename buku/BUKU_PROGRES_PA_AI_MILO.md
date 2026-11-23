@@ -407,157 +407,545 @@ Tabel 2.2 Matriks Perbandingan Penelitian Terkait dan Posisi Kebaruan MILO
 
 ---
 
-# BAB 3  
-# DESAIN SISTEM
+# BAB 3
+# DESAIN SISTEM DAN METODOLOGI PENELITIAN
 
 ## 3.1 DESKRIPSI SOLUSI
-Sebagai respons konkret terhadap problematika *speaking anxiety* dan keterbatasan sarana latihan berbicara interaktif, penelitian proyek akhir ini merealisasikan **MILO (Multimodal Interactive Learning Companion)**. MILO adalah platform berbasis web responsif yang dirancang sebagai kawan belajar cerdas yang mendampingi mahasiswa dalam melatih kefasihan berbicara bahasa Inggris secara bertahap.
+Berdasarkan permasalahan yang telah diidentifikasi pada Bab 2, penelitian ini mengusulkan pengembangan **MILO (Multimodal Interactive Learning Companion)**, yaitu platform pembelajaran berbicara bahasa Inggris berbasis web yang memanfaatkan teknologi *Artificial Intelligence* (AI) sebagai mitra belajar virtual. Platform ini ditujukan bagi mahasiswa dengan kemampuan bahasa Inggris setara CEFR level B1–B2 yang masih mengalami keterbatasan dalam berlatih berbicara akibat *speaking anxiety*, kurangnya kesempatan praktik, serta media pembelajaran yang belum mampu menghadirkan pengalaman belajar yang interaktif. Melalui platform ini, pengguna diharapkan dapat melakukan latihan berbicara secara mandiri dalam lingkungan belajar yang lebih nyaman, adaptif, dan fleksibel.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          USER FLOW SISTEM MILO                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-  [1. Autentikasi / Login] 
++-----------------------------------------------------------------------------+
+|                          GAMBAR 3.1 USER FLOW DIAGRAM                       |
++-----------------------------------------------------------------------------+
+  [Pengguna Masuk / Login]
              │
              ▼
-  [2. Diagnostic Placement Test] ──► (Menentukan Rekomendasi Level CEFR: B1 / B2)
+  [Diagnostic Placement Test] ──► (Klasifikasi Kemampuan Awal: CEFR B1 / B2)
              │
              ▼
-  [3. Dashboard & Goal Setting] ──► (Pilih Topik: Job Interview / Academic / Daily)
+  [Dashboard Utama & Pemilihan Modul] ──► (Job Interview / Daily / Academic)
              │
              ▼
-  [4. Sesi Percakapan Interaktif (Microlearning 3–5 Menit)]
-       • Input Wicara Pengguna (Mikrofon Web Audio)
-       • Transkripsi Wicara ke Teks (Whisper ASR)
-       • Penelusuran Konteks Materi Silabus (ChromaDB RAG)
-       • Penalaran Kontekstual & Evaluasi (GPT-4o-mini via Bifrost Gateway)
-       • Sintesis Wicara Suara Alami (OpenAI TTS)
-       • Animasi Ekspresi & Gerak Bibir Karakter (Live2D Lip-sync)
+  [Sesi Latihan Berbicara Interaktif (Microlearning 3–5 Menit)]
+       │
+       ├── Masukan Suara Pengguna (Audio 16 kHz)
+       ├── Pengenalan Suara Otomatis (Whisper ASR)
+       ├── Penelusuran Dokumen Materi Silabus (Hybrid RAG: ChromaDB + BM25)
+       ├── Penalaran Tutor AI & Evaluasi (GPT-4o-mini via Bifrost Gateway)
+       ├── Sintesis Suara Percakapan Alami (OpenAI TTS nova)
+       └── Visualisasi Respon & Lip-sync (Avatar 2D Live2D WebGL)
              │
              ▼
-  [5. Umpan Balik Korektif & Gamifikasi (Feedback & Reward)]
-       • Skor Akurasi Tata Bahasa (*Grammar*), Kosakata (*Vocabulary*), Kelancaran (*Fluency*)
-       • Rekomendasi Frasa Alternatif Berstandar CEFR
-       • Poin XP, Pembaharuan Streak Harian, & Pembukaan Lencana (*Badge*)
+  [Evaluasi Sesi & Gamifikasi]
+       ├── Analisis Kesalahan Tata Bahasa (Grammar Correction & Feedback)
+       ├── Perolehan Poin Pengalaman (XP) & Pembaharuan Daily Streak
+       └── Pembukaan Lencana Prestasi (Achievement Badges)
 ```
-*Gambar 3.1 Alur Kerja Pengguna Sistem MILO (User Flow Diagram)*
+*Gambar 3.1 Diagram Alur Interaksi Pengguna (User Flow Diagram)*
 
-Pengguna memulai interaksi dengan menjalani *Diagnostic Placement Test* untuk memetakan kemampuan awal ke level B1 atau B2. Selanjutnya, pengguna memilih skenario percakapan terarah (*Job Interview, Academic Discussion, Daily Conversation*). Selama sesi latihan, pengguna berbicara secara alami melalui mikrofon perangkat. Sistem memproses sinyal wicara, merespons dalam format suara alami yang disinkronkan dengan gerak bibir avatar Live2D, serta menampilkan catatan umpan balik koreksi linguistik tanpa memutus kenyamanan dialog.
+MILO mengintegrasikan teknologi *Automatic Speech Recognition* (ASR), *Large Language Model* (LLM), *Retrieval-Augmented Generation* (RAG), *Text-to-Speech* (TTS), serta avatar virtual dua dimensi (Live2D) dalam satu sistem pembelajaran yang saling terintegrasi. Sebagaimana diilustrasikan pada Gambar 3.1, masukan suara pengguna diproses menggunakan ASR untuk menghasilkan transkripsi teks, kemudian dianalisis oleh LLM dengan dukungan RAG yang mengambil informasi dari *knowledge base* pembelajaran bahasa Inggris. Integrasi ini memungkinkan sistem menghasilkan respons percakapan yang lebih relevan dan kontekstual, sekaligus menyajikan umpan balik berupa koreksi tata bahasa (*grammar correction*), rekomendasi kosakata (*vocabulary enhancement*), serta evaluasi kelancaran berbicara. Respons tersebut selanjutnya disampaikan melalui *Text-to-Speech* dan divisualisasikan menggunakan avatar virtual Live2D sehingga interaksi terasa lebih alami dan komunikatif.
+
+Selain mendukung latihan berbicara, platform ini dirancang untuk meningkatkan keterlibatan belajar (*student engagement*) melalui penerapan konsep *microlearning* dan gamifikasi. Materi disajikan dalam sesi latihan singkat berdurasi 3 hingga 5 menit yang berfokus pada satu tujuan pembelajaran spesifik, kemudian dipadukan dengan fitur perolehan poin (*points/XP*), lencana pencapaian (*badges*), pencatatan rekor harian (*daily streak*), dan pelacakan progres belajar (*learning progress*). Kombinasi fitur tersebut diharapkan mampu menumbuhkan motivasi pengguna untuk berlatih secara konsisten sekaligus membangun kebiasaan belajar yang berkelanjutan.
 
 ---
 
-## 3.2 PERANCANGAN SISTEM
+## 3.2 METODE PENELITIAN
 
-### 3.2.1 Arsitektur Sistem Berlapis (Layered Architecture)
-Arsitektur perangkat lunak MILO dibangun menggunakan prinsip pemisahan tanggung jawab (*separation of concerns*) melalui lima lapisan hierarkis (*layered architecture*), sebagaimana ditunjukkan pada Gambar 3.2:
+### 3.2.1 Pendekatan Penelitian
+Penelitian ini menggunakan pendekatan metode campuran (*mixed methods approach*) yang menggabungkan pengumpulan data kualitatif dan kuantitatif secara terpadu guna memperoleh evaluasi sistem yang komprehensif:
+1. **Pendekatan Kualitatif**: Diterapkan pada tahap awal dan pertengahan melalui tinjauan ahli (*expert review*) yang melibatkan ahli media pembelajaran interaktif dan ahli pengajaran bahasa Inggris (*English education expert*). Uji ahli bertujuan untuk memvalidasi kelayakan antarmuka, kesesuaian materi silabus CEFR B1–B2, serta ketepatan pedagogis umpan balik korektif yang dihasilkan sistem.
+2. **Pendekatan Kuantitatif**: Diterapkan pada tahap evaluasi akhir untuk mengukur performa teknis sistem (akurasi transkripsi ASR, latensi komputasi, skor tolok ukur *DeepEval*), tingkat kebergunaan antarmuka (*usability*) menggunakan instrumen *User Experience Questionnaire* (UEQ), serta efektivitas platform terhadap peningkatan keterlibatan belajar (*student engagement*) mahasiswa melalui desain eksperimen *pretest-posttest* pada kelompok responden uji coba ($N \ge 30$).
+
+### 3.2.2 Metode Pengembangan ADDIE
+Pengembangan platform MILO mempedomani model instruksional ADDIE (*Analysis, Design, Development, Implementation, Evaluation*). Model ADDIE dipilih karena menyediakan kerangka kerja rekayasa multimedia edukasi yang sistematis, terukur, dan memiliki siklus evaluasi berulang (*iterative feedback loop*) pada setiap fasenya.
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 1. PRESENTATION LAYER (Web Client UI)                                       │
-│    • HTML5 / Tailwind CSS / Vanilla JS   • Web Audio API (MediaRecorder)   │
-│    • Live2D Cubism Web SDK Core          • Real-time Feedback & Metric View │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ HTTP / REST / WebSocket
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│ 2. API & APPLICATION LAYER (FastAPI Backend)                                │
-│    • Voice Router (/api/v1/voice)        • Chat Router (/api/v1/chat)       │
-│    • Feedback Router (/api/v1/feedback)  • Gamification & Progress Engine   │
-│    • Security & JWT Authentication       • Evaluation & Benchmark Engine    │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ Async Pipeline Call
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│ 3. CORE AI & PROCESSING PIPELINE                                            │
-│    • ASR Engine: OpenAI Whisper (Local / Cloud API)                         │
-│    • LLM Engine: GPT-4o-mini (Orchestrated via Bifrost AI Gateway)          │
-│    • TTS Engine: OpenAI TTS-1 (Voice: Nova, MP3/Base64 streaming)           │
-└──────────────────────────────────────┬──────────────────────────────────────┘
-                                       │ Dense Vector Search / SQL Query
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│ 4. KNOWLEDGE & DATA STORAGE LAYER                                           │
-│    • Vector Store: ChromaDB (text-embedding-3-small, 1536 dim)              │
-│    • Obsidian Vault: Markdown CEFR B1–B2 Structured Curriculum              │
-│    • Relational DB: PostgreSQL / SQLite (SQLAlchemy Async ORM)              │
-└─────────────────────────────────────────────────────────────────────────────┘
++-----------------------------------------------------------------------------+
+|              GAMBAR 3.2 KERANGKA PENGEMBANGAN SISTEM (ADDIE)                |
++-----------------------------------------------------------------------------+
+  [1. ANALYSIS] ────────────────────────────────────────────────────────┐
+        │ Identifikasi speaking anxiety, target CEFR B1-B2,            │
+        │ analisis kebutuhan fungsional & non-fungsional, alat bantu    │
+        ▼                                                               │
+  [2. DESIGN] ──────────────────────────────────────────────┐           │
+        │ Cetak biru arsitektur berlapis, pipeline Hybrid RAG,    │     │
+        │ formulasi matematis, skema ERD, rigging Live2D, mockup  │     │
+        ▼                                                         │     │
+  [3. DEVELOPMENT] ─────────────────────────────────────┐   Revisi      │
+        │ Koding backend FastAPI, Docker Bifrost,        │   Desain     │
+        │ ingesti ChromaDB, integrasi Live2D WebGL      │   & Aset      │
+        ▼                                               │   (Loop)      │
+  [4. IMPLEMENTATION] ───────────────────────────┐      │         │     │
+        │ Deployment lokal, integrasi operasional, │    │         │     │
+        │ uji coba interaksi responden mahasiswa │    │         │     │
+        ▼                                        │    │         │     │
+  [5. EVALUATION] ◄──────────────────────────────┴────┴─────────┴─────┘
+        • Black Box Testing (Fungsionalitas 100%)
+        • Speech Recognition Testing (Akurasi Kata & Latensi)
+        • DeepEval Benchmark (Faithfulness & Answer Relevancy)
+        • User Experience Questionnaire / UEQ (Usability)
+        • Student Engagement Pretest-Posttest (N-Gain Hake)
 ```
-*Gambar 3.2 Diagram Arsitektur Berlapis Sistem MILO*
+*Gambar 3.2 Kerangka Pengembangan Sistem MILO Menggunakan Model ADDIE*
 
-Tabel 3.1 Pemetaan Komponen Arsitektur Sistem MILO
-| Lapisan Arsitektur | Komponen / Modul | Peran dan Tanggung Jawab Utama |
+Sebagaimana diilustrasikan pada Gambar 3.2, kelima fase ADDIE dijalankan secara bertahap dengan mekanisme peninjauan berkala. Temuan evaluasi formatif pada fase implementasi dapat menjadi dasar perbaikan pada fase perancangan (*design*) maupun pengembangan (*development*) sebelum sistem diuji secara sumatif pada fase evaluasi akhir.
+
+---
+
+## 3.3 TAHAPAN PENGEMBANGAN SISTEM
+
+### 3.3.1 Analysis (Analisis Kebutuhan Sistem)
+Tahap *Analysis* bertujuan untuk mengidentifikasi akar permasalahan, karakteristik pengguna sasaran, kebutuhan fungsional sistem, serta spesifikasi perangkat pendukung yang diperlukan dalam membangun platform MILO:
+
+#### 1. Analisis Kebutuhan Pembelajaran dan Sasaran Pengguna
+Subjek sasaran penelitian adalah mahasiswa tingkat sarjana terapan yang berada pada rentang kemahiran berbicara bahasa Inggris tingkat menengah (*Intermediate* / CEFR B1) hingga menengah atas (*Upper-Intermediate* / CEFR B2). Berdasarkan temuan studi pendahuluan, hambatan utama pembelajar berakar pada *foreign language speaking anxiety* (FLSA)—yaitu rasa takut dinilai salah oleh orang lain saat berbicara di depan umum—serta keterbatasan akses terhadap mitra tutur yang siap memberikan koreksi secara personal dan tidak menghakimi.
+
+#### 2. Analisis Kebutuhan Fungsional (Functional Requirements)
+Sistem yang dikembangkan harus memenuhi tujuh kapabilitas fungsional utama:
+1. **F-01 (Autentikasi Akun)**: Sistem mampu mengelola pendaftaran, autentikasi sesi masuk (*login*), dan manajemen profil pengguna secara aman.
+2. **F-02 (Diagnostic Placement Test)**: Sistem mampu menyajikan uji diagnostik wicara singkat untuk mengklasifikasikan tingkat kemahiran awal pengguna ke dalam level B1 atau B2.
+3. **F-03 (Speech-to-Text Conversion)**: Sistem mampu merekam masukan suara pengguna melalui peramban web dan mentranskripsikannya ke dalam format teks secara akurat menggunakan ASR Whisper.
+4. **F-04 (Hybrid Context Retrieval)**: Sistem mampu mencari dokumen silabus pembelajaran yang relevan dari *Knowledge Base* menggunakan perpaduan penelusuran vektor (ChromaDB) dan leksikal (BM25).
+5. **F-05 (Contextual Response & Feedback Generation)**: Sistem mampu menghasilkan respons percakapan yang komunikatif sekaligus mengekstrak koreksi tata bahasa dan kosakata menggunakan model GPT-4o-mini.
+6. **F-06 (Speech Synthesis & Lip-sync Animation)**: Sistem mampu mensintesis teks balasan tutor ke dalam aliran audio alami (TTS) dan menyinkronkan amplitudo suara ke parameter gerak bibir avatar Live2D.
+7. **F-07 (Gamification & Progress Tracking)**: Sistem mampu menghitung perolehan poin pengalaman (XP), mencatat rekor latihan harian (*streak*), membuka lencana prestasi (*badges*), dan menyimpan riwayat capaian belajar.
+
+#### 3. Analisis Kebutuhan Non-Fungsional (Non-Functional Requirements)
+Kebutuhan non-fungsional dirancang guna menjamin kenyamanan, keandalan, dan stabilitas operasional platform:
+1. **NF-01 (Performansi & Latensi Komputasi)**: Waktu respons total (*end-to-end latency*) mulai dari pengguna selesai berbicara hingga audio balasan AI dan animasi avatar mulai berputar ditargetkan tidak melebihi **3,0 detik** pada koneksi internet stabil.
+2. **NF-02 (Keandalan & Circuit Breaking)**: Sistem dilengkapi dengan perantara *AI Gateway* yang menerapkan mekanisme *retry*, *rate limiting*, dan *caching* guna mencegah kegagalan interaksi akibat batas kuota atau galat jaringan eksternal.
+3. **NF-03 (Kebergunaan & Aksesibilitas)**: Antarmuka sistem mematuhi prinsip *User-Centered Design* (UCD) dan standar kontras warna WCAG AAA, menghadirkan tata letak yang bersih, intuitif, dan responsif terhadap berbagai resolusi layar desktop/laptop.
+4. **NF-04 (Integritas Data)**: Seluruh riwayat percakapan dan profil pengguna tersimpan dalam basis data relasional ternormalisasi dengan enkripsi kata sandi menggunakan pustaka *Bcrypt*.
+
+Rangkuman kebutuhan pengembangan sistem disajikan pada Tabel 3.1.
+
+*Tabel 3.1 Analisis Kebutuhan Pengembangan Sistem MILO*
+| Kategori Kebutuhan | Komponen Analisis | Deskripsi Kebutuhan Sistem |
 | :--- | :--- | :--- |
-| **Presentation** | Web Frontend & Live2D | Menangkap input audio pengguna, merender visual avatar 2D, memutar audio respons, dan menampilkan antarmuka gamifikasi. |
-| **API Application** | FastAPI Endpoints | Mengorkestrasikan alur logika percakapan, mengelola sesi, memvalidasi token keamanan, dan menghitung skor performa. |
-| **Core AI Pipeline** | Whisper, GPT-4o, TTS | Melakukan transkripsi wicara, penalaran dialog cerdas, deteksi kesalahan linguistik, dan sintesis wicara balasan. |
-| **Knowledge & Data** | ChromaDB & PostgreSQL | Menyimpan representasi vektor silabus materi CEFR, data akun, riwayat sesi, dan log analitik pengujian. |
+| **Karakteristik Pengguna** | Mahasiswa Tingkat B1–B2 | Memerlukan lingkungan latihan berbicara yang aman dari rasa cemas, materi komunikatif kontekstual, dan koreksi kesalahan yang membangun. |
+| **Teknologi Wicara** | ASR & TTS | Penangkapan audio mikrofon 16 kHz, transkripsi otomatis OpenAI Whisper, dan sintesis audio ekspresif OpenAI TTS profil *nova*. |
+| **Kecerdasan Buatan** | LLM & Hybrid RAG | Penalaran dialog berstandar CEFR menggunakan GPT-4o-mini didukung basis pengetahuan materi Obsidian Vault, ChromaDB, dan BM25. |
+| **Antarmuka Interaktif** | Avatar Virtual 2D | Visualisasi *Animated Pedagogical Agent* berbasis Live2D Cubism Web SDK yang mendukung gerakan bibir adaptif (*lip-sync*). |
+| **Keterlibatan Belajar** | Microlearning & Gamifikasi | Durasi sesi ringkas (3–5 menit), akumulasi poin XP, rekor konsistensi latihan harian (*daily streak*), dan lencana apresiasi. |
 
-### 3.2.2 Bagian 1: Input & Diagnostic Layer
-Lapisan masukan bertugas mengelola konversi sinyal suara analog pengguna menjadi format audio digital standar (WAV/WEBM) dengan laju sampling 16 kHz mono melalui antarmuka *Web Audio API*. Berkas audio dikirimkan ke endpoint `/api/v1/voice` secara asinkron. Modul *ASR* Whisper kemudian memproses spektrogram sinyal suara untuk mengekstrak transkrip teks secara akurat.
+#### 4. Analisis Perangkat Lunak dan Perangkat Keras
+Kelancaran perancangan dan implementasi sistem didukung oleh spesifikasi perangkat lunak dan perangkat keras sebagaimana dirinci pada Tabel 3.2 dan Tabel 3.3.
 
-Selain input wicara sesi reguler, lapisan ini mengelola modul **Diagnostic Placement Test** yang terdiri atas 20 butir instrumen soal terstandarisasi untuk memetakan profil linguistik pembelajar ke dalam 4 domain kompetensi:
+*Tabel 3.2 Komponen Perangkat Lunak yang Digunakan*
+| No | Perangkat Lunak | Versi / Rilis | Peran dan Fungsi dalam Sistem |
+| :---: | :--- | :--- | :--- |
+| 1 | Python | 3.11.x (via `uv`) | Bahasa pemrograman utama untuk logika backend, orkestrasi AI, dan evaluasi. |
+| 2 | FastAPI | 0.115.x | *Framework* backend asinkron berkinerja tinggi untuk penyedia REST API. |
+| 3 | Uvicorn | 0.34.x | *ASGI web server* untuk menjalankan aplikasi backend FastAPI. |
+| 4 | ChromaDB | 0.5.x | Basis data vektor terdistribusi untuk menyimpan *embedding* materi RAG. |
+| 5 | OpenAI Whisper API | Whisper-1 | Model *Automatic Speech Recognition* (ASR) untuk transkripsi audio wicara. |
+| 6 | OpenAI Chat API | GPT-4o-mini | Model bahasa cerdas untuk penalaran percakapan dan koreksi linguistik. |
+| 7 | OpenAI Audio API | TTS-1 (*nova*) | Layanan sintesis wicara alami untuk menghasilkan suara tutor virtual. |
+| 8 | Bifrost AI Gateway | 1.x (Docker) | *Reverse proxy* lokal untuk manajemen *rate limit*, *caching*, dan kuota token API. |
+| 9 | Live2D Cubism SDK | Web SDK 5.0 | Pustaka rendering WebGL untuk menggerakkan model karakter 2D interaktif. |
+| 10 | Tailwind CSS & HTML5 | 3.4.x | *Framework styling* dan struktur antarmuka halaman web responsif. |
+| 11 | Docker Desktop | 4.3x | Kontainerisasi untuk menjalankan layanan Bifrost AI Gateway pada port 8080. |
+| 12 | DeepEval | 1.5.x | Kerangka tolok ukur kuantitatif evaluasi kinerja LLM (*LLM-as-a-Judge*). |
 
-Tabel 3.2 Bobot Penilaian Domain Kompetensi Diagnostic Placement Test
-| Domain Kompetensi | Jumlah Soal | Bobot Skor | Target Pengukuran Kemampuan |
-| :--- | :---: | :---: | :--- |
-| **Grammar** | 6 butir | 30% | Penguasaan struktur kalimat (*tenses*, modalitas, klausa pengandaian). |
-| **Vocabulary** | 6 butir | 30% | Ketepatan pemilihan leksikal, kolokasi frasa, dan ungkapan formal. |
-| **Discourse** | 4 butir | 20% | Kohesi dan koherensi dalam merangkai alur argumen percakapan. |
-| **Pragmatics** | 4 butir | 20% | Kesantunan bahasa (*politeness strategy*) dan kesesuaian konteks sosial. |
+*Tabel 3.3 Spesifikasi Perangkat Keras Pengembangan dan Pengujian*
+| No | Komponen Perangkat Keras | Spesifikasi Minimum / Rekomendasi | Peran dalam Proyek Akhir |
+| :---: | :--- | :--- | :--- |
+| 1 | Processor (CPU) | Intel Core i7 12th Gen / AMD Ryzen 7 | Menjalankan lingkungan pengembangan, server backend, dan komputasi embedding. |
+| 2 | Memori (RAM) | 16 GB DDR4 / DDR5 | Memastikan kestabilan eksekusi paralel FastAPI, ChromaDB, dan Docker Bifrost. |
+| 3 | Penyimpanan (Storage) | 512 GB NVMe SSD | Penyimpanan korpus *knowledge base*, aset Live2D, dan repositori kode sumber. |
+| 4 | Mikrofon Masukan | USB Condenser Microphone / Headset Mic | Menangkap sinyal wicara pengembang dan pengguna dengan SNR tinggi. |
+| 5 | Perangkat Keluaran Audio | Stereo Speaker / Audio Headphone | Memonitor kualitas dan kejelasan hasil sintesis wicara TTS. |
+| 6 | Koneksi Jaringan | Pita lebar internet minimal 10 Mbps | Komunikasi data dengan API penyedia model bahasa dan gateway komputasi awan. |
 
-### 3.2.3 Bagian 2: Core Processing & RAG Engine
-Inti pemrosesan sistem MILO memadukan *Retrieval-Augmented Generation* (RAG) dengan *Conversational Manager* GPT-4o-mini. Alur kerja pemrosesan RAG dijabarkan sebagai berikut:
-1. **Knowledge Ingestion**: Materi kurikulum CEFR B1–B2 yang tersimpan dalam *Obsidian Vault* (`knowledge_base/`) diekstraksi dan dipartisi menjadi segmen teks berukuran 500 karakter dengan *overlap* 50 karakter.
-2. **Dense Vector Embedding**: Setiap segmen dikonversi menjadi vektor 1536 dimensi menggunakan model `text-embedding-3-small`.
-3. **Similarity Retrieval**: Ketika pengguna mengujarkan kalimat, sistem mencari *top-k* (k=3) dokumen materi yang paling relevan di ChromaDB menggunakan metrik kesamaan kosinus (*Cosine Similarity*).
-4. **Context Injection & LLM Reasoning**: Konteks materi yang ditemukan disuntikkan ke dalam *system prompt* GPT-4o-mini bersama pedoman pedagogis:
-   - *CEFR Adaptation Rule*: Menyesuaikan kompleksitas kosakata dengan level pengguna.
-   - *One-Question Rule*: Setiap respons tutor diakhiri dengan tepat satu pertanyaan pemantik untuk menjaga dialog dua arah tetap mengalir.
-   - *Corrective Feedback Rule*: Menganalisis kalimat pengguna dan menghasilkan struktur JSON berisi koreksi gramatika, alternatif kosakata, dan skor kelancaran.
+---
 
-### 3.2.4 Bagian 3: Output & Visual Rendering Layer (Live2D & TTS)
-Respons teks yang dihasilkan oleh LLM dialirkan ke OpenAI TTS model `tts-1` dengan profil vokal *Nova* (karakter suara wanita muda yang ramah dan energetik). Berkas audio yang dihasilkan dikirim ke peramban dalam format Base64 encoded MP3. 
+### 3.3.2 Design (Perancangan Sistem)
+Perancangan sistem dalam penelitian ini difokuskan pada integrasi alur pemrosesan kecerdasan buatan multimodal (*multimodal AI pipeline*) dan interaksi pengguna yang terstruktur. Sistem yang dirancang bertujuan untuk menghubungkan basis pengetahuan pembelajaran bahasa Inggris standar CEFR B1–B2 dengan teknologi pemrosesan bahasa alami serta avatar virtual interaktif, sehingga menghasilkan mitra belajar berbicara (*virtual learning companion*) yang adaptif dan responsif. Penjelasan mengenai perancangan sistem ini diawali dengan gambaran umum arsitektur sistem (*high-level view*) untuk memudahkan pemahaman terhadap alur pemrosesan data secara keseluruhan.
 
-Pada sisi klien, pustaka **Live2D Cubism Web SDK** menganalisis amplitudo dan bentuk gelombang audio yang sedang diputar untuk menggerakkan parameter parameter mulut (*ParamMouthOpenY*) secara *real-time*, menghasilkan efek *lip-sync* yang sinkron dan natural. Selain itu, parameter mata (*ParamEyeBallX, ParamEyeBallY*) dan gestur kepala (*ParamAngleZ*) digerakkan secara prosedural untuk menyimulasikan kedipan mata dan anggukan empati selama interaksi.
+Desain sistem menggambarkan hubungan terpadu antara masukan data pengguna, pemrosesan kecerdasan buatan, basis penyimpanan data, serta luaran multimodal yang dihasilkan. Gambar 3.3 mengilustrasikan arsitektur utama perancangan sistem MILO melalui pendekatan berlapis (*layered architecture*). Diagram ini menunjukkan bagaimana masukan audio pengguna diproses melalui model pengenalan suara dan penalaran berbasis RAG, hingga akhirnya disintesis menjadi respons wicara serta visualisasi avatar interaktif guna meningkatkan keterlibatan belajar (*student engagement*) pengguna.
 
-### 3.2.5 Bagian 4: Learning & Gamification Mechanics
-Sesi dirancang dengan format *microlearning* berdurasi 3 hingga 5 menit (setara 6–10 giliran bicara). Setelah pengguna menuntaskan sesi, mesin gamifikasi secara otomatis memperbarui status data pengguna:
-1. **Perhitungan Skor Sesi**: Menggabungkan rata-rata skor *grammar*, *vocabulary*, dan *fluency* (skala 0–100).
-2. **Pemberian XP & Streak**: Pengguna memperoleh 50 XP per sesi tuntas. Jika pengguna berlatih pada hari berturut-turut, atribut `current_streak` bertambah satu.
-3. **Trigger Lencana (Badge)**: Sistem memeriksa kriteria pencapaian (misal: "B2 Pioneer" saat pertama kali menyelesaikan skenario B2).
+```
++-----------------------------------------------------------------------------+
+|          GAMBAR 3.3 DESAIN SISTEM BERLAPIS (LAYERED ARCHITECTURE)           |
++-----------------------------------------------------------------------------+
+  [1. INPUT LAYER]
+      • Voice Input (Audio 16 kHz Mono)    • Text Input (Alternatif)
+      • Learning Goals Selection           • CEFR Target Level (B1 / B2)
+  ──────────────────────────────────────┬──────────────────────────────────────
+                                        ▼
+  [2. CORE PROCESSING LAYER]
+      • ASR Engine (OpenAI Whisper)
+      • Local AI Gateway (Bifrost: Rate Limiter, Cache, Budgeting)
+      • Conversational LLM Engine (GPT-4o-mini)
+      • Scaffolding Prompt Engine (The One-Question Rule & CEFR Adaptation)
+  ──────────────────────────────────────┬──────────────────────────────────────
+                                        ▼
+  [3. STORAGE LAYER (KNOWLEDGE & DATA)]
+      • Knowledge Base (Obsidian Vault: Markdown Silabus CEFR B1–B2)
+      • Dense Vector Store (ChromaDB + HNSW Index, 1536 Dim)
+      • Sparse Lexical Search (BM25 Engine)
+      • Relational Database (SQLAlchemy Async ORM: User, Session, Feedback)
+  ──────────────────────────────────────┬──────────────────────────────────────
+                                        ▼
+  [4. OUTPUT LAYER]
+      • Neural Text-to-Speech (OpenAI TTS-1 Voice nova)
+      • Animated Pedagogical Agent (Live2D Cubism WebGL Engine)
+      • Web Audio API Lip-Sync Controller (Amplitudo RMS -> ParamMouthOpenY)
+      • Real-time Grammar & Fluency Feedback Card
+  ──────────────────────────────────────┬──────────────────────────────────────
+                                        ▼
+  [5. LEARNING & ENGAGEMENT LAYER]
+      • Microlearning Manager (3–5 Menit per Sesi Latihan)
+      • Gamification Engine (XP Points, Daily Streak Tracker, Badges System)
+      • Longitudinal Progress Tracking (CEFR Skill Evolution Analytics)
+```
+*Gambar 3.3 Desain Arsitektur Sistem Berlapis (Layered Architecture) MILO*
 
-### 3.2.6 Persamaan Matematis Sistem
-Dalam mekanisme pencarian vektor materi RAG, tingkat kemiripan semantik antara vektor masukan kueri pengguna ($u$) dan vektor dokumen kurikulum ($v$) dihitung menggunakan persamaan kesamaan kosinus (*Cosine Similarity*):
+Untuk menguraikan cetak biru arsitektur tersebut ke dalam spesifikasi rekayasa yang terperinci dan dapat diimplementasikan secara terukur, perancangan sistem dijabarkan ke dalam delapan bagian utama:
 
-$$\text{Sim}(u, v) = \frac{u \cdot v}{\|u\| \|v\|} = \frac{\sum_{i=1}^{n} u_i v_i}{\sqrt{\sum_{i=1}^{n} u_i^2} \sqrt{\sum_{i=1}^{n} v_i^2}} \qquad \text{(Persamaan 3.1)}$$
+#### A. Perancangan Alur Pengguna (Detailed User Flow Diagram)
+Perancangan alur pengguna memetakan setiap tahapan interaksi mahasiswa secara prosedural dari awal penggunaan hingga akhir sesi latihan:
 
-Di mana $u_i$ dan $v_i$ merepresentasikan komponen vektor pada dimensi ke-$i$ dalam ruang laten 1536 dimensi. Nilai kesamaan kosinus berkisar antara -1,0 hingga 1,0, di mana nilai yang mendekati 1,0 menunjukkan tingkat relevansi topik kurikulum yang sangat tinggi.
+```
++-----------------------------------------------------------------------------+
+|                GAMBAR 3.4 DETAILED USER FLOW DIAGRAM                        |
++-----------------------------------------------------------------------------+
+  (Start)
+     │
+     ▼
+  [Halaman Autentikasi: Login / Registrasi]
+     │
+     ▼
+  {Sudah Pernah Placement Test?} ──(Tidak)──► [Ikuti Diagnostic Speaking Test]
+     │ (Ya)                                              │
+     ▼                                                   ▼
+  [Masuk ke Dashboard Utama] ◄───────────────── [Sistem Petakan Level B1/B2]
+     │
+     ▼
+  [Pilih Modul & Topik Percakapan: Microlearning 3–5 Menit]
+     │
+     ▼
+  [Masuk Ruang Sesi Interaktif (Practice Studio)]
+     │
+     ├──► Pengguna Tekan Tombol Bicara (Push-to-Talk) & Rekam Suara
+     ├──► Sistem Transkripsikan Suara & Ekstrak Konteks RAG
+     ├──► LLM Hasilkan Respon Berbobot & Evaluasi Korektif
+     ├──► TTS Sintesiskan Suara & Avatar Live2D Sinkronkan Gerak Bibir
+     │
+     ▼
+  {Sesi Mencapai Giliran Target (6–10 Putaran)?} ──(Belum)──► (Lanjut Dialog)
+     │ (Sudah)
+     ▼
+  [Halaman Rangkuman Umpan Balik (Summary Feedback)]
+     │
+     ├── Tampilkan Skor Sesi, Analisis Grammar, & Saran Idiom
+     ├── Akumulasikan Poin XP & Perbarui Rekor Streak Harian
+     └── Buka Kunci Lencana Baru (Jika Memenuhi Syarat Kriteria)
+     │
+     ▼
+  (Selesai / Kembali ke Dashboard)
+```
+*Gambar 3.4 Diagram Alur Pengguna Terperinci (Detailed User Flow Diagram)*
 
-Selanjutnya, skor gabungan performa berbicara pada setiap akhir sesi latihan ($S_{\text{overall}}$) dikalkulasikan melalui pembobotan proporsional tiga dimensi linguistik:
+#### B. Perancangan Knowledge Base & Adaptive Hybrid RAG
+Basis pengetahuan (*Knowledge Base*) dirancang sebagai pustaka rujukan silabus bahasa Inggris yang dikurasi khusus untuk tingkat CEFR B1–B2.
 
-$$S_{\text{overall}} = w_g \cdot S_{\text{grammar}} + w_v \cdot S_{\text{vocabulary}} + w_f \cdot S_{\text{fluency}} \qquad \text{(Persamaan 3.2)}$$
+```
++-----------------------------------------------------------------------------+
+|            GAMBAR 3.5 DIAGRAM PIPELINE ADAPTIVE HYBRID RAG                  |
++-----------------------------------------------------------------------------+
+  [Dokumen Markdown Silabus CEFR B1–B2 (Obsidian Vault)]
+                       │
+                       ▼
+  [Pemisahan Teks: Chunk Size 500 Karakter, Overlap 50 Karakter]
+                       │
+          ┌────────────┴────────────┐
+          ▼                         ▼
+  [Dense Embedding]         [Sparse Indexing]
+  Model: text-embedding-    Algoritma BM25 Tokenizer
+  3-small (1536 Dimensi)    (Kecocokan Kata Kunci Gramatikal)
+          │                         │
+          ▼                         ▼
+  [ChromaDB Vector Store]   [In-Memory BM25 Index]
+  (HNSW Index, Cosine Sim)          │
+          │                         │
+          └────────────┬────────────┘
+                       │
+  [Kueri Wicara Pengguna Masuk]
+                       │
+                       ▼
+  [Eksekusi Penelusuran Hibrida & Perankingan RRF (Top-3 Dokumen)]
+                       │
+                       ▼
+  [Penyusunan Context Prompt ke GPT-4o-mini]
+```
+*Gambar 3.5 Diagram Pipeline Ingesti dan Penelusuran Adaptive Hybrid RAG*
 
-Di mana $w_g = 0{,}40$, $w_v = 0{,}30$, dan $w_f = 0{,}30$ merupakan koefisien bobot untuk masing-masing parameter tata bahasa, variasi kosakata, dan kelancaran wacana lisan.
+Rancangan RAG menetapkan parameter teknis sebagai berikut:
+1. **Format Berkas Sumber**: Materi disusun dalam berkas Markdown berstruktur *frontmatter* yang memuat taksonomi grammar, topik diskusi, dan pola kesalahan umum.
+2. **Chunking Strategy**: Menggunakan *RecursiveCharacterTextSplitter* dengan ukuran **500 karakter** dan toleransi tumpang tindih (*overlap*) **50 karakter**.
+3. **Representasi Vektor & Penyimpanan**: Setiap pecahan teks dikonversi ke vektor 1536 dimensi oleh model `text-embedding-3-small`, kemudian diindeks pada ChromaDB dengan metrik *Cosine Similarity*.
+4. **Hybrid Retrieval & RRF**: Penelusuran semantik padat (*dense retrieval*) dari ChromaDB digabungkan dengan penelusuran leksikal (*sparse retrieval*) BM25. Penggabungan peringkat dihitung menggunakan formula *Reciprocal Rank Fusion* (RRF) untuk mengambil **3 potongan materi terbaik ($k=3$)** sebagai konteks pembantu.
 
-### 3.2.7 Perancangan Antarmuka Pengguna (UI/UX Design)
-Rancangan antarmuka visual MILO dirancang mengikuti kaidah desain humanis dan ergonomis, menekankan kontras visual yang nyaman serta navigasi yang minim distraksi:
-1. **Halaman Diagnostic Placement**: Antarmuka bersih berisi instruksi tes awal 20 soal dengan indikator progres pengerjaan di bagian atas.
-2. **Halaman Dashboard**: Menampilkan ringkasan level kemahiran CEFR aktif, status *streak* harian dengan ikon api, kartu akumulasi poin XP, dan visualisasi diagram radar perkembangan keterampilan.
-3. **Halaman Sesi Latihan Bicara**: Merupakan area interaksi utama. Karakter Live2D diposisikan di area tengah layar. Sisi kanan menampilkan balon riwayat dialog interaktif. Sisi bawah menyediakan tombol mikrofon melingkar berukuran besar (*tap-to-talk / push-to-talk*) yang dilengkapi animasi gelombang suara saat mendengarkan ucapan pengguna.
-4. **Halaman Feedback Summary**: Menampilkan kartu analitik pasca-latihan yang memuat rincian kesalahan kalimat pengguna, penjelasan koreksi tata bahasa, frasa alternatif bernuansa B1/B2, serta perolehan poin dan lencana baru.
+#### C. Perancangan AI Gateway (Bifrost)
+Komunikasi antara backend lokal dengan API kecerdasan buatan dikelola melalui gerbang terisolasi Bifrost guna menjaga stabilitas dan efisiensi operasional.
 
-### 3.2.8 Perancangan Basis Data (Database Schema)
-Pengelolaan data aplikasi menggunakan basis data relasional yang dimodelkan melalui SQLAlchemy ORM. Struktur entitas utama disajikan pada Tabel 3.3:
+```
++-----------------------------------------------------------------------------+
+|             GAMBAR 3.6 ARSITEKTUR PERANTARA AI GATEWAY BIFROST              |
++-----------------------------------------------------------------------------+
+  [FastAPI Backend Application]
+                │
+                ▼
+  [Bifrost AI Gateway (Local Port 8080)]
+       ├── 1. Rate Limiting Engine: Kuota Maksimal 60 Request / Menit
+       ├── 2. Semantic Cache: Kemiripan Kosinus >= 0.95 -> Return Cache (<50ms)
+       ├── 3. Token Budgeting: Pembatasan Maksimal 250 Output Token per Respon
+       └── 4. Circuit Breaker: Auto-retry 3x & Fallback Graceful Degradation
+                │
+                ▼
+  [Penyedia Model Komputasi Eksternal (OpenAI API Endpoints)]
+```
+*Gambar 3.6 Diagram Arsitektur Perantara AI Gateway Bifrost*
 
-Tabel 3.3 Definisi Struktur Entitas Tabel Basis Data Sistem MILO
-| Nama Tabel | Kolom Kunci / Atribut Penting | Tipe Data | Deskripsi Fungsi |
+#### D. Perancangan Conversational Prompting & Scaffolding Pedagogis
+Interaksi percakapan dikendalikan melalui rekayasa instruksi (*prompt engineering*) terstruktur dengan kaidah pedagogis yang ketat:
+1. **The One-Question Rule**: Setiap giliran respons tutor AI **hanya diperbolehkan memuat satu pertanyaan terarah di akhir kalimat**. Aturan ini mencegah kebingungan pengguna, membatasi beban kognitif, dan menjaga ritme percakapan tetap natural.
+2. **Scaffolding Adaptif CEFR**: *System prompt* menyuntikkan batasan leksikogramatikal secara dinamis:
+   - *Target B1*: Menggunakan kalimat tunggal/majemuk setara, kosakata umum, dan tempo tutur yang santai.
+   - *Target B2*: Menggunakan klausa bawahan, variasi idiom formal, serta pertanyaan analisis reflektif.
+3. **Format Umpan Balik Terstruktur**: Evaluasi linguistik dipisahkan dari dialog dan diformat dalam struktur JSON standar:
+   ```json
+   {
+     "original_sentence": "I go to campus yesterday by bus.",
+     "corrected_sentence": "I went to campus yesterday by bus.",
+     "error_category": "Past Tense Inconsistency",
+     "pedagogical_explanation": "Gunakan bentuk past tense 'went' untuk peristiwa masa lampau."
+   }
+   ```
+
+#### E. Formulasi Matematis Sistem
+Logika komputasi sistem didasarkan pada empat formulasi matematis baku:
+
+##### 1. Kemiripan Kosinus (Cosine Similarity)
+Derajat kemiripan semantik antara vektor kueri pengguna ($\mathbf{q}$) dan vektor pecahan dokumen materi ($\mathbf{d}$) dirumuskan pada Persamaan 3.1:
+
+$$	ext{Cosine Similarity}(\mathbf{q}, \mathbf{d}) = rac{\mathbf{q} \cdot \mathbf{d}}{\|\mathbf{q}\| \|\mathbf{d}\|} = rac{\sum_{i=1}^{n} q_i d_i}{\sqrt{\sum_{i=1}^{n} q_i^2} \sqrt{\sum_{i=1}^{n} d_i^2}}$$
+*(Persamaan 3.1)*
+
+Potongan dokumen dengan nilai kemiripan $\ge 0{,}70$ diprioritaskan masuk ke ruang konteks.
+
+##### 2. Penggabungan Peringkat (Reciprocal Rank Fusion - RRF)
+Skor gabungan penelusuran hibrida antara ChromaDB dan BM25 dihitung melalui formula RRF pada Persamaan 3.2:
+
+$$RRF\_Score(d \in D) = \sum_{m \in M} rac{1}{k + r_m(d)}$$
+*(Persamaan 3.2)*
+
+Di mana $M = \{	ext{ChromaDB}, 	ext{BM25}\}$, $r_m(d)$ merupakan peringkat dokumen $d$ pada metode penelusuran $m$, dan $k$ adalah konstanta perata bernilai 60.
+
+##### 3. Formulasi Skor Placement Test (Diagnostic Score)
+Tingkat kemahiran awal pengguna ditentukan berdasarkan agregasi berbobot dari akurasi tata bahasa ($S_g$), ketepatan leksikal ($S_v$), dan kelancaran berbicara ($S_f$) pada uji diagnostik:
+
+$$Score_{placement} = (0{,}40 \cdot S_g) + (0{,}35 \cdot S_v) + (0{,}25 \cdot S_f)$$
+*(Persamaan 3.3)*
+
+Pengguna dipetakan ke level B2 jika $Score_{placement} \ge 70{,}0\%$, dan ke level B1 jika $Score_{placement} < 70{,}0\%$.
+
+##### 4. Formulasi Skor Performa Sesi Pembelajaran (Session Speaking Score)
+Skor performa akhir pada setiap sesi latihan lisan dihitung menggunakan Persamaan 3.4:
+
+$$Score_{session} = \left( 0{,}30 \cdot rac{C_{turns}}{T_{target}} ight) + (0{,}40 \cdot Acc_{grammar}) + (0{,}30 \cdot Fluency_{wpm})$$
+*(Persamaan 3.4)*
+
+Di mana $C_{turns}$ adalah jumlah giliran bicara yang dituntaskan, $T_{target}$ adalah target putaran dialog, $Acc_{grammar}$ adalah persentase kalimat benar, dan $Fluency_{wpm}$ adalah rasio kelancaran kata per menit.
+
+#### F. Perancangan Basis Data (Database Design)
+Pengelolaan data relasional dibangun menggunakan SQLAlchemy *asynchronous ORM*. Struktur entitas dan relasi antartabel diilustrasikan melalui *Entity Relationship Diagram* (ERD) pada Gambar 3.7.
+
+```
++-----------------------------------------------------------------------------+
+|          GAMBAR 3.7 ENTITY RELATIONSHIP DIAGRAM (ERD) BASIS DATA            |
++-----------------------------------------------------------------------------+
+  ┌──────────────────────┐         ┌─────────────────────────┐
+  │        USERS         │1       *│    PRACTICE_SESSIONS    │
+  ├──────────────────────┼─────────┼─────────────────────────┤
+  │ PK id (UUID)         │         │ PK id (UUID)            │
+  │    email (VARCHAR)   │         │ FK user_id (UUID)       │
+  │    password (VARCHAR)│         │    topic_name (VARCHAR) │
+  │    full_name (VARCHAR│         │    target_cefr (VARCHAR)│
+  │    target_cefr (VAR) │         │    start_time (DATETIME)│
+  │    created_at (TIME) │         │    end_time (DATETIME)  │
+  └──────────┬───────────┘         └────────────┬────────────┘
+             │1                                 │1
+             │                                  │
+             │*                                 │*
+  ┌──────────▼───────────┐         ┌────────────▼────────────┐
+  │   USER_GAMIFICATION  │         │        MESSAGES         │
+  ├──────────────────────┤         ├─────────────────────────┤
+  │ PK id (UUID)         │         │ PK id (UUID)            │
+  │ FK user_id (UUID)    │         │ FK session_id (UUID)    │
+  │    total_points (INT)│         │    sender_role (VARCHAR)│
+  │    current_level (INT│         │    transcribed_text (TX)│
+  │    daily_streak (INT)│         │    response_text (TEXT) │
+  │    last_active (DATE)│         │    feedback_json (JSON) │
+  └──────────────────────┘         └─────────────────────────┘
+```
+*Gambar 3.7 Entity Relationship Diagram (ERD) Basis Data MILO*
+
+Definisi kamus data atribut tabel disajikan pada Tabel 3.4.
+
+*Tabel 3.4 Kamus Data Basis Data Relasional MILO*
+| Nama Tabel | Nama Kolom | Tipe Data | Keterangan & Batasan |
 | :--- | :--- | :--- | :--- |
-| `users` | `id` (PK), `username`, `email`, `cefr_level` | GUID, String | Menyimpan identitas pembelajar dan level CEFR aktif. |
-| `sessions` | `id` (PK), `user_id` (FK), `topic`, `overall_score` | GUID, Float | Menyimpan metadata sesi latihan percakapan. |
-| `messages` | `id` (PK), `session_id` (FK), `role`, `content`, `feedback` | GUID, Text, JSON | Menyimpan riwayat ujaran dan rincian evaluasi per giliran. |
-| `learning_progress`| `id` (PK), `user_id` (FK), `skill`, `score` | Integer, Float | Menyimpan akumulasi perkembangan *skill* pengguna. |
-| `user_gamification`| `id` (PK), `user_id` (FK), `points`, `current_streak` | Integer | Menyimpan status poin XP dan konsistensi latihan harian. |
-| `user_badges` | `id` (PK), `user_id` (FK), `badge_key` | Integer, String | Menyimpan daftar lencana prestasi yang telah diraih. |
-| `system_log_analytics`| `id` (PK), `event_type`, `duration_seconds`, `turns_count` | Integer, String | Merekam data telemetri aktivitas untuk analisis Bab 4. |
-| `evaluation_surveys`| `id` (PK), `behavioral_score`, `emotional_score`, `cognitive_score` | Integer, Float | Menyimpan respon kuesioner keterlibatan responden. |
-| `placement_test_results`| `id` (PK), `score_percentage`, `recommended_level` | Integer, Float, String | Menyimpan hasil tes penempatan 4 domain kompetensi. |
+| **`users`** | `id` <br> `email` <br> `hashed_password` <br> `full_name` <br> `target_cefr` | UUID <br> VARCHAR(255) <br> VARCHAR(255) <br> VARCHAR(100) <br> VARCHAR(10) | *Primary Key* <br> *Unique, Not Null* <br> Sandi terenkripsi *Bcrypt* <br> Nama lengkap pengguna <br> Level aktif ('B1' atau 'B2') |
+| **`practice_sessions`** | `id` <br> `user_id` <br> `topic_name` <br> `target_cefr` <br> `start_time` | UUID <br> UUID <br> VARCHAR(100) <br> VARCHAR(10) <br> TIMESTAMP | *Primary Key* <br> *Foreign Key (`users.id`)* <br> Topik percakapan <br> Tingkat kesulitan sesi <br> Waktu mulai sesi |
+| **`messages`** | `id` <br> `session_id` <br> `sender_role` <br> `transcribed_text` <br> `feedback_json` | UUID <br> UUID <br> VARCHAR(20) <br> TEXT <br> JSONB / TEXT | *Primary Key* <br> *Foreign Key (`practice_sessions.id`)* <br> Nilai: 'user' / 'assistant' <br> Transkripsi suara pengguna <br> Data koreksi tata bahasa |
+| **`user_gamification`**| `id` <br> `user_id` <br> `total_points` <br> `current_streak` <br> `last_active` | UUID <br> UUID <br> INTEGER <br> INTEGER <br> DATE | *Primary Key* <br> *Foreign Key (`users.id`)* <br> Akumulasi poin XP pengguna <br> Rekor hari berturut-turut <br> Tanggal aktivitas terakhir |
+| **`user_badges`** | `id` <br> `user_id` <br> `badge_code` <br> `unlocked_at` | UUID <br> UUID <br> VARCHAR(50) <br> TIMESTAMP | *Primary Key* <br> *Foreign Key (`users.id`)* <br> Kode unik lencana prestasi <br> Waktu perolehan lencana |
+
+#### G. Perancangan Identitas Visual dan Karakter Avatar Live2D
+Perancangan identitas visual berfokus pada penciptaan atmosfer antarmuka yang ramah dan menenangkan:
+1. **Palet Warna (Color Palette)**:
+   - *Primary (`#4F46E5` - Deep Indigo)*: Menghadirkan kesan profesionalitas dan ketenangan berpikir.
+   - *Secondary (`#06B6D4` - Bright Cyan)*: Aksen modern pada visualisator gelombang audio.
+   - *Neutral Dark (`#0F172A` - Slate Navy)*: Teks berkontras tinggi memenuhi standar WCAG AAA.
+   - *Neutral Light (`#F8FAFC` - Off-White)*: Warna latar belakang lembut peredam kelelahan mata.
+   - *Accent Success (`#10B981` - Emerald Green)*: Penanda keberhasilan grammar dan perolehan poin.
+2. **Tipografi**: Menggunakan jenis huruf *Plus Jakarta Sans* untuk elemen struktural dan *Inter* untuk keterbacaan teks transkripsi dan umpan balik dialog.
+3. **Spesifikasi Rigging Avatar Live2D**: Karakter "MILO" diintegrasikan dengan sinyal audio melalui pemetaan parameter pada Tabel 3.5.
+
+```
++-----------------------------------------------------------------------------+
+|         GAMBAR 3.8 DIAGRAM RIGGING DAN SINKRONISASI AUDIO LIVE2D            |
++-----------------------------------------------------------------------------+
+  [Aliran Audio TTS (MP3/WAV)] ──► [Web Audio API: AnalyserNode]
+                                                │
+                                                ▼
+                                   [Ekstraksi Amplitudo RMS]
+                                                │
+                                                ▼
+  [Normalisasi Nilai (0.0 – 1.0)] ──► [Pemetaan Parameter Live2D: ParamMouthOpenY]
+                                                │
+                                                ▼
+                            [Gerakan Bibir Karakter Sinkron Real-time]
+```
+*Gambar 3.8 Diagram Alur Sinkronisasi Audio dan Rigging Parameter Live2D*
+
+*Tabel 3.5 Pemetaan Parameter Model Live2D terhadap Dinamika Sistem*
+| Parameter ID | Rentang Nilai | Pemicu Input / Event | Efek Gerak Visual pada Avatar |
+| :--- | :---: | :--- | :--- |
+| `ParamMouthOpenY` | 0.0 s.d. 1.0 | Amplitudo RMS audio wicara TTS | Buka-tutup mulut (*lip-sync*) mengikuti suku kata |
+| `ParamEyeLOpen`, `ParamEyeROpen` | 0.0 s.d. 1.0 | *Random timer* interval 2.5–4.0 detik | Kedipan mata natural saat posisi siaga (*idle*) |
+| `ParamAngleZ` | -30° s.d. +30° | Status sistem: Pengguna berbicara | Kepala miring menyimak dengan penuh perhatian |
+| `ParamBodyAngleX` | -10° s.d. +10° | Status sistem: AI mulai merespons | Gestur tubuh menyambut ramah mitra bicara |
+
+#### H. Perancangan Antarmuka Pengguna (Wireframe & High-Fidelity Mockup)
+Rancangan antarmuka disusun secara terpadu guna memastikan navigasi yang intuitif dari awal hingga akhir sesi.
+
+```
++-----------------------------------------------------------------------------+
+|                GAMBAR 3.9 PERANCANGAN ANTARMUKA PENGGUNA                    |
++-----------------------------------------------------------------------------+
+  (a) Wireframe Alur Navigasi Antarmuka Sistem
+  (b) Mockup High-Fidelity Dashboard Utama (Pilihan Modul, Streak, XP Card)
+  (c) Mockup High-Fidelity Sesi Latihan (Kanvas Live2D, Push-to-Talk, Waveform)
+  (d) Mockup High-Fidelity Rangkuman Evaluasi (Grammar Breakdown & Skor Sesi)
+```
+*Gambar 3.9 Rancangan Antarmuka Pengguna: (a) Wireframe Alur; (b) Dashboard Utama; (c) Sesi Latihan Live2D; (d) Rangkuman Evaluasi*
+
+---
+
+### 3.3.3 Development (Tahap Pengembangan Sistem)
+Tahap *Development* merupakan proses realisasi fisik dari seluruh spesifikasi yang telah dirumuskan pada tahap *Design*. Pada tahap ini, pengembang membangun basis kode sumber (*source code*), menata arsitektur repositori, mengkonfigurasikan *AI Gateway*, menyusun basis data vektor, dan mengintegrasikan model avatar Live2D ke dalam aplikasi web:
+
+#### 1. Penataan Lingkungan Pengembangan dan Struktur Direktori
+Proyek diorganisasikan ke dalam arsitektur modular berbasis Python 3.11 yang dikelola menggunakan manajer paket `uv`. Struktur direktori proyek pada Visual Studio Code dirancang memisahkan logika backend (`app/`), basis pengetahuan (`knowledge_base/`), antarmuka web (`frontend/`), konfigurasi *gateway* (`docker-compose.bifrost.yml`), dan skrip pengujian evaluasi (`evaluations/`).
+
+```
+[TEMPATKAN GAMBAR DI SINI]
+Gambar 3.10 Struktur Direktori dan Lingkungan Pengembangan Proyek AI-MILO pada VS Code
+```
+
+#### 2. Penerapan AI Gateway Bifrost Berbasis Kontainer Docker
+Untuk memastikan efisiensi pemanggilan API dan perlindungan terhadap *rate-limiting*, layanan Bifrost dioperasikan pada lingkungan terisolasi menggunakan Docker Compose. Berkas konfigurasi mendefinisikan rute proksi cerdas pada port 8080 dengan *semantic caching* lokal.
+
+```
+[TEMPATKAN GAMBAR DI SINI]
+Gambar 3.11 Tampilan Eksekusi Kontainer AI Gateway Bifrost pada Terminal Docker
+```
+
+#### 3. Pembangunan Basis Pengetahuan dan Vektorisasi Dokumen
+Materi silabus CEFR B1–B2 yang disimpan dalam format Markdown pada folder `knowledge_base/` diproses melalui skrip ingesti asinkron (`knowledge_base/ingest.py`). Skrip melakukan pemecahan teks (*chunking* 500 karakter), memanggil model embedding `text-embedding-3-small`, dan menyimpan koleksi vektor ke dalam basis data ChromaDB.
+
+```
+[TEMPATKAN GAMBAR DI SINI]
+Gambar 3.12 Eksekusi Skrip Ingesti dan Pengindeksan Dokumen ke Basis Data Vektor ChromaDB
+```
+
+#### 4. Integrasi Model Avatar Live2D pada Antarmuka WebGL
+Model avatar 2D yang terdiri atas berkas konfigurasi `.model3.json`, kompilasi fisika gerakan `.moc3`, dan lembar tekstur gambar diintegrasikan ke dalam antarmuka web menggunakan Live2D Cubism Core JavaScript SDK. Kanvas HTML5 diatur secara responsif di samping kontrol perekam suara *Web Audio API*.
+
+```
+[TEMPATKAN GAMBAR DI SINI]
+Gambar 3.13 Struktur Aset Karakter Live2D dan Tampilan Rendering pada Kanvas WebGL
+```
+
+#### 5. Implementasi Logika Backend dan Endpoint REST API FastAPI
+Layanan backend dibangun menggunakan *framework* FastAPI dengan pola asinkron (`async/await`) untuk menangani unggahan audio wicara, komunikasi dengan ASR Whisper, pemanggilan penelusuran hibrida RAG, orkestrasi respons GPT-4o-mini, sintesis suara TTS, dan perhitungan skor gamifikasi secara paralel.
+
+```
+[TEMPATKAN GAMBAR DI SINI]
+Gambar 3.14 Cuplikan Kode Sumber Backend Utama pada Modul RAG dan Conversational LLM
+```
+
+---
+
+### 3.3.4 Implementation (Tahap Penerapan Sistem)
+Tahap *Implementation* merupakan tahapan di mana sistem yang telah berhasil dikembangkan pada tahap *Development* mulai dioperasikan dalam lingkungan uji coba nyata untuk digunakan oleh subjek penelitian:
+
+#### 1. Penerapan Lingkungan Operasional
+Seluruh komponen perangkat lunak dijalankan secara terintegrasi pada lingkungan server pengembang lokal yang dapat diakses oleh responden uji coba melalui jaringan peramban web modern (Google Chrome / Microsoft Edge). Server FastAPI menyajikan berkas frontend statis sekaligus melayani rute API wicara, sementara basis data relasional SQLite/PostgreSQL secara aktif merekam setiap transaksi percakapan dan metrik aktivitas pengguna.
+
+#### 2. Prosedur Uji Coba Penggunaan Sistem oleh Responden
+Pelaksanaan implementasi kepada responden mahasiswa mengikuti protokol terstruktur:
+1. **Fase Orientasi & Pretest**: Responden mengisi kuesioner awal (*baseline*) mengenai tingkat *speaking anxiety* dan keterlibatan belajar (*student engagement*) saat menggunakan media konvensional.
+2. **Fase Diagnostic Test**: Responden mengakses platform MILO untuk pertama kali dan menjalani tes diagnostik berbicara terpandu guna memetakan rekomendasi modul ke level B1 atau B2.
+3. **Fase Latihan Percakapan Terbimbing**: Responden menjalankan sesi latihan berbicara interaktif berformat *microlearning* (3–5 menit per sesi) secara mandiri sebanyak 3 hingga 5 kali pertemuan selama periode intervensi penelitian. Selama proses ini, sistem secara otomatis merekam durasi interaksi, jumlah giliran bicara, akurasi tata bahasa, dan perolehan poin gamifikasi.
+4. **Fase Posttest & Refleksi**: Setelah menuntaskan seluruh rangkaian modul latihan, responden mengisi kuesioner akhir (*posttest*) keterlibatan belajar serta instrumen kebergunaan sistem (*User Experience Questionnaire* / UEQ).
+
+---
+
+### 3.3.5 Evaluation (Rencana Pengujian Sistem)
+Rencana pengujian dalam penelitian ini dirancang secara komprehensif mencakup validasi fungsional, performa kecerdasan buatan, kebergunaan antarmuka, dan efektivitas pedagogis terhadap keterlibatan belajar mahasiswa. Evaluasi dibagi menjadi lima pilar pengujian terukur sebagaimana dijabarkan pada matriks Tabel 3.6:
+
+*Tabel 3.6 Matriks Rencana Pengujian Komprehensif Sistem MILO*
+| No | Dimensi Pengujian | Tujuan Pengujian | Parameter & Instrumen | Kriteria Keberhasilan / Target |
+| :---: | :--- | :--- | :--- | :--- |
+| 1 | **Black Box Testing** | Memverifikasi seluruh fitur fungsional berjalan tanpa galat logika atau antarmuka. | *Test cases* mencakup: Autentikasi, Diagnostic Test, ASR Recording, RAG Retrieval, Live2D Lip-sync, Gamifikasi, dan Export Feedback. | 100% skenario pengujian berstatus *Pass* (berhasil tanpa galat kritis). |
+| 2 | **Speech Recognition Testing** | Mengukur akurasi dan ketahanan model Whisper ASR terhadap wicara mahasiswa Indonesia. | Nilai *Word Error Rate* (WER), transkripsi audio dengan variasi aksen, dan waktu latensi pemrosesan audio. | Rata-rata WER $\le 12{,}0\%$ dan latensi transkripsi audio $< 1{,}5$ detik. |
+| 3 | **DeepEval Benchmark (LLM-as-a-Judge)** | Menilai mutu pedagogis dan keabsahan respons RAG serta koreksi tata bahasa secara kuantitatif. | Metrik *Faithfulness* (keselarasan konteks), *Answer Relevancy*, dan akurasi koreksi tata bahasa pada berkas *test cases*. | Rata-rata skor *Faithfulness* $\ge 0{,}85$ dan *Answer Relevancy* $\ge 0{,}85$ (skala 0.0–1.0). |
+| 4 | **User Experience Evaluation (UEQ)** | Mengukur tingkat kepuasan dan kebergunaan antarmuka pengguna secara terstandarisasi. | Kuesioner UEQ (26 butir item pasangan sifat mencakup 6 skala: Daya Tarik, Kejelasan, Efisiensi, Ketepatan, Stimulasi, dan Kebaruan). | Seluruh skala UEQ berada pada kategori *Above Average* atau *Good* dibandingkan tolok ukur acuan. |
+| 5 | **Student Engagement Evaluation** | Mengukur peningkatan keterlibatan belajar berbicara sebelum dan sesudah menggunakan MILO. | Kuesioner keterlibatan belajar 3 dimensi (Perilaku, Emosional, Kognitif) menggunakan skala Likert 1–5, dianalisis via *Normalized Gain* (N-Gain). | Terjadi peningkatan skor yang signifikan secara statistik ($p < 0{,}05$) dengan nilai $g > 0{,}30$ (kategori sedang s.d. tinggi). |
+
+#### Instrumen Keterlibatan Belajar (Student Engagement)
+Pengukuran keterlibatan belajar mengadaptasi model tiga dimensi Phil Hiver dkk. (2021) yang dirinci ke dalam 12 butir indikator pernyataan pada Tabel 3.7.
+
+*Tabel 3.7 Indikator Evaluasi Student Engagement Tiga Dimensi*
+| Dimensi Keterlibatan | No | Butir Indikator Pernyataan Angket | Skala Ukur |
+| :--- | :---: | :--- | :---: |
+| **Keterlibatan Perilaku (Behavioral)** | 1 <br> 2 <br> 3 <br> 4 | Saya secara aktif berlatih berbicara bahasa Inggris menggunakan platform ini. <br> Saya berusaha menyelesaikan setiap sesi latihan microlearning hingga tuntas. <br> Saya terdorong untuk mempertahankan rekor latihan harian (streak). <br> Saya memanfaatkan tombol mikrofon berulang kali untuk menyempurnakan ujaran saya. | Skala Likert 1–5 <br> (1: Sangat Tidak Setuju, <br> 5: Sangat Setuju) |
+| **Keterlibatan Emosional (Emotional)** | 5 <br> 6 <br> 7 <br> 8 | Saya merasa lebih percaya diri dan tidak takut salah saat berbicara dengan avatar AI. <br> Kehadiran avatar virtual Live2D membuat suasana latihan terasa menyenangkan. <br> Saya merasa dihargai dengan adanya pemberian poin (XP) dan lencana pencapaian. <br> Latihan berbicara melalui platform ini terasa menenangkan dan meredakan rasa cemas saya. | Skala Likert 1–5 |
+| **Keterlibatan Kognitif (Cognitive)** | 9 <br> 10 <br> 11 <br> 12 | Saya memperhatikan dan mempelajari catatan evaluasi grammar yang disajikan sistem. <br> Saya mencoba menerapkan rekomendasi frasa alternatif pada sesi percakapan berikutnya. <br> Topik latihan yang adaptif mendorong saya berpikir kritis dalam menyusun argumen lisan. <br> Umpan balik yang diberikan sistem membantu saya memahami kelemahan berbicara saya secara mandiri. | Skala Likert 1–5 |
+
+Data skor *pretest* ($S_{pre}$) dan *posttest* ($S_{post}$) keterlibatan belajar dihitung efektivitas peningkatannya menggunakan formulasi *Normalized Gain* ($g$) Hake pada Persamaan 3.5:
+
+$$g = rac{S_{post} - S_{pre}}{S_{max} - S_{pre}}$$
+*(Persamaan 3.5)*
+
+Kategori perolehan skor ternormalisasi diinterpretasikan sebagai berikut:
+- $g \ge 0{,}70$ : Kategori Peningkatan Tinggi
+- $0{,}30 \le g < 0{,}70$ : Kategori Peningkatan Sedang
+- $g < 0{,}30$ : Kategori Peningkatan Rendah
 
 ---
 

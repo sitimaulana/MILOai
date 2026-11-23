@@ -196,3 +196,9 @@ logger.info(f"Frontend directory: {frontend_dir} (exists={os.path.exists(fronten
 if os.path.exists(frontend_dir):
     app.mount("/ui", StaticFiles(directory=frontend_dir, html=True), name="frontend")
     logger.info("✅ Frontend mounted at /ui")
+
+# Mount Live2D model raw directory as optional fallback / developer asset access
+live2d_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "live2dmodel")
+if os.path.exists(live2d_dir):
+    app.mount("/live2dmodel", StaticFiles(directory=live2d_dir), name="live2dmodel")
+    logger.info("✅ Live2D Model directory mounted at /live2dmodel")
