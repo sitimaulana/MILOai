@@ -19,6 +19,7 @@ Usage:
 """
 
 import logging
+import re
 from dataclasses import dataclass
 
 from openai import AsyncOpenAI
@@ -79,8 +80,8 @@ You are MILO, a warm, lively, and supportive English speaking companion and tuto
    - Do NOT invent unmentioned topics, assume fake scenarios, or jump to unrelated subjects.
    - Example (Good): "Oh, having two cats must be lively! What are their names?"
    - Example (Bad/Stiff): "That is interesting. Now, tell me about your job."
-2. ONE QUESTION RULE:
-   - Always end with exactly ONE engaging, open-ended question that is easy and natural to answer. Never stack multiple questions in one message.
+2. SINGLE CONVERSATIONAL QUESTION:
+   - Always conclude with exactly ONE engaging, open-ended question that is easy and natural to answer. Never stack multiple questions in one message.
 3. NO UNSOLICITED LECTURING:
    - Never give unrequested grammar lectures, quiz the user out of the blue, or explain textbook rules unless the student explicitly asks ("How do I use...", "Explain...", "What is the difference...").
 4. NATURAL IMPLICIT RECASTING:
@@ -92,6 +93,7 @@ You are MILO, a warm, lively, and supportive English speaking companion and tuto
 - ALWAYS respond in English.
 - NEVER mention that you are an AI language model: you are MILO.
 - Keep responses conversational, engaging, and friendly.
+- Output ONLY direct conversational speech. NEVER include meta-commentary, constraint checklists, rule explanations, or bracketed/italicized notes about your instructions (e.g., do NOT output "*One question rule applies.*", "*Rule applied*", or any notes in asterisks or parentheses explaining system prompt rules).
 
 ## Current Learning Goal & Scenario:
 {learning_goal}
@@ -113,7 +115,7 @@ CLOSING_DIRECTIVE = """\
 ## CRITICAL DIRECTIVE - SESSION TIME LIMIT REACHED:
 The practice session duration has ended. This is the FINAL turn of the conversation.
 You MUST conclude the conversation:
-1. STRICT OVERRIDE OF RULE 2 (NO QUESTIONS): DO NOT ask any questions! Do not ask "What about you?", "How about you?", or anything that invites a reply. Under NO circumstances should you include a question mark (?).
+1. NO QUESTIONS AT CLOSING: DO NOT ask any questions! Do not ask "What about you?", "How about you?", or anything that invites a reply. Under NO circumstances should you include a question mark (?).
 2. ACKNOWLEDGE TIME: State warmly and naturally that our practice time for today has finished.
 3. PRAISE & ENCOURAGE: Commend the student for their spoken participation and effort today in 1-2 natural, spoken sentences.
 4. SIGN OFF: Conclude with a warm sign-off (e.g., "Take care, and see you next time!").
@@ -320,7 +322,8 @@ class MILOConversationLLM:
 
         message = completion.choices[0].message
         usage = completion.usage
-        content = message.content or getattr(message, "reasoning", "") or ""
+        raw_content = message.content or getattr(message, "reasoning", "") or ""
+        content = sanitize_llm_response(raw_content)
 
         return LLMResponse(
             content=content,
@@ -328,6 +331,25 @@ class MILOConversationLLM:
             completion_tokens=usage.completion_tokens if usage else 0,
             model=completion.model,
         )
+
+
+def sanitize_llm_response(text: str) -> str:
+    """
+    Clean unwanted meta-commentary, instruction leakage, or rule tags
+    from LLM responses before returning to pipeline/TTS.
+    """
+    if not text:
+        return ""
+    patterns = [
+        r"(?i)[-*•]?\s*\*+\s*\(?\s*(?:note:?\s*)?(?:one|single)\s+question\s+rule\b[^*\n]*\)?\s*\*+\.?",
+        r"(?i)[-*•]?\s*[\(\[]\s*(?:note:?\s*)?(?:one|single)\s+question\s+rule\b[^)\]\n]*[\)\]]\.?",
+        r"(?i)\*+\s*\(?\s*(?:note:?\s*)?rule\s+\d+\s+(?:applies|applied|enforced)[^*\n]*\)?\s*\*+\.?",
+        r"(?i)(?:note:?\s*)?(?:one|single)\s+question\s+rule\s+applies\.?",
+    ]
+    cleaned = text
+    for pattern in patterns:
+        cleaned = re.sub(pattern, "", cleaned)
+    return cleaned.strip()
 
 
 # Global singleton LLM instance

@@ -11,8 +11,27 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from httpx import AsyncClient, ASGITransport
 
-from app.core.llm import CLOSING_DIRECTIVE, generate_response, milo_llm
+from app.core.llm import CLOSING_DIRECTIVE, generate_response, milo_llm, sanitize_llm_response
 from app.models.schemas import ChatRequest, ChatResponse
+
+
+@pytest.mark.asyncio
+async def test_sanitize_llm_response():
+    """Verify that leaked rule commentary is stripped from LLM output."""
+    raw = "That sounds exciting! What do you like most about it?\n\n*One question rule applies.*"
+    assert sanitize_llm_response(raw) == "That sounds exciting! What do you like most about it?"
+
+    raw2 = "Great job! How was your weekend? *(One question rule applies)*"
+    assert sanitize_llm_response(raw2) == "Great job! How was your weekend?"
+
+    raw3 = "I like reading books. What genre do you prefer? (One question rule applies.)"
+    assert sanitize_llm_response(raw3) == "I like reading books. What genre do you prefer?"
+
+    raw4 = "Hello there! *Rule 2 applied*"
+    assert sanitize_llm_response(raw4) == "Hello there!"
+
+    raw5 = "Nice to meet you! [One question rule applies]"
+    assert sanitize_llm_response(raw5) == "Nice to meet you!"
 
 
 @pytest.mark.asyncio
