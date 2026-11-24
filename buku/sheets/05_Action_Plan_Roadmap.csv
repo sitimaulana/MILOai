@@ -1,0 +1,9 @@
+﻿ROADMAP & PRIORITAS PENYELESAIAN (TARGET 100%)
+Panduan langkah konkret untuk menuntaskan sisa 24.72% pengerjaan Proyek Akhir AI-MILO:
+
+No,Tugas Pengembangan,Fokus Komponen,Target Kenaikan Progres,Berkas Terkait,Tingkat Prioritas,Status Tindakan
+1,Implementasi Real Audio Lip-Sync Live2D,"Hubungkan HTML5 Audio TTS ke Web Audio API AnalyserNode, hitung RMS volume, dan petakan ke ParamMouthOpenY.",+10.0% (Mendongkrak RQ-C ke 85%),frontend/js/milo-live2d.js,Prioritas 1 (Kritis),Siap Dikerjakan
+2,Polesan Antarmuka Visual Gamifikasi,"Desain widget streak (ikon api menyala), progress bar XP level, rak lencana aktif, dan modal pop-up perayaan.",+10.0% (Mendongkrak RQ-C ke 85%),"frontend/dashboard.html, summary.html, css/",Prioritas 1 (Kritis),Siap Dikerjakan
+3,Penerapan Visual Stepper Microlearning,Tambahkan komponen stepper interaktif ('Turn X of Y') dan session timer pada practice.html.,+5.0% (Menyempurnakan alur latihan),"frontend/practice.html, practice.js",Prioritas 2 (Tinggi),Siap Dikerjakan
+4,Rekapitulasi Data Responden (N=32),Lengkapi input data respons survei ke tabel evaluation_surveys dan hitung formula N-Gain Hake.,+5.0% (Menuntaskan Bab 4 riset),"app/api/evaluation.py, buku/BUKU_PROGRES_PA_AI_MILO.md",Prioritas 2 (Tinggi),Menunggu Data
+5,Penggantian Placeholder Gambar Bab 3 & 4,Ganti placeholder [TEMPATKAN GAMBAR DI SINI] pada buku laporan dengan tangkapan layar sistem asli.,+3.0% (Finishing Naskah Buku PA),buku/BUKU_PROGRES_PA_AI_MILO.md,Prioritas 3 (Sedang),Setelah UI Matang

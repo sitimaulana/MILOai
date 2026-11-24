@@ -50,14 +50,33 @@ function formatTopicDisplay(topic) {
 const audioStore = new Map();
 let audioIdCounter = 0;
 
-function playAudio(btnElement, audioId) {
+function getStatusTextForEmotion(emotion) {
+    switch (emotion) {
+        case 'happy':
+            return 'Milo senang & bangga dengan kemajuanmu! ✨';
+        case 'supportive':
+            return 'Milo memberikan tips & masukan evaluasi 💡';
+        case 'curious':
+            return 'Milo mendengarkan dengan antusias 🤔';
+        case 'speaking':
+        default:
+            return 'Milo menjawab...';
+    }
+}
+
+function playAudio(btnElement, audioId, emotion = 'friendly', feedback = null) {
     const base64Audio = audioStore.get(audioId);
     if (!base64Audio) return;
 
     const audio = new Audio("data:audio/mp3;base64," + base64Audio);
+    const statusText = getStatusTextForEmotion(emotion);
     if (typeof window.setCompanionState === 'function') {
-        window.setCompanionState('speaking', 'Milo menjawab...');
+        window.setCompanionState('speaking', statusText, emotion, feedback);
     }
+    if (window.miloLive2D && typeof window.miloLive2D.bindAudio === 'function') {
+        window.miloLive2D.bindAudio(audio, emotion, feedback);
+    }
+
     if (btnElement) {
         const icon = btnElement.querySelector('i');
         const origClass = icon ? icon.className : '';
@@ -92,12 +111,16 @@ function playAudio(btnElement, audioId) {
     return audio;
 }
 
-function autoPlayAudio(base64Audio) {
+function autoPlayAudio(base64Audio, emotion = 'friendly', feedback = null) {
     if (!base64Audio) return;
     try {
         const audio = new Audio("data:audio/mp3;base64," + base64Audio);
+        const statusText = getStatusTextForEmotion(emotion);
         if (typeof window.setCompanionState === 'function') {
-            window.setCompanionState('speaking', 'Milo menjawab...');
+            window.setCompanionState('speaking', statusText, emotion, feedback);
+        }
+        if (window.miloLive2D && typeof window.miloLive2D.bindAudio === 'function') {
+            window.miloLive2D.bindAudio(audio, emotion, feedback);
         }
         audio.onended = () => {
             if (typeof window.setCompanionState === 'function') {
@@ -115,6 +138,7 @@ function autoPlayAudio(base64Audio) {
                 window.setCompanionState('idle', 'Milo siap berlatih');
             }
         });
+        return audio;
     } catch (e) {
         console.error("Audio autoplay failed:", e);
     }

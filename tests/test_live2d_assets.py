@@ -4,8 +4,6 @@ Unit tests for Live2D model assets, vendor libraries, and FastAPI mounting.
 
 import json
 import os
-from fastapi.testclient import TestClient
-from app.main import app
 
 def test_live2d_assets_exist():
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +43,8 @@ def test_live2d_model3_json_configuration():
     assert "ParamMouthOpenY" in groups["LipSync"]
 
 def test_live2d_endpoints_served_by_fastapi():
+    from fastapi.testclient import TestClient
+    from app.main import app
     client = TestClient(app)
 
     # Test static files from /ui

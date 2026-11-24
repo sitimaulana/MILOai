@@ -6,9 +6,10 @@
  * - Live2D Cubism 4 initialization via PixiJS & pixi-live2d-display
  * - Half-body (bust/chest-up) viewport framing and responsive resizing
  * - Natural micro-animations (breathing, eye blinking, hair physics, cursor gaze tracking)
+ * - True Audio-driven Lip-Sync via Web Audio API AnalyserNode
+ * - LLM Feedback-driven emotional expressions ('happy', 'supportive', 'curious', 'friendly')
  * - State management ('idle', 'listening', 'thinking', 'speaking')
- * - Dynamic lip-sync during AI speech
- * - Graceful fallback to static image on failure or unsupported environments
+ * - Graceful fallback to static image on unsupported environments
  */
 
 (function () {
@@ -19,9 +20,9 @@
             this.canvasId = options.canvasId || 'miloLive2DCanvas';
             this.fallbackImgId = options.fallbackImgId || 'miloCharacterImg';
             this.stageId = options.stageId || 'miloCompanionStage';
-            this.modelPath = options.modelPath || 'assets/live2d/MILO Model.model3.json?v=20261123f';
+            this.modelPath = options.modelPath || 'assets/live2d/MILO Model.model3.json?v=20261124a';
 
-            // Half-body framing configuration based on Image 2 reference:
+            // Half-body framing configuration:
             // Hair top is at Y ~ 16, skirt waistband/belt is at Y ~ 1420 out of 3224 model height
             this.config = Object.assign({
                 targetVisibleHeight: 1420, // Height in model coordinates from top of hair to waistband
@@ -42,6 +43,18 @@
             this.model = null;
             this.isReady = false;
             this.currentState = 'idle';
+
+            // Emotional feedback states from LLM
+            this.currentEmotion = 'friendly';
+            this.currentFeedback = null;
+
+            // Audio & Web Audio API lip-sync variables
+            this.audioContext = null;
+            this.analyser = null;
+            this.audioDataArray = null;
+            this.boundAudioElement = null;
+            this.pendingAudio = null;
+            this.manualSpeakingPulse = 0;
 
             // Animation state variables
             this.time = 0;
@@ -90,13 +103,12 @@
             }
 
             try {
-                // High-DPI resolution for razor-sharp rendering (supersampling at least 2x)
-                const dpr = Math.max(window.devicePixelRatio || 1, 2);
+                // Resolution: natural DPR between 1 and 2 for crisp yet smooth rendering
+                const dpr = Math.min(Math.max(window.devicePixelRatio || 1, 1), 2);
 
                 if (PIXI.settings) {
                     PIXI.settings.RESOLUTION = dpr;
-                    PIXI.settings.ROUND_PIXELS = true;
-                    PIXI.settings.ANISOTROPIC_LEVEL = 16;
+                    PIXI.settings.ROUND_PIXELS = false; // Smooth sub-pixel mesh deformation
                 }
 
                 const parent = this.canvas.parentElement || this.canvas;
@@ -114,7 +126,7 @@
                 this._currentWidth = cw;
                 this._currentHeight = ch;
 
-                // Create PixiJS Application with transparent background and 2x resolution
+                // Create PixiJS Application with transparent background and antialiasing
                 this.app = new PIXI.Application({
                     view: this.canvas,
                     autoStart: false,
@@ -139,8 +151,8 @@
                 // Set up half-body viewport framing
                 this._applyHalfBodyFraming(cw, ch);
 
-                // Ensure base textures are sharp and do not downsample via blurry mipmaps
-                this._ensureCrispTextures();
+                // Ensure textures are rendered cleanly with standard linear filtering and mipmaps
+                this._ensureNaturalTextures();
 
                 // Setup event listeners
                 window.addEventListener('resize', this._onResize, { passive: true });
@@ -148,55 +160,79 @@
                 document.addEventListener('mouseleave', this._onMouseLeave, { passive: true });
                 this._initResizeObserver();
 
-                // Start Pixi ticker loop
-                this.app.ticker.add(this._animate);
-                this.app.start();
-
-                this.isReady = true;
-                console.log('✅ [MiloLive2D] Milo Live2D companion ready in crisp half-body mode!');
-
-                // Smoothly reveal canvas and hide fallback image
+                // Hide static fallback image and show canvas cleanly
                 if (this.fallbackImg) {
                     this.fallbackImg.style.display = 'none';
                 }
+                this.canvas.style.display = 'block';
                 this.canvas.style.opacity = '1';
                 this.canvas.classList.add('live2d-loaded');
 
-                // Delayed resize to ensure layout is fully settled after styles load
-                setTimeout(() => this._onResize(), 150);
+                this.isReady = true;
 
+                // Handle any pending audio binding that occurred during model load
+                if (this.pendingAudio) {
+                    const { audio, emotion, feedback } = this.pendingAudio;
+                    this.pendingAudio = null;
+                    this.bindAudio(audio, emotion, feedback);
+                }
+
+                // Start Pixi render ticker
+                this.app.ticker.add(this._animate);
+                this.app.start();
+
+                console.log('[MiloLive2D] Half-body Live2D companion initialized successfully.');
             } catch (err) {
-                console.error('❌ [MiloLive2D] Failed to initialize Live2D model:', err);
-                // Ensure static image remains visible
+                console.error('[MiloLive2D] Initialization failed:', err);
                 if (this.fallbackImg) {
-                    this.fallbackImg.style.display = '';
+                    this.fallbackImg.style.display = 'block';
                 }
-            }
-        }
-
-        _ensureCrispTextures() {
-            if (!this.model) return;
-            try {
-                if (this.model.textures && Array.isArray(this.model.textures)) {
-                    this.model.textures.forEach(tex => {
-                        if (tex && tex.baseTexture) {
-                            tex.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
-                            tex.baseTexture.mipmap = PIXI.MIPMAP_MODES.OFF;
-                            tex.baseTexture.update();
-                        }
-                    });
+                if (this.canvas) {
+                    this.canvas.style.display = 'none';
                 }
-            } catch (e) {
-                // Ignore transient texture mode setup
             }
         }
 
         _initResizeObserver() {
-            if (window.ResizeObserver && this.canvas && this.canvas.parentElement) {
-                this.resizeObserver = new ResizeObserver(() => {
-                    this._onResize();
-                });
-                this.resizeObserver.observe(this.canvas.parentElement);
+            if (typeof ResizeObserver === 'undefined') return;
+
+            const parent = this.canvas.parentElement;
+            if (!parent) return;
+
+            let resizeTimeout = null;
+            this.resizeObserver = new ResizeObserver(entries => {
+                for (const entry of entries) {
+                    const rect = entry.contentRect;
+                    if (rect.width > 50 && rect.height > 50) {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            this._onResize();
+                        }, 60);
+                    }
+                }
+            });
+
+            this.resizeObserver.observe(parent);
+        }
+
+        /**
+         * Sets up natural texture filtering:
+         * Uses linear interpolation and standard mipmapping to avoid both blurriness
+         * and harsh artificial over-sharpening ("terlalu HD").
+         */
+        _ensureNaturalTextures() {
+            if (!this.model) return;
+            try {
+                const meshes = this.model.internalModel ? this.model.internalModel.drawables : null;
+                if (meshes && meshes.length > 0) {
+                    meshes.forEach(m => {
+                        if (m.texture && m.texture.baseTexture) {
+                            m.texture.baseTexture.scaleMode = PIXI.SCALE_MODES.LINEAR;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.warn('[MiloLive2D] Texture filtering notice:', e);
             }
         }
 
@@ -266,14 +302,14 @@
             this._currentWidth = cw;
             this._currentHeight = ch;
 
-            const dpr = Math.max(window.devicePixelRatio || 1, 2);
+            const dpr = Math.min(Math.max(window.devicePixelRatio || 1, 1), 2);
             if (this.app.renderer.resolution !== dpr) {
                 this.app.renderer.resolution = dpr;
             }
 
             this.app.renderer.resize(cw, ch);
             this._applyHalfBodyFraming(cw, ch);
-            this._ensureCrispTextures();
+            this._ensureNaturalTextures();
         }
 
         _onMouseMove(e) {
@@ -317,6 +353,94 @@
          */
         setState(state) {
             this.currentState = state || 'idle';
+            if (state !== 'speaking' && !this.boundAudioElement) {
+                this.targetMouthOpen = 0;
+            }
+        }
+
+        /**
+         * Sets emotion and feedback data from LLM
+         * @param {'happy'|'supportive'|'curious'|'friendly'|string} emotion 
+         * @param {Object} feedback 
+         */
+        setEmotion(emotion, feedback) {
+            this.currentEmotion = emotion || 'friendly';
+            if (feedback !== undefined) {
+                this.currentFeedback = feedback;
+            }
+        }
+
+        /**
+         * Pulse lip opening for Web Speech API synthesis or syllable triggers
+         * @param {number} intensity (0.0 to 1.0)
+         */
+        setSpeakingPulse(intensity = 0.75) {
+            this.manualSpeakingPulse = Math.max(0, Math.min(1.0, intensity));
+            this.targetMouthOpen = this.manualSpeakingPulse;
+        }
+
+        /**
+         * Binds an HTMLAudioElement to the Live2D model for real-time lip-sync
+         * @param {HTMLAudioElement} audioElement 
+         * @param {string} emotion 
+         * @param {Object} feedback 
+         */
+        bindAudio(audioElement, emotion, feedback) {
+            if (!audioElement) return;
+
+            if (!this.isReady) {
+                this.pendingAudio = { audio: audioElement, emotion, feedback };
+                return;
+            }
+
+            this.boundAudioElement = audioElement;
+            this.currentState = 'speaking';
+            if (emotion) this.setEmotion(emotion, feedback);
+
+            // Set up Web Audio API AnalyserNode if supported
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) {
+                    if (!this.audioContext) {
+                        this.audioContext = new AudioCtx();
+                    }
+                    if (this.audioContext.state === 'suspended') {
+                        this.audioContext.resume().catch(() => {});
+                    }
+
+                    if (!audioElement._hasLive2DSource) {
+                        const source = this.audioContext.createMediaElementSource(audioElement);
+                        const analyser = this.audioContext.createAnalyser();
+                        analyser.fftSize = 256;
+                        analyser.smoothingTimeConstant = 0.45;
+                        source.connect(analyser);
+                        analyser.connect(this.audioContext.destination);
+
+                        audioElement._hasLive2DSource = true;
+                        audioElement._live2dAnalyser = analyser;
+                    }
+
+                    this.analyser = audioElement._live2dAnalyser;
+                    this.audioDataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                }
+            } catch (err) {
+                // If browser restricts createMediaElementSource (e.g. CORS or audio routing),
+                // fallback to audio-time based lip-sync seamlessly.
+                this.analyser = null;
+            }
+
+            // Cleanup handlers when audio ends or pauses
+            const onEndOrPause = () => {
+                if (this.boundAudioElement === audioElement) {
+                    this.boundAudioElement = null;
+                    this.targetMouthOpen = 0;
+                    this.setState('idle');
+                }
+            };
+
+            audioElement.addEventListener('ended', onEndOrPause, { once: true });
+            audioElement.addEventListener('pause', onEndOrPause, { once: true });
+            audioElement.addEventListener('error', onEndOrPause, { once: true });
         }
 
         /**
@@ -366,54 +490,162 @@
             this.currentEyeX += (this.targetEyeX - this.currentEyeX) * easing;
             this.currentEyeY += (this.targetEyeY - this.currentEyeY) * easing;
 
-            // 4. State-specific Modulations
+            // 4. Lip-Sync Computation based on real audio feedback
+            const isAudioActive = this.boundAudioElement && 
+                                 !this.boundAudioElement.paused && 
+                                 !this.boundAudioElement.ended;
+
+            if (isAudioActive) {
+                if (this.analyser && this.audioDataArray) {
+                    // Extract frequency energy in speech range (~150Hz to ~3200Hz)
+                    this.analyser.getByteFrequencyData(this.audioDataArray);
+                    let energy = 0;
+                    let count = 0;
+                    for (let i = 2; i < 28; i++) {
+                        energy += this.audioDataArray[i];
+                        count++;
+                    }
+                    const avg = energy / (count || 1); // 0 to 255
+
+                    if (avg > 14) {
+                        // Dynamic speech volume mapping to mouth opening (range 0.1 to 0.85)
+                        const norm = Math.min(1.0, (avg - 14) / 100);
+                        let openVal = Math.pow(norm, 0.8) * 0.85;
+
+                        // Add gentle phoneme modulation
+                        const phonemeMod = 0.85 + 0.15 * Math.sin(this.time * 16.0);
+                        this.targetMouthOpen = openVal * phonemeMod;
+                    } else {
+                        this.targetMouthOpen = 0.05; // Resting small opening during micro-pauses
+                    }
+                } else {
+                    // Fallback when Web Audio Analyser is unavailable:
+                    // Rhythmic natural phoneme wave strictly bounded to active audio playback
+                    const syll = Math.abs(Math.sin(this.time * 14.0)) * 0.55 
+                               + Math.abs(Math.sin(this.time * 7.5)) * 0.3;
+                    this.targetMouthOpen = Math.min(0.85, syll);
+                }
+            } else if (this.currentState === 'speaking') {
+                // Decay manual speaking pulse (e.g. from Web Speech API word boundaries)
+                if (this.manualSpeakingPulse > 0.05) {
+                    this.manualSpeakingPulse -= dt * 3.5;
+                    this.targetMouthOpen = this.manualSpeakingPulse;
+                } else {
+                    this.targetMouthOpen = 0;
+                }
+            } else {
+                this.targetMouthOpen = 0;
+            }
+
+            // Smooth interpolation to target mouth opening
+            this.mouthOpenValue += (this.targetMouthOpen - this.mouthOpenValue) * 0.35;
+
+            // 5. LLM Feedback & Emotion Expression Computation
             let finalAngleX = this.currentAngleX;
             let finalAngleY = this.currentAngleY;
             let finalAngleZ = 0;
             let finalEyeX = this.currentEyeX;
             let finalEyeY = this.currentEyeY;
-            let eyeSmile = 0.1;
+            let eyeLOpen = eyeOpen;
+            let eyeROpen = eyeOpen;
+            let eyeSmile = 0.15;
             let cheek = 0.15;
-            let mouthForm = 0.2;
+            let mouthForm = 0.25;
+            let browLY = 0;
+            let browRY = 0;
+            let browLAngle = 0;
+            let browRAngle = 0;
 
-            if (this.currentState === 'listening') {
-                // Listening state: attentive head tilt, alert eyes
-                finalAngleZ = -4.0 + Math.sin(this.time * 1.5) * 1.0;
-                finalAngleY += 3.0;
-                eyeOpen = Math.min(1.0, eyeOpen * 1.05);
-                cheek = 0.2;
-            } else if (this.currentState === 'thinking') {
-                // Thinking state: upward & slightly sideways thoughtful glance
-                finalAngleY += 10.0;
-                finalAngleX += -6.0;
-                finalAngleZ = 3.0;
-                finalEyeY = Math.max(finalEyeY, 0.55);
-                finalEyeX = -0.3;
-                eyeOpen = Math.max(0.65, eyeOpen);
-                mouthForm = -0.1;
-            } else if (this.currentState === 'speaking') {
-                // Speaking state: cheerful smile, gentle rhythmic nodding, active lip-sync
-                eyeSmile = 0.5;
-                cheek = 0.45;
-                mouthForm = 0.5;
-                const nod = Math.sin(this.time * 5.5) * 2.5;
+            const emotion = this.currentEmotion || 'friendly';
+            const overallScore = (this.currentFeedback && typeof this.currentFeedback.overall_score === 'number') 
+                ? this.currentFeedback.overall_score 
+                : 0;
+            const hasCorrections = Boolean(
+                this.currentFeedback && 
+                this.currentFeedback.corrections && 
+                this.currentFeedback.corrections.length > 0
+            );
+
+            if (this.currentState === 'speaking') {
+                // Speech rhythmic nodding
+                const nod = Math.sin(this.time * 4.8) * 1.8;
                 finalAngleY += nod;
 
-                // Speech Lip-Sync: composite rhythmic wave mimicking speech phonemes
-                const speechWave = Math.abs(Math.sin(this.time * 13.0)) * 0.65 
-                                 + Math.abs(Math.sin(this.time * 6.5)) * 0.35;
-                this.targetMouthOpen = speechWave;
+                if (emotion === 'happy' || overallScore >= 85) {
+                    // High praise / excellent score: joyous crinkled eyes, radiant smile, cute blush
+                    eyeSmile = 0.85;
+                    cheek = 0.55;
+                    mouthForm = 0.8;
+                    browLY = 0.35;
+                    browRY = 0.35;
+                    finalAngleZ = -2.5 + Math.sin(this.time * 2.2) * 1.2;
+                } else if (emotion === 'supportive' || hasCorrections) {
+                    // Supportive feedback: empathetic caring expression, gentle encouraging nod
+                    eyeSmile = 0.4;
+                    cheek = 0.25;
+                    mouthForm = 0.35;
+                    browLAngle = 0.25;
+                    browRAngle = 0.25;
+                    browLY = 0.2;
+                    browRY = 0.2;
+                    finalAngleZ = 2.0 + Math.sin(this.time * 1.8) * 0.9;
+                } else if (emotion === 'curious') {
+                    // Inquisitive inquiry / question: wide alert eyes, raised brows, inquisitive tilt
+                    eyeLOpen = Math.min(1.15, eyeOpen * 1.15);
+                    eyeROpen = Math.min(1.15, eyeOpen * 1.15);
+                    browLY = 0.45;
+                    browRY = 0.45;
+                    mouthForm = 0.35;
+                    cheek = 0.2;
+                    finalAngleZ = -4.0;
+                    finalAngleX += 2.5;
+                } else {
+                    // Friendly conversational default
+                    eyeSmile = 0.45;
+                    cheek = 0.3;
+                    mouthForm = 0.5;
+                    finalAngleZ = Math.sin(this.time * 1.6) * 1.0;
+                }
+            } else if (this.currentState === 'listening') {
+                // Listening state: attentive forward tilt, alert eyes
+                finalAngleZ = -3.5 + Math.sin(this.time * 1.4) * 0.8;
+                finalAngleY += 3.0;
+                eyeLOpen = Math.min(1.05, eyeOpen * 1.05);
+                eyeROpen = Math.min(1.05, eyeOpen * 1.05);
+                cheek = 0.2;
+                mouthForm = 0.25;
+            } else if (this.currentState === 'thinking') {
+                // Thinking state: thoughtful upward & sideways glance
+                finalAngleY += 8.0;
+                finalAngleX += -5.0;
+                finalAngleZ = 3.0;
+                finalEyeY = Math.max(finalEyeY, 0.5);
+                finalEyeX = -0.3;
+                eyeLOpen = Math.max(0.7, eyeOpen);
+                eyeROpen = Math.max(0.7, eyeOpen);
+                browLY = -0.1;
+                browRY = -0.1;
+                mouthForm = -0.1;
             } else {
-                // Idle state: subtle idle head float
+                // Idle state: subtle idle head float, retaining gentle warmth from recent feedback
+                if (overallScore >= 85) {
+                    eyeSmile = 0.35;
+                    mouthForm = 0.45;
+                    cheek = 0.28;
+                } else if (hasCorrections) {
+                    eyeSmile = 0.25;
+                    mouthForm = 0.3;
+                    cheek = 0.2;
+                } else {
+                    eyeSmile = 0.2;
+                    mouthForm = 0.3;
+                    cheek = 0.18;
+                }
                 finalAngleY += Math.sin(this.time * 1.2) * 1.2;
                 finalAngleZ = Math.sin(this.time * 0.9) * 0.8;
-                this.targetMouthOpen = 0;
             }
 
-            // Smooth mouth closing/opening transition
-            this.mouthOpenValue += (this.targetMouthOpen - this.mouthOpenValue) * 0.25;
-
-            // 5. Apply Values to Live2D Parameters
+            // 6. Apply Values to Live2D Parameters
             this._setParam(coreModel, 'ParamAngleX', finalAngleX);
             this._setParam(coreModel, 'ParamAngleY', finalAngleY);
             this._setParam(coreModel, 'ParamAngleZ', finalAngleZ);
@@ -421,10 +653,15 @@
             this._setParam(coreModel, 'ParamEyeBallX', finalEyeX);
             this._setParam(coreModel, 'ParamEyeBallY', finalEyeY);
 
-            this._setParam(coreModel, 'ParamEyeLOpen', eyeOpen);
-            this._setParam(coreModel, 'ParamEyeROpen', eyeOpen);
+            this._setParam(coreModel, 'ParamEyeLOpen', eyeLOpen);
+            this._setParam(coreModel, 'ParamEyeROpen', eyeROpen);
             this._setParam(coreModel, 'ParamEyeLSmile', eyeSmile);
             this._setParam(coreModel, 'ParamEyeRSmile', eyeSmile);
+
+            this._setParam(coreModel, 'ParamBrowLY', browLY);
+            this._setParam(coreModel, 'ParamBrowRY', browRY);
+            this._setParam(coreModel, 'ParamBrowLAngle', browLAngle);
+            this._setParam(coreModel, 'ParamBrowRAngle', browRAngle);
 
             this._setParam(coreModel, 'ParamMouthOpenY', this.mouthOpenValue);
             this._setParam(coreModel, 'ParamMouthForm', mouthForm);
@@ -479,12 +716,17 @@
 
     // Automatic hook to window.setCompanionState
     const prevSetCompanionState = window.setCompanionState;
-    window.setCompanionState = function (state, text) {
+    window.setCompanionState = function (state, text, emotion, feedback) {
         if (typeof prevSetCompanionState === 'function') {
-            prevSetCompanionState(state, text);
+            prevSetCompanionState(state, text, emotion, feedback);
         }
-        if (window.miloLive2D && typeof window.miloLive2D.setState === 'function') {
-            window.miloLive2D.setState(state);
+        if (window.miloLive2D) {
+            if (typeof window.miloLive2D.setState === 'function') {
+                window.miloLive2D.setState(state);
+            }
+            if ((emotion || feedback) && typeof window.miloLive2D.setEmotion === 'function') {
+                window.miloLive2D.setEmotion(emotion, feedback);
+            }
         }
     };
 
@@ -495,7 +737,7 @@
             window.miloLive2D = new MiloLive2DCompanion({
                 canvasId: 'miloLive2DCanvas',
                 fallbackImgId: 'miloCharacterImg',
-                modelPath: 'assets/live2d/MILO Model.model3.json?v=20261123f'
+                modelPath: 'assets/live2d/MILO Model.model3.json?v=20261124a'
             });
         }
     });

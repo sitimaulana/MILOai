@@ -1,0 +1,16 @@
+﻿REKAPITULASI PROGRES PROYEK AKHIR AI-MILO
+Judul:,Asisten Virtual 2D Berbasis OpenAI untuk Meningkatkan Keterlibatan Belajar Berbicara Bahasa Inggris
+Nama Pengembang:,Siti Maulana Shofiyah (NRP. 5323600043) - PENS TRM
+Tanggal Audit:,23 November 2026
+
+Research Question,Fokus Pengembangan,Bobot (%),Skor Progres (%),Poin Kontribusi (%),Status Evaluasi
+RQ-A,Platform Web & Latihan Mandiri CEFR B1-B2,30.0,85.0,25.5,"Sangat Baik (Backend & DB Siap, Tinggal Kalibrasi Bank Soal & Error Handling)"
+RQ-B,"Core AI Pipeline (Whisper ASR, Hybrid RAG, GPT-4o-mini, TTS, Adaptive Feedback)",40.0,86.0,34.4,"Sangat Baik (Integrasi Wicara & RAG Siap, DeepEval Dikecualikan)"
+RQ-C,"Avatar 2D Live2D, Microlearning, Gamifikasi, & Student Engagement",30.0,51.25,15.38,Perlu Penyempurnaan (Live2D Lip-sync & UI Web Gamifikasi Masih Belum Matang)
+
+TOTAL PROGRES RIIL,,100.0,,75.28,75.28% (~75% - Tahap Integrasi Visual & Finishing Antarmuka)
+
+CATATAN KHUSUS AUDIT:
+1.,"Live2D WebGL: Model karakter ter-render & kedipan mata aktif, namun sinkronisasi audio lip-sync nyata masih berupa gelombang sinus dummy (belum terhubung ke Web Audio API)."
+2.,"Microlearning & Gamifikasi: Logika database dan perhitungan kalkulasi poin XP/streak sudah selesai di backend, namun antarmuka visual di web belum dipoles/masih kasar."
+3.,"DeepEval: Sesuai arahan, metrik DeepEval tidak dimasukkan ke dalam penilaian persentase ini; fokus pada keandalan fungsional pipeline."

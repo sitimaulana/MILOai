@@ -577,8 +577,7 @@ h1, h2, h3, h4, .title-progress-sesi, .title-evaluation-panel, .goal-modal-title
     max-height: 100%;
     filter: drop-shadow(0 14px 28px rgba(31, 46, 36, 0.12));
     touch-action: none;
-    opacity: 0;
-    transition: opacity 0.4s ease;
+    opacity: 1;
     cursor: grab;
 }
 

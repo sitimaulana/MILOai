@@ -30,7 +30,7 @@ const progressBarFill = document.getElementById('progressBarFill');
 const miloCompanionStage = document.getElementById('miloCompanionStage');
 const miloStatusText = document.getElementById('miloStatusText');
 
-function setCompanionState(state, text) {
+function setCompanionState(state, text, emotion, feedback) {
     if (miloCompanionStage) {
         miloCompanionStage.classList.remove('listening', 'thinking', 'speaking');
         if (state && state !== 'idle') {
@@ -40,8 +40,13 @@ function setCompanionState(state, text) {
     if (miloStatusText && text) {
         miloStatusText.textContent = text;
     }
-    if (window.miloLive2D && typeof window.miloLive2D.setState === 'function') {
-        window.miloLive2D.setState(state);
+    if (window.miloLive2D) {
+        if (typeof window.miloLive2D.setState === 'function') {
+            window.miloLive2D.setState(state);
+        }
+        if ((emotion || feedback) && typeof window.miloLive2D.setEmotion === 'function') {
+            window.miloLive2D.setEmotion(emotion, feedback);
+        }
     }
 }
 window.setCompanionState = setCompanionState;
@@ -173,7 +178,7 @@ function formatRagSourceLabel(src) {
     return s.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
-function appendMessage(text, sender, audioBase64 = null, translation = null, ragSources = [], ragDetails = []) {
+function appendMessage(text, sender, audioBase64 = null, translation = null, ragSources = [], ragDetails = [], emotion = 'friendly', feedback = null) {
     const isMilo = sender === 'milo';
     const msgId = ++messageIdCounter;
 
@@ -191,7 +196,9 @@ function appendMessage(text, sender, audioBase64 = null, translation = null, rag
         audioId,
         translation,
         ragSources,
-        ragDetails
+        ragDetails,
+        emotion,
+        feedback
     });
 
     const row = document.createElement('div');
@@ -289,9 +296,9 @@ function appendMessage(text, sender, audioBase64 = null, translation = null, rag
 
     turnCount++;
 
-    // Auto play audio if from MILO
+    // Auto play audio if from MILO with emotion & feedback
     if (isMilo && audioBase64) {
-        autoPlayAudio(audioBase64);
+        autoPlayAudio(audioBase64, emotion, feedback);
     }
 
     return msgId;
@@ -302,9 +309,9 @@ function playMiloSpeech(msgId, btnElement) {
     if (!msg) return;
 
     if (msg.audioId !== null && audioStore.has(msg.audioId)) {
-        playAudio(btnElement, msg.audioId);
+        playAudio(btnElement, msg.audioId, msg.emotion || 'friendly', msg.feedback || null);
     } else {
-        speakEnglishWithSynthesis(msg.text, btnElement);
+        speakEnglishWithSynthesis(msg.text, btnElement, msg.emotion || 'friendly', msg.feedback || null);
     }
 }
 window.playMiloSpeech = playMiloSpeech;
@@ -312,11 +319,11 @@ window.playMiloSpeech = playMiloSpeech;
 function playUserSpeech(msgId, btnElement) {
     const msg = messageStore.get(msgId);
     if (!msg || !msg.text) return;
-    speakEnglishWithSynthesis(msg.text, btnElement);
+    speakEnglishWithSynthesis(msg.text, btnElement, 'friendly', null);
 }
 window.playUserSpeech = playUserSpeech;
 
-function speakEnglishWithSynthesis(text, btnElement) {
+function speakEnglishWithSynthesis(text, btnElement, emotion = 'friendly', feedback = null) {
     if (!('speechSynthesis' in window)) {
         alert('Browser Anda tidak mendukung Web Speech API.');
         return;
@@ -325,6 +332,9 @@ function speakEnglishWithSynthesis(text, btnElement) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
     utterance.rate = 0.95;
+
+    const statusText = typeof getStatusTextForEmotion === 'function' ? getStatusTextForEmotion(emotion) : 'Milo menjawab...';
+    setCompanionState('speaking', statusText, emotion, feedback);
 
     let icon = null;
     let origClass = '';
@@ -336,11 +346,19 @@ function speakEnglishWithSynthesis(text, btnElement) {
         }
     }
 
+    utterance.onboundary = () => {
+        if (window.miloLive2D && typeof window.miloLive2D.setSpeakingPulse === 'function') {
+            window.miloLive2D.setSpeakingPulse(0.75);
+        }
+    };
+
     utterance.onend = () => {
         if (icon) icon.className = origClass;
+        setCompanionState('idle', 'Milo siap berlatih');
     };
     utterance.onerror = () => {
         if (icon) icon.className = origClass;
+        setCompanionState('idle', 'Milo siap berlatih');
     };
 
     window.speechSynthesis.speak(utterance);
@@ -467,10 +485,17 @@ async function sendTextMessage() {
             return;
         }
 
-        // Render MILO's reply with audio and Indonesian translation
-        setCompanionState('speaking', 'Milo menjawab...');
-        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, data.rag_sources, data.rag_details);
-        setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
+        // Render MILO's reply with audio, Indonesian translation, and feedback emotion
+        const avatarEmotion = data.avatar_emotion || (data.feedback?.overall_score >= 85 ? 'happy' : (data.feedback?.corrections?.length ? 'supportive' : 'friendly'));
+        const statusText = typeof getStatusTextForEmotion === 'function' ? getStatusTextForEmotion(avatarEmotion) : 'Milo menjawab...';
+
+        setCompanionState('speaking', statusText, avatarEmotion, data.feedback);
+        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, data.rag_sources, data.rag_details, avatarEmotion, data.feedback);
+
+        if (!data.audio_base64) {
+            const speakDuration = Math.max(3000, Math.min(8000, (data.response_text.split(/\s+/).length / 2.5) * 1000));
+            setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), speakDuration);
+        }
 
         // Update real-time Speech Evaluation HUD and inline user bubble badge
         if (data.feedback) {
@@ -649,10 +674,17 @@ async function sendVoiceMessage(audioBlob) {
                 return;
             }
 
-            // Render MILO's reply with audio and Indonesian translation
-            setCompanionState('speaking', 'Milo menjawab...');
-            appendMessage(data.response_text, 'milo', data.audio_base64, data.translation);
-            setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
+            // Render MILO's reply with audio, Indonesian translation, and feedback emotion
+            const avatarEmotion = data.avatar_emotion || (data.feedback?.overall_score >= 85 ? 'happy' : (data.feedback?.corrections?.length ? 'supportive' : 'friendly'));
+            const statusText = typeof getStatusTextForEmotion === 'function' ? getStatusTextForEmotion(avatarEmotion) : 'Milo menjawab...';
+
+            setCompanionState('speaking', statusText, avatarEmotion, data.feedback);
+            appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, [], [], avatarEmotion, data.feedback);
+
+            if (!data.audio_base64) {
+                const speakDuration = Math.max(3000, Math.min(8000, (data.response_text.split(/\s+/).length / 2.5) * 1000));
+                setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), speakDuration);
+            }
 
             // Update real-time Speech Evaluation HUD and inline user bubble badge
             if (data.feedback) {
@@ -704,10 +736,17 @@ async function sendVoiceMessage(audioBlob) {
             return;
         }
 
-        // Render MILO's reply with audio and Indonesian translation
-        setCompanionState('speaking', 'Milo menjawab...');
-        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, data.rag_sources, data.rag_details);
-        setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), 4000);
+        // Render MILO's reply with audio, Indonesian translation, and feedback emotion
+        const avatarEmotion = data.avatar_emotion || (data.feedback?.overall_score >= 85 ? 'happy' : (data.feedback?.corrections?.length ? 'supportive' : 'friendly'));
+        const statusText = typeof getStatusTextForEmotion === 'function' ? getStatusTextForEmotion(avatarEmotion) : 'Milo menjawab...';
+
+        setCompanionState('speaking', statusText, avatarEmotion, data.feedback);
+        appendMessage(data.response_text, 'milo', data.audio_base64, data.translation, data.rag_sources, data.rag_details, avatarEmotion, data.feedback);
+
+        if (!data.audio_base64) {
+            const speakDuration = Math.max(3000, Math.min(8000, (data.response_text.split(/\s+/).length / 2.5) * 1000));
+            setTimeout(() => setCompanionState('idle', 'Milo siap berlatih'), speakDuration);
+        }
 
         // Update real-time Speech Evaluation HUD and inline user bubble badge
         if (data.feedback) {
@@ -1040,7 +1079,10 @@ function playClosingAudioAndRedirect(base64Audio) {
     if (base64Audio) {
         try {
             const audio = new Audio("data:audio/mp3;base64," + base64Audio);
-            setCompanionState('speaking', 'Milo menutup percakapan...');
+            setCompanionState('speaking', 'Milo menutup percakapan...', 'happy');
+            if (window.miloLive2D && typeof window.miloLive2D.bindAudio === 'function') {
+                window.miloLive2D.bindAudio(audio, 'happy', null);
+            }
             audio.onended = () => {
                 setCompanionState('idle', 'Sesi latihan selesai');
                 setTimeout(triggerRedirect, 1500);
