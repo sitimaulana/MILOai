@@ -50,12 +50,18 @@ function formatTopicDisplay(topic) {
 const audioStore = new Map();
 let audioIdCounter = 0;
 
-function getStatusTextForEmotion(emotion) {
+function getStatusTextForEmotion(emotion, feedback = null) {
+    if (feedback && feedback.corrections && feedback.corrections.length > 0) {
+        return 'Milo memberikan tips evaluasi 💡';
+    }
+    if (feedback && typeof feedback.overall_score === 'number' && feedback.overall_score >= 85) {
+        return 'Milo senang & bangga dengan kemajuanmu! ✨';
+    }
     switch (emotion) {
         case 'happy':
             return 'Milo senang & bangga dengan kemajuanmu! ✨';
         case 'supportive':
-            return 'Milo memberikan tips & masukan evaluasi 💡';
+            return 'Milo memberikan tips evaluasi 💡';
         case 'curious':
             return 'Milo mendengarkan dengan antusias 🤔';
         case 'speaking':
@@ -64,17 +70,36 @@ function getStatusTextForEmotion(emotion) {
     }
 }
 
-function playAudio(btnElement, audioId, emotion = 'friendly', feedback = null) {
+function getIdleStatusTextForEmotion(emotion, feedback = null) {
+    if (feedback && feedback.corrections && feedback.corrections.length > 0) {
+        return 'Milo menyemangatimu: simak tips evaluasi 💡';
+    }
+    if (feedback && typeof feedback.overall_score === 'number' && feedback.overall_score >= 85) {
+        return 'Bagus sekali! Milo bangga dengan kemajuanmu ✨';
+    }
+    switch (emotion) {
+        case 'happy':
+            return 'Bagus sekali! Milo siap untuk latihan berikutnya ✨';
+        case 'supportive':
+            return 'Semangat! Coba terapkan tips di samping 💡';
+        case 'curious':
+            return 'Milo menunggu ceritamu... 🎤';
+        default:
+            return 'Milo siap berlatih';
+    }
+}
+
+function playAudio(btnElement, audioId, emotion = 'friendly', feedback = null, text = '') {
     const base64Audio = audioStore.get(audioId);
     if (!base64Audio) return;
 
     const audio = new Audio("data:audio/mp3;base64," + base64Audio);
-    const statusText = getStatusTextForEmotion(emotion);
+    const statusText = getStatusTextForEmotion(emotion, feedback);
     if (typeof window.setCompanionState === 'function') {
         window.setCompanionState('speaking', statusText, emotion, feedback);
     }
     if (window.miloLive2D && typeof window.miloLive2D.bindAudio === 'function') {
-        window.miloLive2D.bindAudio(audio, emotion, feedback);
+        window.miloLive2D.bindAudio(audio, emotion, feedback, text);
     }
 
     if (btnElement) {
@@ -85,57 +110,64 @@ function playAudio(btnElement, audioId, emotion = 'friendly', feedback = null) {
         }
         audio.onended = () => {
             if (icon) icon.className = origClass;
+            const idleText = getIdleStatusTextForEmotion(emotion, feedback);
             if (typeof window.setCompanionState === 'function') {
-                window.setCompanionState('idle', 'Milo siap berlatih');
+                window.setCompanionState('idle', idleText, emotion, feedback);
             }
         };
         audio.onerror = () => {
             if (icon) icon.className = origClass;
+            const idleText = getIdleStatusTextForEmotion(emotion, feedback);
             if (typeof window.setCompanionState === 'function') {
-                window.setCompanionState('idle', 'Milo siap berlatih');
+                window.setCompanionState('idle', idleText, emotion, feedback);
             }
         };
     } else {
         audio.onended = () => {
+            const idleText = getIdleStatusTextForEmotion(emotion, feedback);
             if (typeof window.setCompanionState === 'function') {
-                window.setCompanionState('idle', 'Milo siap berlatih');
+                window.setCompanionState('idle', idleText, emotion, feedback);
             }
         };
     }
     audio.play().catch(err => {
         console.error("Audio playback error:", err);
+        const idleText = getIdleStatusTextForEmotion(emotion, feedback);
         if (typeof window.setCompanionState === 'function') {
-            window.setCompanionState('idle', 'Milo siap berlatih');
+            window.setCompanionState('idle', idleText, emotion, feedback);
         }
     });
     return audio;
 }
 
-function autoPlayAudio(base64Audio, emotion = 'friendly', feedback = null) {
+function autoPlayAudio(base64Audio, emotion = 'friendly', feedback = null, text = '') {
     if (!base64Audio) return;
     try {
         const audio = new Audio("data:audio/mp3;base64," + base64Audio);
-        const statusText = getStatusTextForEmotion(emotion);
+        const statusText = getStatusTextForEmotion(emotion, feedback);
         if (typeof window.setCompanionState === 'function') {
             window.setCompanionState('speaking', statusText, emotion, feedback);
         }
         if (window.miloLive2D && typeof window.miloLive2D.bindAudio === 'function') {
-            window.miloLive2D.bindAudio(audio, emotion, feedback);
+            window.miloLive2D.bindAudio(audio, emotion, feedback, text);
         }
         audio.onended = () => {
+            const idleText = getIdleStatusTextForEmotion(emotion, feedback);
             if (typeof window.setCompanionState === 'function') {
-                window.setCompanionState('idle', 'Milo siap berlatih');
+                window.setCompanionState('idle', idleText, emotion, feedback);
             }
         };
         audio.onerror = () => {
+            const idleText = getIdleStatusTextForEmotion(emotion, feedback);
             if (typeof window.setCompanionState === 'function') {
-                window.setCompanionState('idle', 'Milo siap berlatih');
+                window.setCompanionState('idle', idleText, emotion, feedback);
             }
         };
         audio.play().catch(err => {
             console.log("Auto-play prevented by browser policy:", err);
+            const idleText = getIdleStatusTextForEmotion(emotion, feedback);
             if (typeof window.setCompanionState === 'function') {
-                window.setCompanionState('idle', 'Milo siap berlatih');
+                window.setCompanionState('idle', idleText, emotion, feedback);
             }
         });
         return audio;
