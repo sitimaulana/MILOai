@@ -277,13 +277,38 @@ function initAuthNav() {
     const registerUrl = `${resolvePageUrl('register.html')}?redirect=${redirectParam}`;
     const setupUrl = resolvePageUrl('setup.html');
 
+    // Toggle links that require login (e.g. Ruang Latihan & Dashboard)
+    const isLoggedIn = Boolean(token && user);
+    if (document.body) {
+        document.body.classList.toggle('logged-in', isLoggedIn);
+    }
+    const authRequiredLinks = document.querySelectorAll('.auth-required-nav');
+    authRequiredLinks.forEach(link => {
+        if (isLoggedIn) {
+            link.style.setProperty('display', link.classList.contains('mobile-nav-link') ? 'flex' : 'inline-block', 'important');
+        } else {
+            link.style.setProperty('display', 'none', 'important');
+        }
+    });
+
+    const authGuestLinks = document.querySelectorAll('.auth-guest-nav');
+    authGuestLinks.forEach(link => {
+        if (isLoggedIn) {
+            link.style.setProperty('display', 'none', 'important');
+        } else {
+            link.style.setProperty('display', link.classList.contains('mobile-nav-link') ? 'flex' : 'inline-block', 'important');
+        }
+    });
+
     // 1. Navbar Action Wrapper (index, dashboard, summary)
+    const isIndexOrSetup = currentPage === '' || currentPage === 'index.html' || currentPage === 'setup.html';
     const containers = document.querySelectorAll('.nav-action-wrapper');
     containers.forEach(container => {
-        if (token && user) {
+        if (isLoggedIn) {
             const initial = (user.full_name || user.username || 'M').charAt(0).toUpperCase();
             const displayName = user.full_name || user.username;
             const cefr = user.cefr_level || 'B1';
+            const ctaBtn = isIndexOrSetup ? '' : `<a href="${setupUrl}" class="nav-cta-btn">Mulai Latihan</a>`;
 
             container.innerHTML = `
                 <div class="user-profile-nav-pill" title="Masuk sebagai ${escapeHtml(displayName)}">
@@ -294,13 +319,27 @@ function initAuthNav() {
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </button>
                 </div>
-                <a href="${setupUrl}" class="nav-cta-btn">Mulai Latihan</a>
+                ${ctaBtn}
             `;
+
+            // Hide the 'Masuk' menu link in nav-menu when user is logged in
+            const masukLink = document.getElementById('nav-link-masuk');
+            if (masukLink) masukLink.style.display = 'none';
+            const mobileMasuk = document.getElementById('mobile-nav-link-masuk');
+            if (mobileMasuk) mobileMasuk.style.display = 'none';
         } else {
-            container.innerHTML = `
-                <a href="${loginUrl}" class="nav-secondary-btn">Masuk</a>
-                <a href="${registerUrl}" class="nav-cta-btn">Daftar</a>
-            `;
+            if (isIndexOrSetup) {
+                container.innerHTML = '';
+            } else {
+                container.innerHTML = `
+                    <a href="${loginUrl}" class="nav-secondary-btn">Masuk</a>
+                    <a href="${registerUrl}" class="nav-cta-btn">Daftar</a>
+                `;
+            }
+            const masukLink = document.getElementById('nav-link-masuk');
+            if (masukLink) masukLink.style.display = '';
+            const mobileMasuk = document.getElementById('mobile-nav-link-masuk');
+            if (mobileMasuk) mobileMasuk.style.display = '';
         }
     });
 

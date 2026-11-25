@@ -63,7 +63,7 @@
 
 body.setup-body {
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--sand-grad);
+    background: #FBEFE3;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -258,57 +258,414 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
     background: #EEDDCC;
 }
 
+/* ─── Auth Guest vs Logged In Nav State ────────────────────────────────────────── */
+body.logged-in .auth-guest-nav,
+body.logged-in #nav-link-masuk,
+body.logged-in #mobile-nav-link-masuk {
+    display: none !important;
+}
+
+body.logged-in .auth-required-nav {
+    display: inline-block !important;
+}
+
 /* ─── Main Content Container ─────────────────────────────────────────────────── */
 .setup-main-container {
-    max-width: 720px;
-    width: calc(100% - 48px);
+    max-width: 1220px;
+    width: min(1220px, calc(100% - 48px));
     margin: 0 auto;
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 12px 0 32px;
+    justify-content: flex-start;
+    padding: 24px 0 60px;
 }
 
-/* ─── Question Prompt Bubble ─────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════════
+   FIGMA STYLING: STEP 1 BULLETIN BOARD (Figma Node 2312:6772)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.setup-header-figma {
+    text-align: left;
+    max-width: 1180px;
+    width: 100%;
+    margin: 8px auto 20px;
+    box-sizing: border-box;
+}
+
+.setup-title-figma {
+    font-family: 'Nunito', sans-serif;
+    font-size: 42px;
+    font-weight: 900;
+    color: #1E415A;
+    letter-spacing: -0.03em;
+    margin: 0 0 8px 0;
+    line-height: 1.15;
+}
+
+.setup-subtitle-figma {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #557086;
+    max-width: none;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Board & Milo Flex Stage */
+.setup-board-stage {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 16px;
+    position: relative;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1180px;
+    padding-bottom: 40px;
+}
+
+/* Bulletin Board Container */
+.bulletin-board-card {
+    position: relative;
+    flex: 0 0 944px;
+    width: 944px;
+    min-height: 520px;
+    background-image: url('../assets/figma/setup/board_bg.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 72px 48px 48px 48px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Post-it Note at Top Left */
+.board-postit-note {
+    position: absolute;
+    top: -24px;
+    left: -20px;
+    width: 124px;
+    z-index: 5;
+    pointer-events: none;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.16));
+    transition: transform 0.2s ease;
+}
+
+.postit-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Pinned Topic Cards Grid */
+.board-cards-grid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    width: 100%;
+    position: relative;
+    z-index: 2;
+}
+
+/* Topic Card */
+.board-topic-card {
+    width: 216px;
+    min-height: 308px;
+    border-radius: 14px;
+    padding: 22px 14px 18px;
+    box-sizing: border-box;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, outline 0.15s ease;
+    user-select: none;
+    z-index: 2;
+}
+
+.board-topic-card * {
+    pointer-events: none;
+}
+
+.board-topic-card:hover {
+    transform: translateY(-12px) scale(1.08);
+    box-shadow: 0 24px 44px rgba(0, 0, 0, 0.32);
+    z-index: 10;
+}
+
+.board-topic-card.selected {
+    transform: translateY(-6px) scale(1.03);
+    outline: 3px solid #FFFFFF;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28), 0 0 0 5px rgba(30, 65, 90, 0.45);
+    z-index: 3;
+}
+
+.board-topic-card.selected:hover {
+    transform: translateY(-12px) scale(1.08);
+    box-shadow: 0 24px 44px rgba(0, 0, 0, 0.35), 0 0 0 5px rgba(30, 65, 90, 0.5);
+    z-index: 10;
+}
+
+/* Individual Card Color Themes matching Figma exact tokens */
+.board-topic-card.card-interview {
+    background-color: #38B6FF;
+}
+
+.board-topic-card.card-academic {
+    background-color: #38A778;
+}
+
+.board-topic-card.card-daily {
+    background-color: #FBB63A;
+}
+
+/* Pushpins on Cards */
+.card-pin {
+    position: absolute;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #FF8D80 0%, #B84F43 55%, #7A241B 100%);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), 0 0 0 1.5px rgba(251, 239, 227, 0.95);
+    z-index: 4;
+}
+
+.card-pin.pin-left {
+    top: 7px;
+    left: 14px;
+}
+
+.card-pin.pin-right {
+    top: 7px;
+    right: 14px;
+}
+
+/* Inner content of each card */
+.card-inner-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.card-topic-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 10px;
+    line-height: 1.25;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon-wrap {
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.card-topic-icon {
+    max-height: 72px;
+    max-width: 88px;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+    transition: transform 0.2s ease;
+}
+
+.board-topic-card:hover .card-topic-icon {
+    transform: scale(1.06);
+}
+
+.card-topic-desc {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #FFFFFF;
+    line-height: 1.45;
+    text-align: left;
+    margin-bottom: 12px;
+    flex: 1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.card-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.card-tag-pill {
+    background-color: #FBEFE3;
+    color: #1E415A;
+    font-family: 'Nunito', sans-serif;
+    font-size: 9.5px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    letter-spacing: -0.01em;
+}
+
+/* Milo Thinking Character Stage */
+.setup-milo-stage {
+    position: relative;
+    flex: 0 0 215px;
+    width: 215px;
+    height: 570px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: -8px;
+    margin-top: -8px;
+    z-index: 4;
+}
+
+.setup-milo-thinking-img {
+    width: 215px;
+    height: auto;
+    object-fit: contain;
+    z-index: 2;
+    position: relative;
+    filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.1));
+}
+
+.setup-milo-shadow {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 210px;
+    height: 38px;
+    background: radial-gradient(ellipse at center, rgba(60, 40, 30, 0.26) 0%, rgba(60, 40, 30, 0) 72%);
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Responsive adjustments for Setup Stage */
+@media (max-width: 1199px) {
+    .setup-header-figma {
+        text-align: center;
+    }
+    .setup-board-stage {
+        flex-direction: column;
+        align-items: center;
+        gap: 32px;
+    }
+    .bulletin-board-card {
+        flex: 1;
+        width: 100%;
+        max-width: 944px;
+    }
+    .setup-milo-stage {
+        height: 380px;
+        flex: 0 0 auto;
+        margin-left: 0;
+        margin-top: 0;
+    }
+    .setup-milo-thinking-img {
+        width: 150px;
+    }
+}
+
+@media (max-width: 920px) {
+    .bulletin-board-card {
+        padding: 56px 24px 36px 24px;
+        min-height: auto;
+    }
+    .board-cards-grid {
+        gap: 16px;
+    }
+    .board-topic-card {
+        width: 180px;
+        padding: 18px 10px 14px;
+    }
+    .card-topic-title {
+        font-size: 13.5px;
+    }
+    .card-topic-desc {
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 680px) {
+    .bulletin-board-card {
+        background: #F4E7D7;
+        border: 8px solid #C49C74;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        padding: 48px 16px 24px 16px;
+    }
+    .board-cards-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .board-topic-card {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+/* ─── Question Prompt Bubble (Figma Node 2403-1595) ───────────────────────────── */
 .prompt-bubble-card {
     background: #FFFFFF;
     border-radius: 20px;
-    padding: 24px 32px;
-    box-shadow: var(--shadow-card);
-    border: 1px solid var(--border-subtle);
-    margin-bottom: 24px;
-    text-align: center;
+    padding: 22px 32px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    margin: 0 0 28px 0;
+    text-align: left;
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
     position: relative;
-}
-
-.prompt-bubble-card::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #FFFFFF;
+    box-sizing: border-box;
 }
 
 .prompt-bubble-card h2 {
-    font-size: 21px;
-    font-weight: 800;
-    color: var(--text-navy);
-    line-height: 1.35;
+    font-family: 'Nunito', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: #1E3144;
+    line-height: 1.25;
     letter-spacing: -0.02em;
+    margin-bottom: 6px;
 }
 
 .prompt-bubble-desc {
-    font-size: 13.5px;
-    color: var(--text-slate);
-    margin-top: 8px;
-    font-weight: 500;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #64748B;
+    margin: 0;
     line-height: 1.5;
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .prompt-bubble-card {
+        display: block;
+        width: 100%;
+        padding: 18px 20px;
+    }
+    .prompt-bubble-desc {
+        white-space: normal;
+    }
 }
 
 /* ─── Step 1: Levels Grid (Dual Tracks B1 & B2) ──────────────────────────────── */
@@ -679,49 +1036,431 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
     color: #FFFFFF;
 }
 
-/* ─── Step 4: Specific Topics Grid & Cards (Anti-Slop Craftsmanship) ─── */
-.specific-topics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 18px;
-    margin-top: 8px;
+/* ═══════════════════════════════════════════════════════════════════════════════
+   STEP 1.5: CLOSED BOOK COVER (Figma Node 2403-1595 Intro)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+#stepBookCoverContainer {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 10px 0 40px;
+    animation: bookContainerIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@media (max-width: 768px) {
+@keyframes bookContainerIn {
+    0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.book-nav-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 24px;
+}
+
+.btn-book-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #FFFFFF;
+    color: #1E3144;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.btn-book-back:hover {
+    background: #F8FAFC;
+    transform: translateX(-3px);
+    border-color: #CBD5E1;
+}
+
+.book-stage-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 2200px;
+    padding: 20px 0 36px;
+}
+
+/* 3D Scrapbook Assembly Container */
+.scrapbook-wrapper {
+    position: relative;
+    width: 660px;
+    max-width: 95vw;
+    height: 470px;
+    perspective: 2200px;
+    transform-style: preserve-3d;
+}
+
+/* Underneath Inner Pages Block (revealed as front cover opens!) */
+.book-inside-spread {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #FFFDF9;
+    border-radius: 18px;
+    box-sizing: border-box;
+    display: flex;
+    overflow: hidden;
+    /* Layered book page edges on right and bottom */
+    box-shadow: 
+        4px 4px 0 #F1E7DC,
+        8px 8px 0 #E5D5C5,
+        12px 12px 0 #D8C3AF,
+        0 24px 50px rgba(15, 23, 42, 0.25);
+    border: 1px solid #E6D8C8;
+    z-index: 1;
+}
+
+.book-inside-spine {
+    width: 58px;
+    height: 100%;
+    background: #E8DDD0;
+    box-shadow: inset -4px 0 10px rgba(0, 0, 0, 0.12);
+}
+
+.book-inside-content {
+    flex: 1;
+    padding: 36px 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-image: radial-gradient(#E2D3C2 0.85px, transparent 0.85px);
+    background-size: 16px 16px;
+    box-sizing: border-box;
+}
+
+.inside-track-badge {
+    display: inline-block;
+    background: #1E3144;
+    color: #FFFFFF;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 900;
+    padding: 4px 12px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.inside-welcome {
+    font-family: 'Nunito', sans-serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: #1E3144;
+    margin: 8px 0 0;
+}
+
+.inside-sketch-art {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin: 16px 0;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(226, 216, 204, 0.8);
+}
+
+.inside-milo-avatar {
+    width: 72px;
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+.inside-text-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.inside-hint-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: #1E3144;
+    margin: 0;
+}
+
+.inside-hint-text {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #557086;
+    margin: 0;
+    line-height: 1.45;
+}
+
+.inside-loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #F3ECE2;
+    padding: 10px 18px;
+    border-radius: 12px;
+    width: fit-content;
+    color: #1E3144;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.inside-loading-indicator i {
+    color: #FBB63A;
+    font-size: 16px;
+}
+
+/* Front Cover (Hinges on Left Edge and Swings Wide Open in 3D!) */
+.interactive-book-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #23374B;
+    border-radius: 20px;
+    display: flex;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transform-origin: left center;
+    transition: transform 0.82s cubic-bezier(0.25, 1, 0.4, 1), box-shadow 0.82s ease;
+    user-select: none;
+    z-index: 5;
+    box-shadow: 0 16px 36px rgba(15, 23, 42, 0.3);
+}
+
+.interactive-book-card:hover {
+    transform: rotateY(-4deg) translateY(-2px);
+    box-shadow: 0 24px 50px rgba(15, 23, 42, 0.38);
+}
+
+/* Visible 3D Open Flip Animation! */
+.scrapbook-wrapper.opening .interactive-book-card,
+.interactive-book-card.opening {
+    transform: rotateY(-130deg);
+    box-shadow: -24px 24px 55px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
+
+/* Book Bookmark Tab */
+.book-bookmark-tab {
+    position: absolute;
+    top: -14px;
+    right: 48px;
+    background: #1B4543;
+    color: #FFFFFF;
+    font-family: 'Nunito', sans-serif;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 4px 16px 6px;
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+    letter-spacing: 0.03em;
+}
+
+/* Book Spine */
+.book-spine {
+    width: 58px;
+    height: 100%;
+    border-radius: 20px 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 40px 0;
+    box-shadow: inset -4px 0 8px rgba(0, 0, 0, 0.25);
+    transition: background 0.3s ease;
+}
+
+.book-spine.spine-blue {
+    background-color: #38B6FF;
+}
+
+.book-spine.spine-green {
+    background-color: #38A778;
+}
+
+.book-spine.spine-yellow {
+    background-color: #FBB63A;
+}
+
+.spine-stitch {
+    width: 20px;
+    height: 3px;
+    background: #FFD27D;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Book Cover Surface */
+.book-cover-surface {
+    flex: 1;
+    padding: 20px 24px 20px 14px;
+    box-sizing: border-box;
+    display: flex;
+}
+
+.book-stitched-inner {
+    flex: 1;
+    border: 2px dashed rgba(255, 255, 255, 0.22);
+    border-radius: 14px;
+    padding: 36px 36px 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.book-plate-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    width: 100%;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    box-sizing: border-box;
+}
+
+.book-plate-title {
+    font-family: 'Nunito', sans-serif;
+    font-size: 34px;
+    font-weight: 900;
+    color: #1E3144;
+    margin: 0 0 8px;
+    letter-spacing: -0.02em;
+}
+
+.book-plate-sub1 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #64748B;
+    margin: 0 0 4px;
+}
+
+.book-plate-sub2 {
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748B;
+    margin: 0;
+}
+
+.book-cta-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.btn-book-action {
+    background: #FBB63A;
+    color: #1E3144;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 14px;
+    padding: 10px 32px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(251, 182, 58, 0.4);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-book-action:hover {
+    transform: translateY(-2px);
+    background: #F59E0B;
+}
+
+.book-action-hint {
+    font-family: 'DM Sans', monospace, sans-serif;
+    font-size: 13px;
+    color: #FFFFFF;
+    opacity: 0.85;
+    margin: 0;
+    letter-spacing: 0.04em;
+}
+
+/* ─── Step 2: Specific Topics Grid & Cards (Figma Node 2403-1595 exact match) ─── */
+#step2SpecificContainer {
+    width: 100%;
+    animation: step2Reveal 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes step2Reveal {
+    0% {
+        opacity: 0;
+        transform: scale(0.97) translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.specific-topics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+    max-width: 1220px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1080px) {
     .specific-topics-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 20px;
     }
 }
 
 .specific-topic-card {
     background: #FFFFFF;
-    border-radius: 18px;
-    padding: 22px;
-    box-shadow: var(--shadow-sm);
-    border: 2px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    border: 1.5px solid #E2E8F0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 0;
     cursor: pointer;
-    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     user-select: none;
     outline: none;
+    box-sizing: border-box;
 }
 
 .specific-topic-card:hover,
 .specific-topic-card:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--primary);
-    background: #FFFEFD;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    border-color: #CBD5E1;
 }
 
 .specific-topic-card.selected {
-    border-color: var(--primary);
-    box-shadow: 0 10px 28px rgba(122, 154, 130, 0.22);
-    background: #FAFCFA;
+    border: 2.5px solid #23374B;
+    box-shadow: 0 12px 28px rgba(35, 55, 75, 0.14);
+    transform: translateY(-2px);
+    background: #FFFFFF;
 }
 
 /* Card Top Metadata Row */
@@ -733,18 +1472,17 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
 }
 
 .topic-id-badge {
-    background: var(--primary);
+    background: #23374B;
     color: #FFFFFF;
+    font-family: 'Nunito', sans-serif;
     font-size: 12px;
-    font-weight: 800;
-    padding: 5px 12px;
+    font-weight: 900;
+    padding: 6px 14px;
     border-radius: 8px;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    box-shadow: 0 2px 6px rgba(122, 154, 130, 0.28);
 }
 
 .topic-meta-badges {
@@ -753,37 +1491,18 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
     gap: 8px;
 }
 
-.topic-meta-pill {
-    background: var(--neutral-bg);
-    color: var(--text-slate);
-    border: 1px solid var(--border-subtle);
-    font-size: 11.5px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.topic-meta-pill.level-pill {
-    background: var(--secondary-tint);
-    color: var(--secondary);
-    border-color: var(--secondary-border);
-}
-
 /* Selected State Active Indicator */
 .specific-topic-card .selection-indicator {
     display: none;
     align-items: center;
     gap: 6px;
+    font-family: 'Nunito', sans-serif;
     font-size: 11.5px;
     font-weight: 800;
-    color: var(--primary-dark);
-    background: var(--primary-tint);
-    border: 1px solid var(--primary-border);
-    padding: 3px 9px;
-    border-radius: 6px;
+    color: #1E3144;
+    background: #EAF0F6;
+    padding: 4px 12px;
+    border-radius: 999px;
 }
 
 .specific-topic-card.selected .selection-indicator {
@@ -792,73 +1511,86 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
 
 /* Card Title */
 .specific-topic-title {
-    font-size: 17px;
-    font-weight: 800;
-    color: var(--text-navy);
-    line-height: 1.35;
-    letter-spacing: -0.01em;
+    font-family: 'Nunito', sans-serif;
+    font-size: 18.5px;
+    font-weight: 900;
+    color: #23374B;
+    line-height: 1.32;
+    letter-spacing: -0.015em;
+    margin: 16px 0 14px;
+    min-height: 50px;
 }
 
 /* Can-Do Statement Container Box */
 .specific-topic-cando-box {
-    background: var(--neutral-bg);
-    border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 12px 14px;
+    background: #FAF4EE;
+    border-radius: 14px;
+    padding: 14px 16px;
+    border: none;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    margin-bottom: 16px;
 }
 
 .specific-topic-cando-label {
+    font-family: 'Nunito', sans-serif;
     font-size: 11px;
-    font-weight: 800;
+    font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--primary-dark);
+    letter-spacing: 0.06em;
+    color: #23374B;
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
 
 .specific-topic-cando {
-    font-size: 13px;
-    color: var(--text-navy);
-    line-height: 1.5;
-    font-weight: 500;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.55;
+    font-weight: 600;
 }
 
 /* Vocabulary Preview Chips */
 .topic-vocab-preview-row {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 6px;
-    padding-top: 4px;
+    margin-top: auto;
 }
 
 .topic-vocab-preview-label {
+    font-family: 'Nunito', sans-serif;
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-muted);
-    margin-right: 2px;
+    color: #64748B;
+}
+
+.topic-vocab-chips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
 }
 
 .topic-vocab-chip {
+    font-family: 'Nunito', sans-serif;
     font-size: 11px;
     font-weight: 700;
-    background: #FFFFFF;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-slate);
-    padding: 2px 8px;
-    border-radius: 6px;
     font-style: italic;
-}
-
-.specific-topic-card.selected .topic-vocab-chip {
-    border-color: var(--primary-border);
-    color: var(--primary-dark);
-    background: var(--primary-tint);
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    color: #23374B;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    word-break: break-word;
 }
 
 .topics-grid-layout {
@@ -970,18 +1702,20 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
 /* ─── Bottom Shelf / Dock ────────────────────────────────────────────────────── */
 .setup-bottom-shelf {
     background: #FFFFFF;
-    border-radius: 28px 28px 0 0;
-    padding: 18px 48px 22px;
-    box-shadow: 0 -4px 24px rgba(31, 46, 36, 0.05);
-    border-top: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 14px 28px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(226, 232, 240, 0.85);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-top: auto;
+    margin: 32px auto 24px;
+    max-width: 1220px;
+    width: calc(100% - 48px);
     position: sticky;
-    bottom: 0;
+    bottom: 20px;
     z-index: 100;
-    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .shelf-info-text {
@@ -990,39 +1724,49 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
 }
 
 .shelf-info-badge {
-    background: var(--primary-tint);
-    color: var(--primary-dark);
-    padding: 3px 10px;
-    border-radius: 6px;
+    background: #60B6E7;
+    color: #1E3144;
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+    font-size: 13px;
+    border: none;
+    letter-spacing: 0.02em;
+}
+
+#shelfSpecificTopicTitle {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
     font-weight: 800;
-    font-size: 12px;
-    border: 1px solid var(--primary-border);
+    color: #1E3144;
 }
 
 .btn-cta-next {
-    background: var(--secondary);
+    background: #FBB63A;
     color: #FFFFFF;
     border: none;
-    padding: 13px 30px;
+    padding: 13px 28px;
     border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
     font-size: 14.5px;
     font-weight: 800;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     cursor: pointer;
-    box-shadow: var(--shadow-secondary);
+    box-shadow: 0 4px 14px rgba(251, 182, 58, 0.4);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-cta-next:hover:not(:disabled) {
-    background: var(--secondary-hover);
+    background: #F59E0B;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(140, 98, 57, 0.35);
+    box-shadow: 0 6px 20px rgba(251, 182, 58, 0.45);
 }
 
 .btn-cta-next:active:not(:disabled) {
@@ -1037,13 +1781,14 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
 }
 
 .btn-cta-secondary {
-    background: transparent;
-    color: var(--text-slate);
-    border: 1.5px solid var(--border-subtle);
-    padding: 11px 22px;
+    background: #FFFFFF;
+    color: #1E3144;
+    border: 1.5px solid #E2E8F0;
+    padding: 12px 22px;
     border-radius: 12px;
-    font-size: 13.5px;
-    font-weight: 700;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1052,9 +1797,9 @@ h1, h2, h3, h4, .card-title-text, .prompt-bubble-card h2 {
 }
 
 .btn-cta-secondary:hover {
-    color: var(--text-navy);
-    border-color: var(--primary);
-    background: var(--primary-tint);
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    transform: translateX(-2px);
 }
 
 /* ─── Diagnostic Placement Mini-Modal ("Bingung? Cari tahu levelmu") ─────────── */

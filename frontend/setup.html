@@ -6,41 +6,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="assets/Icon logo milo.svg">
     <title>Pilih Level, Target & Topik: MILO English Speaking Practice</title>
+    <!-- Google Fonts: DM Sans & Nunito (Exact fonts used in Figma) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Nunito:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/setup.css?v=20261118e">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="css/index.css?v=20261126_v6">
+    <link rel="stylesheet" href="css/setup.css?v=20261126_v6">
 </head>
 
 <body class="setup-body">
 
-    <!-- Top Header Navigation -->
-    <header class="setup-nav-header">
-        <div style="display:flex;align-items:center;gap:12px;">
-            <button type="button" class="btn-header-back" title="Kembali" id="btnHeaderBack" aria-label="Kembali">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <a href="index.html" class="brand setup-brand" title="Kembali ke Beranda" aria-label="Kembali ke Beranda MILO">
-                <span class="brand-mark">
-                    <img src="assets/Icon logo milo.svg" alt="" width="32" height="32" class="brand-mark-img">
-                </span>
-                <span class="brand-text">MILO</span>
-            </a>
-        </div>
-        <div class="stepper-dots-wrapper" aria-label="Indikator tahapan">
-            <span class="stepper-dot active" id="dotStep1" title="Langkah 1: Kategori Skenario"></span>
-            <span class="stepper-dot" id="dotStep2" title="Langkah 2: Modul Spesifik"></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-            <!-- Active Level Badge (Read-only, set in onboarding) -->
-            <div class="setup-level-badge" id="setupLevelBadge" title="Level CEFR aktif akun Anda">
-                <i class="fa-solid fa-layer-group" style="font-size: 11px;" aria-hidden="true"></i>
-                <span id="setupLevelPillText">Level B1</span>
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVBAR (Desktop - 2 Floating Pill matching Figma Node 2312:6772)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <header class="site-header">
+        <div class="wrap">
+            <nav class="nav-pill" aria-label="Navigasi utama">
+                <!-- Full Logo exactly as shown in Figma -->
+                <a href="index.html" class="brand-logo-wrap" aria-label="MILO Interactive Companion">
+                    <img src="assets/milo-logo-full.svg" alt="MiLo (Interactive Companion)" class="brand-logo-img">
+                </a>
+
+                <!-- Desktop Nav Links -->
+                <div class="nav-menu">
+                    <a href="index.html">Beranda</a>
+                    <a href="setup.html" class="active auth-required-nav">Ruang Latihan</a>
+                    <a href="dashboard.html" class="auth-required-nav">Dashboard</a>
+
+                </div>
+
+                <!-- Auth / Profile Pill (Syncs automatically with login session via common.js) -->
+                <div class="nav-action-wrapper"></div>
+
+                <!-- Mobile Hamburger Toggle -->
+                <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi"
+                    aria-expanded="false" aria-controls="mobile-nav-drawer">
+                    <i data-lucide="menu" aria-hidden="true"></i>
+                </button>
+            </nav>
+
+            <!-- Mobile Navigation Drawer -->
+            <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
+                <div id="drawer-user-info" style="display:none;margin-bottom:12px;"></div>
+                <div class="mobile-nav-links">
+                    <a href="index.html" class="mobile-nav-link">Beranda</a>
+                    <a href="setup.html" class="mobile-nav-link active auth-required-nav">Ruang Latihan</a>
+                    <a href="index.html#manfaat" class="mobile-nav-link">Manfaat</a>
+                    <a href="index.html#skenario" class="mobile-nav-link">Skenario</a>
+                    <a href="index.html#level-cefr" class="mobile-nav-link">Level CEFR</a>
+                    <a href="dashboard.html" class="mobile-nav-link auth-required-nav">Dashboard</a>
+                    <a href="login.html" class="mobile-nav-link auth-guest-nav" id="mobile-nav-link-masuk">Masuk</a>
+                </div>
             </div>
-            <div class="setup-user-status" id="setupUserStatus"></div>
         </div>
     </header>
 
@@ -48,61 +69,164 @@
     <main class="setup-main-container">
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             STEP 1: CATEGORY SELECTION (Job Interview, Academic, Daily)
+             STEP 1: CATEGORY SELECTION (Figma Node 2312:6772)
              ═══════════════════════════════════════════════════════════════════════ -->
         <section id="step1CategoryContainer">
-            <!-- Question Speech Bubble -->
-            <div class="prompt-bubble-card">
-                <h2>Pilih Kategori Latihan</h2>
-                <p class="prompt-bubble-desc">Pilih bidang percakapan yang ingin kamu latih bersama Milo hari ini:</p>
+            <!-- Header Titles matching Figma exactly -->
+            <div class="setup-header-figma">
+                <h1 class="setup-title-figma">Pilih Kategori Latihan</h1>
+                <p class="setup-subtitle-figma">Pilih bidang percakapan yang ingin kamu latih bersama Milo hari ini!</p>
             </div>
 
-            <!-- Topics Grid Layout -->
-            <div class="topics-grid-layout">
-                <!-- Topic 1: Job Interview -->
-                <div class="topic-selection-card selected" data-topic="job_interview" tabindex="0" role="button">
-                    <div class="topic-icon-box interview">
-                        <span style="font-weight: 800; font-size: 15px;">01</span>
+            <div class="setup-board-stage">
+                <!-- Bulletin Board Container -->
+                <div class="bulletin-board-card">
+                    <!-- Post-it Note on Top Left -->
+                    <div class="board-postit-note" aria-hidden="true">
+                        <img src="assets/figma/setup/postit.png" alt="Speaking practice with MILO" class="postit-img">
                     </div>
-                    <div class="card-text-block" style="flex: 1;">
-                        <div class="card-title-text">Job Interview Practice</div>
-                        <div class="card-desc-text">MILO bertindak sebagai pewawancara kerja. Latih pertanyaan profesional, background, dan behavioral.</div>
-                        <div class="topic-tags-row">
-                            <span class="topic-mini-tag">Formal English</span>
-                            <span class="topic-mini-tag">Career</span>
-                            <span class="topic-mini-tag">Self-Introduction</span>
+
+                    <!-- 3 Pinned Topic Cards -->
+                    <div class="board-cards-grid">
+                        <!-- Card 1: Job Interview Practice -->
+                        <div class="board-topic-card card-interview" data-topic="job_interview" tabindex="0"
+                            role="button" aria-pressed="false">
+                            <span class="card-pin pin-left"></span>
+                            <span class="card-pin pin-right"></span>
+                            <div class="card-inner-content">
+                                <h3 class="card-topic-title">Job Interview Practice</h3>
+                                <div class="card-icon-wrap">
+                                    <img src="assets/figma/setup/icon_briefcase.png" alt="Job Interview Practice"
+                                        class="card-topic-icon" loading="lazy">
+                                </div>
+                                <p class="card-topic-desc">MILO bertindak sebagai pewawancara kerja. Latih pertanyaan
+                                    profesional, background, dan behavioral.</p>
+                                <div class="card-tags-row">
+                                    <span class="card-tag-pill">Formal English</span>
+                                    <span class="card-tag-pill">Career</span>
+                                    <span class="card-tag-pill">Self-Introduction</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Academic Discussion -->
+                        <div class="board-topic-card card-academic" data-topic="academic_discussion" tabindex="0"
+                            role="button" aria-pressed="false">
+                            <span class="card-pin pin-left"></span>
+                            <span class="card-pin pin-right"></span>
+                            <div class="card-inner-content">
+                                <h3 class="card-topic-title">Academic Discussion</h3>
+                                <div class="card-icon-wrap">
+                                    <img src="assets/figma/setup/icon_book.png" alt="Academic Discussion"
+                                        class="card-topic-icon" loading="lazy">
+                                </div>
+                                <p class="card-topic-desc">Diskusi ilmiah seputar riset, teknologi, dan etika. Latih
+                                    argumen terstruktur dan kosakata akademis.</p>
+                                <div class="card-tags-row">
+                                    <span class="card-tag-pill">Critical Thinking</span>
+                                    <span class="card-tag-pill">Presentasi</span>
+                                    <span class="card-tag-pill">Scholarly Vocabulary</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Daily Conversation -->
+                        <div class="board-topic-card card-daily" data-topic="daily_conversation" tabindex="0"
+                            role="button" aria-pressed="false">
+                            <span class="card-pin pin-left"></span>
+                            <span class="card-pin pin-right"></span>
+                            <div class="card-inner-content">
+                                <h3 class="card-topic-title">Daily Conversation</h3>
+                                <div class="card-icon-wrap">
+                                    <img src="assets/figma/setup/icon_cup.png" alt="Daily Conversation"
+                                        class="card-topic-icon" loading="lazy">
+                                </div>
+                                <p class="card-topic-desc">Obrolan santai dan luwes tentang hobi, traveling, dan
+                                    kehidupan sehari-hari untuk melatih kelancaran alami.</p>
+                                <div class="card-tags-row">
+                                    <span class="card-tag-pill">Casual Fluency</span>
+                                    <span class="card-tag-pill">Social</span>
+                                    <span class="card-tag-pill">Everyday Idiom</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Topic 2: Academic Discussion -->
-                <div class="topic-selection-card" data-topic="academic_discussion" tabindex="0" role="button">
-                    <div class="topic-icon-box academic">
-                        <span style="font-weight: 800; font-size: 15px;">02</span>
-                    </div>
-                    <div class="card-text-block" style="flex: 1;">
-                        <div class="card-title-text">Academic Discussion</div>
-                        <div class="card-desc-text">Diskusi ilmiah seputar riset, teknologi, dan etika. Latih argumen terstruktur dan kosakata akademis.</div>
-                        <div class="topic-tags-row">
-                            <span class="topic-mini-tag">Critical Thinking</span>
-                            <span class="topic-mini-tag">Presentasi</span>
-                            <span class="topic-mini-tag">Scholarly Vocabulary</span>
+                <!-- Right Side: Milo Thinking Character -->
+                <div class="setup-milo-stage" aria-hidden="true">
+                    <img src="assets/figma/setup/milo_thinking.png" alt="Milo thinking" class="setup-milo-thinking-img">
+                    <div class="setup-milo-shadow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             STEP 1.5: CLOSED BOOK COVER (Figma Node 2403-1595 Intro)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="stepBookCoverContainer" style="display: none;">
+            <div class="book-nav-header">
+                <button type="button" class="btn-book-back" id="btnBookBackToCategory" title="Pilih kategori lain">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Kembali ke Papan Kategori</span>
+                </button>
+            </div>
+
+            <div class="book-stage-center">
+                <!-- 3D Scrapbook Assembly -->
+                <div class="scrapbook-wrapper" id="scrapbookWrapper">
+                    <!-- Underneath: Book Base & Inner Pages (revealed as front cover opens) -->
+                    <div class="book-inside-spread">
+                        <div class="book-inside-spine"></div>
+                        <div class="book-inside-content">
+                            <div class="inside-header">
+                                <span class="inside-track-badge" id="insideTrackBadge">ACADEMIC DISCUSSION</span>
+                                <h3 class="inside-welcome" id="insideWelcomeTitle">Campus Handbook</h3>
+                            </div>
+                            <div class="inside-sketch-art">
+                                <img src="assets/figma/setup/milo_thinking.png" alt="Milo" class="inside-milo-avatar">
+                                <div class="inside-text-wrap">
+                                    <p class="inside-hint-title">Membuka Lembaran Modul...</p>
+                                    <p class="inside-hint-text">Siapkan dirimu untuk sesi latihan interaktif bersama Milo!</p>
+                                </div>
+                            </div>
+                            <div class="inside-loading-indicator">
+                                <i class="fa-solid fa-book-open fa-bounce"></i>
+                                <span>Menampilkan 3 materi pilihan...</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Topic 3: Daily Conversation -->
-                <div class="topic-selection-card" data-topic="daily_conversation" tabindex="0" role="button">
-                    <div class="topic-icon-box daily">
-                        <span style="font-weight: 800; font-size: 15px;">03</span>
-                    </div>
-                    <div class="card-text-block" style="flex: 1;">
-                        <div class="card-title-text">Daily Conversation</div>
-                        <div class="card-desc-text">Obrolan santai dan luwes tentang hobi, traveling, dan kehidupan sehari-hari untuk melatih kelancaran alami.</div>
-                        <div class="topic-tags-row">
-                            <span class="topic-mini-tag">Casual Fluency</span>
-                            <span class="topic-mini-tag">Everyday Idioms</span>
-                            <span class="topic-mini-tag">Social</span>
+                    <!-- Front Cover (flips open to the left in 3D!) -->
+                    <div class="interactive-book-card" id="interactiveBookCard" role="button" tabindex="0" title="Klik untuk membuka buku">
+                        <!-- Bookmark Tab -->
+                        <div class="book-bookmark-tab" id="bookBookmarkTab">
+                            <span id="bookBookmarkText">milo - B1</span>
+                        </div>
+
+                        <!-- Book Spine -->
+                        <div class="book-spine" id="bookSpine">
+                            <span class="spine-stitch"></span>
+                            <span class="spine-stitch"></span>
+                            <span class="spine-stitch"></span>
+                        </div>
+
+                        <!-- Book Cover Main -->
+                        <div class="book-cover-surface">
+                            <div class="book-stitched-inner">
+                                <!-- White Title Plate -->
+                                <div class="book-plate-card">
+                                    <h2 class="book-plate-title" id="bookTitleHeading">Interview Playbook</h2>
+                                    <p class="book-plate-sub1" id="bookSubtitleLevel">Job Interview Practice (Level B1)</p>
+                                    <p class="book-plate-sub2" id="bookSubtitleDesc">3 simulasi terstruktur untuk menaklukkan pertanyaan HRD</p>
+                                </div>
+
+                                <!-- CTA Button & Open Hint -->
+                                <div class="book-cta-box">
+                                    <button type="button" class="btn-book-action" id="btnBookOpen">Ayo dipilih!</button>
+                                    <p class="book-action-hint">Klik sampul untuk membuka materi</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -110,38 +234,27 @@
         </section>
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             STEP 2: SPECIFIC MICROLEARNING TOPIC SELECTION
+             STEP 2: SPECIFIC MICROLEARNING TOPIC SELECTION (Figma Node 2403-1595)
              ═══════════════════════════════════════════════════════════════════════ -->
         <section id="step2SpecificContainer" style="display: none;">
+            <!-- Prompt Header Card matching Figma Node 2403-1595 exactly -->
             <div class="prompt-bubble-card">
-                <h2>Pilih Topik Microlearning Hari Ini</h2>
-                <p class="prompt-bubble-desc" id="stepSpecificHint">Modul 3-5 menit terstruktur sesuai level aktif dan kategori terpilih:</p>
+                <h2>Belajar apa hari ini?</h2>
+                <p class="prompt-bubble-desc" id="stepSpecificHint">Pilih modul microlearning untuk kategori "Academic Discussion" (Level B1):</p>
             </div>
 
-            <!-- Dynamic Specific Topics Grid (Responsive Dual-Column Layout) -->
+            <!-- Dynamic Specific Topics Grid (3-Column Layout matching Figma Node 2403-1595) -->
             <div class="specific-topics-grid" id="specificTopicsGrid">
-                <!-- Dynamically populated from /api/v1/curriculum/topics -->
+                <!-- Dynamically populated from curriculum -->
             </div>
         </section>
 
     </main>
 
     <!-- ═══════════════════════════════════════════════════════════════════════
-         BOTTOM DOCK / SHELF (Always Visible, Sticky UX)
+         BOTTOM DOCK / SHELF (Step 2 Only)
          ═══════════════════════════════════════════════════════════════════════ -->
-    <footer class="setup-bottom-shelf">
-        <!-- Step 1 Controls -->
-        <div id="shelfStep1" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-            <div class="shelf-info-text">
-                <span class="shelf-info-badge" id="shelfCategoryBadge">Job Interview</span>
-                <span id="shelfCategoryLabel">Pilih modul spesifik</span>
-            </div>
-            <button type="button" class="btn-cta-next" id="btnGotoStep2">
-                <span>Lanjut: Pilih Topik</span>
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
-
+    <footer class="setup-bottom-shelf" style="display: none;">
         <!-- Step 2 Controls -->
         <div id="shelfStep2" style="display: none; align-items: center; justify-content: space-between; width: 100%;">
             <button type="button" class="btn-cta-secondary" id="btnBackToStep1">
@@ -160,8 +273,8 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="js/common.js?v=20261123_v2"></script>
-    <script src="js/setup.js?v=20261123_v2"></script>
+    <script src="js/common.js?v=20261126_v6"></script>
+    <script src="js/setup.js?v=20261126_v6"></script>
 </body>
 
 </html>

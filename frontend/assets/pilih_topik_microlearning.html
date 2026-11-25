@@ -1,0 +1,428 @@
+<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilih Topik Microlearning — MILO</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">/** @type {import('tailwindcss').Config} */
+globalThis.tailwind = globalThis.tailwind || {};
+globalThis.tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        'teal-tint': '#EAF4F2',
+        'peach-tint': '#FDF1E6',
+        'peach-ink': '#9A4A14',
+        'cta-warm': '#F1995B',
+        'cta-warm-ink': '#381600',
+        'light-primary': '#0B5650',
+        'light-on-primary': '#FFFFFF',
+        'light-primary-container': '#2D6E68',
+        'light-on-primary-container': '#FFFFFF',
+        'light-secondary': '#914C14',
+        'light-on-secondary': '#FFFFFF',
+        'light-secondary-container': '#FEA364',
+        'light-on-secondary-container': '#381600',
+        'light-tertiary': '#723E2A',
+        'light-on-tertiary': '#FFFFFF',
+        'light-tertiary-container': '#8E553F',
+        'light-on-tertiary-container': '#FFD9CC',
+        'light-error': '#BA1A1A',
+        'light-on-error': '#FFFFFF',
+        'light-error-container': '#FFDAD6',
+        'light-on-error-container': '#93000A',
+        'light-background': '#FEF9EE',
+        'light-on-background': '#1D1C15',
+        'light-surface': '#FEF9EE',
+        'light-surface-dim': '#DEDACF',
+        'light-surface-bright': '#FEF9EE',
+        'light-surface-container-lowest': '#FFFFFF',
+        'light-surface-container-low': '#F8F3E8',
+        'light-surface-container': '#F3EDE2',
+        'light-surface-container-high': '#EDE8DD',
+        'light-surface-container-highest': '#E7E2D7',
+        'light-on-surface': '#1D1C15',
+        'light-surface-variant': '#DBE5E2',
+        'light-on-surface-variant': '#3F4947',
+        'light-outline': '#6F7977',
+        'light-outline-variant': '#D5D0C5',
+        'light-inverse-surface': '#323029',
+        'light-inverse-on-surface': '#F5F0E5',
+        'light-inverse-primary': '#92D2CB',
+        'dark-primary': '#92D2CB',
+        'dark-on-primary': '#003733',
+        'dark-primary-container': '#2D6E68',
+        'dark-on-primary-container': '#ADEEE6',
+        'dark-secondary': '#FFB787',
+        'dark-on-secondary': '#502400',
+        'dark-secondary-container': '#793A00',
+        'dark-on-secondary-container': '#FFA76A',
+        'dark-tertiary': '#FFB59A',
+        'dark-on-tertiary': '#502311',
+        'dark-tertiary-container': '#8E553F',
+        'dark-on-tertiary-container': '#FFD9CC',
+        'dark-error': '#FFB4AB',
+        'dark-on-error': '#690005',
+        'dark-error-container': '#93000A',
+        'dark-on-error-container': '#FFDAD6',
+        'dark-background': '#15130D',
+        'dark-on-background': '#E7E2D7',
+        'dark-surface': '#15130D',
+        'dark-surface-dim': '#15130D',
+        'dark-surface-bright': '#3B3932',
+        'dark-surface-container-lowest': '#0F0E08',
+        'dark-surface-container-low': '#1D1C15',
+        'dark-surface-container': '#212019',
+        'dark-surface-container-high': '#2C2A23',
+        'dark-surface-container-highest': '#37352D',
+        'dark-on-surface': '#E7E2D7',
+        'dark-surface-variant': '#3F4947',
+        'dark-on-surface-variant': '#BFC9C6',
+        'dark-outline': '#899391',
+        'dark-outline-variant': '#3F4947',
+        'dark-inverse-surface': '#E7E2D7',
+        'dark-inverse-on-surface': '#323029',
+        'dark-inverse-primary': '#266862',
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '10px',
+        'md': '12px',
+        'lg': '16px',
+        'xl': '20px',
+        'full': '9999px',
+      },
+      spacing: {
+        'gutter-xs': '4px',
+        'gutter-sm': '8px',
+        'gutter-md': '16px',
+        'gutter-lg': '24px',
+        'gutter-xl': '32px',
+        'section': '40px',
+        'page-margin': '24px',
+      },
+      fontFamily: {
+        'headline': ['"Alata"', 'sans-serif'],
+        'title': ['"Instrument Sans"', 'sans-serif'],
+        'body': ['"Instrument Sans"', 'sans-serif'],
+        'label': ['"Instrument Sans"', 'sans-serif'],
+      },
+      fontSize: {
+        'headline-lg': ['28px', { lineHeight: '36px', letterSpacing: '-0.25px', fontWeight: '400' }],
+        'headline-md': ['22px', { lineHeight: '28px', letterSpacing: '0px', fontWeight: '400' }],
+        'title-lg': ['19px', { lineHeight: '26px', letterSpacing: '-0.1px', fontWeight: '700' }],
+        'title-md': ['16px', { lineHeight: '22px', letterSpacing: '0px', fontWeight: '600' }],
+        'body-lg': ['15px', { lineHeight: '24px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-md': ['14px', { lineHeight: '21px', letterSpacing: '0px', fontWeight: '400' }],
+        'body-sm': ['13px', { lineHeight: '18px', letterSpacing: '0px', fontWeight: '400' }],
+        'label-lg': ['14px', { lineHeight: '20px', letterSpacing: '0.1px', fontWeight: '600' }],
+        'label-md': ['12px', { lineHeight: '16px', letterSpacing: '0.4px', fontWeight: '600' }],
+        'label-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.2px', fontWeight: '500' }],
+      },
+      transitionDuration: {
+        'state-change': '150ms',
+        'surface-enter': '240ms',
+        'surface-exit': '150ms',
+      },
+      transitionDelay: {
+        'state-change': '0ms',
+        'surface-enter': '0ms',
+        'surface-exit': '0ms',
+      },
+      transitionTimingFunction: {
+        'state-change': 'ease-out',
+        'surface-enter': 'cubic-bezier(0.2, 0, 0, 1)',
+        'surface-exit': 'cubic-bezier(0.3, 0, 1, 1)',
+      },
+    },
+  },
+};
+if (typeof module !== 'undefined') module.exports = globalThis.tailwind.config;
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Alata&amp;family=Instrument+Sans:wght@400;500;600;700&amp;family=Spline+Sans+Mono:wght@500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+  <style>
+    .material-symbols-outlined, .material-symbols-rounded, .material-symbols-sharp, .material-icons {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      line-height: 1 !important;
+      box-sizing: content-box;
+      overflow: hidden;
+      white-space: nowrap;
+      direction: ltr;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body class="bg-light-surface text-light-on-surface antialiased">
+  <div class="min-h-[1024px] flex flex-col bg-light-surface" data-stitch-vh="min-h-[1024px]===min-h-screen">
+
+    <!-- Top Header -->
+    <header class="sticky top-0 z-20 bg-light-surface/95 border-b border-light-outline-variant/40">
+      <div class="max-w-5xl mx-auto px-page-margin py-4 flex items-center justify-between gap-gutter-md">
+        <!-- Left: Back button + MILO Brand -->
+        <div class="flex items-center gap-gutter-md">
+          <button data-component-id="button-icon" data-component-type="button" data-component-variant="icon" type="button" aria-label="Kembali ke halaman sebelumnya" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface hover:bg-light-surface-container-low focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary transition-colors duration-state-change">
+            <span class="material-symbols-outlined text-title-lg" aria-hidden="true">arrow_back</span>
+          </button>
+
+          <a href="#top" class="flex items-center gap-gutter-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary rounded-md">
+            <!-- MILO Mascot Mark -->
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="16" cy="16" r="13" fill="#232A2E"></circle>
+              <rect x="2" y="13" width="3" height="6" rx="1.5" fill="#2D6E68"></rect>
+              <rect x="27" y="13" width="3" height="6" rx="1.5" fill="#2D6E68"></rect>
+              <circle cx="16" cy="16.5" r="8.5" fill="#FAF5E8"></circle>
+              <circle cx="13" cy="15.5" r="1.3" fill="#232A2E"></circle>
+              <circle cx="19" cy="15.5" r="1.3" fill="#232A2E"></circle>
+              <path d="M13.5 19C14.2 20 15 20.4 16 20.4C17 20.4 17.8 20 18.5 19" stroke="#232A2E" stroke-width="1.5" stroke-linecap="round"></path>
+            </svg>
+            <span data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface tracking-tight">MILO</span>
+          </a>
+        </div>
+
+        <!-- Center: Step Progress Dots -->
+        <div class="hidden sm:flex items-center gap-gutter-xs" aria-label="Progres langkah 2 dari 2">
+          <span data-component-id="badge-dot" data-component-type="badge" data-component-variant="dot" role="status" aria-label="Langkah 1 selesai" class="inline-block w-2 h-2 rounded-full bg-light-outline-variant"></span>
+          <span data-component-id="badge-dot-active" data-component-type="badge" data-component-variant="dot" role="status" aria-label="Langkah 2 aktif" class="inline-block w-7 h-2 rounded-full bg-light-primary-container"></span>
+        </div>
+
+        <!-- Right: Level Pill + User Profile Pill -->
+        <div class="flex items-center gap-gutter-sm">
+          <button data-component-id="chip-with-icon" data-component-type="chip" data-component-variant="with-icon" type="button" class="inline-flex items-center gap-gutter-sm px-3.5 py-1.5 rounded-full bg-light-surface-container-high border border-light-outline-variant text-light-on-surface hover:bg-light-surface-container-highest transition-colors duration-state-change">
+            <span class="material-symbols-outlined text-body-lg text-light-on-surface-variant" aria-hidden="true">layers</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg">Level B1</span>
+          </button>
+
+          <button type="button" aria-label="Profil pengguna milo" class="inline-flex items-center gap-gutter-sm pl-1.5 pr-3.5 py-1 rounded-full bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface hover:bg-light-surface-container-low transition-colors duration-state-change">
+            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-light-primary-container text-light-on-primary-container font-label text-label-md">M</span>
+            <span data-design-text-token="label-lg" class="font-label text-label-lg">milo</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full max-w-3xl mx-auto px-page-margin py-gutter-lg flex flex-col gap-gutter-lg">
+
+      <!-- Prompt Header Card -->
+      <section aria-labelledby="page-heading" class="relative">
+        <article data-component-id="card-elevated" data-component-type="card" data-component-variant="elevated" class="w-full bg-light-surface-container-lowest border border-light-outline-variant rounded-lg p-6 text-center shadow-sm">
+          <header class="flex flex-col items-center gap-gutter-xs">
+            <h1 id="page-heading" data-design-text-token="headline-md" class="font-headline text-headline-md text-light-on-surface text-balance">
+              Pilih Topik Microlearning Hari Ini
+            </h1>
+            <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant text-pretty">
+              Pilih modul microlearning untuk kategori &#34;Job Interview Practice&#34; (Level B1):
+            </p>
+          </header>
+        </article>
+        <!-- Subtle downward pointer -->
+        <div class="flex justify-center" aria-hidden="true">
+          <div class="w-4 h-4 bg-light-surface-container-lowest border-r border-b border-light-outline-variant rotate-45 -mt-2"></div>
+        </div>
+      </section>
+
+      <!-- Topic Module Cards -->
+      <section aria-label="Daftar modul microlearning" class="flex flex-col gap-gutter-md">
+
+        <!-- Module Card 1 (Selected) -->
+        <div id="topic-card-1" role="button" tabindex="0" aria-pressed="true" data-topic-id="1" data-topic-tag="Interview #1" data-topic-title="Self-Introduction &amp; Background" data-component-id="card-interactive" data-component-type="card" data-component-variant="interactive" class="topic-card w-full bg-light-surface-container-lowest border-2 border-light-primary-container rounded-lg p-6 shadow-sm cursor-pointer transition-colors duration-state-change focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary">
+          <div class="flex flex-col gap-gutter-md">
+            <!-- Top Metadata Row -->
+            <div class="flex flex-wrap items-center justify-between gap-gutter-sm">
+              <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-light-primary-container text-light-on-primary-container">
+                <span class="material-symbols-outlined text-body-md" style="font-variation-settings: &#39;FILL&#39; 1;" aria-hidden="true">work</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md uppercase tracking-wide">INTERVIEW #1</span>
+              </span>
+
+              <div class="flex flex-wrap items-center gap-gutter-sm">
+                <span data-component-id="badge-duration" data-component-type="badge" data-component-variant="status" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-light-surface-container-low border border-light-outline-variant text-light-on-surface-variant">
+                  <span class="material-symbols-outlined text-body-md" aria-hidden="true">schedule</span>
+                  <span data-design-text-token="label-sm" class="font-label text-label-sm tabular-nums">3–5 Mnt</span>
+                </span>
+
+                <span data-component-id="badge-level" data-component-type="badge" data-component-variant="warning" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-peach-tint text-peach-ink">
+                  <span class="material-symbols-outlined text-body-md" aria-hidden="true">layers</span>
+                  <span data-design-text-token="label-md" class="font-label text-label-md">B1</span>
+                </span>
+
+                <span data-selected-badge data-component-id="badge-selected" data-component-type="badge" data-component-variant="success" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-tint text-light-primary">
+                  <span class="material-symbols-outlined text-body-md" style="font-variation-settings: &#39;FILL&#39; 1;" aria-hidden="true">check_circle</span>
+                  <span data-design-text-token="label-md" class="font-label text-label-md">Terpilih</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Topic Title -->
+            <h2 data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">
+              Self-Introduction &amp; Background
+            </h2>
+
+            <!-- Capaian Target Box -->
+            <div data-component-id="card-action" data-component-type="card" data-component-variant="action" class="w-full bg-light-surface-container-low border border-light-outline-variant/60 rounded-md p-4 flex flex-col gap-gutter-xs">
+              <div class="flex items-center gap-1.5 text-light-primary-container">
+                <span class="material-symbols-outlined text-body-lg" aria-hidden="true">adjust</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md uppercase tracking-wider">CAPAIAN TARGET</span>
+              </div>
+              <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface text-pretty">
+                Mahasiswa mampu memperkenalkan latar belakang pendidikan, fokus bidang studi, dan ketertarikan karir dalam 3–4 kalimat terhubung secara percaya diri.
+              </p>
+            </div>
+
+            <!-- Fokus Frasa Row -->
+            <div class="flex flex-wrap items-center gap-gutter-sm">
+              <div class="inline-flex items-center gap-1.5 text-light-on-surface-variant">
+                <span class="material-symbols-outlined text-body-md text-light-outline" aria-hidden="true">sell</span>
+                <span data-design-text-token="body-sm" class="font-body text-body-sm">Fokus Frasa:</span>
+              </div>
+              <span data-component-id="chip-action" data-component-type="chip" data-component-variant="action" class="inline-flex items-center px-3 py-1 rounded-sm bg-teal-tint text-light-on-surface-variant">
+                <span data-design-text-token="body-sm" class="font-body text-body-sm italic">I am currently a final-year student majoring in...</span>
+              </span>
+              <span data-component-id="chip-action" data-component-type="chip" data-component-variant="action" class="inline-flex items-center px-3 py-1 rounded-sm bg-teal-tint text-light-on-surface-variant">
+                <span data-design-text-token="body-sm" class="font-body text-body-sm italic">My academic focus has been on...</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Module Card 2 (Unselected) -->
+        <div id="topic-card-2" role="button" tabindex="0" aria-pressed="false" data-topic-id="2" data-topic-tag="Interview #2" data-topic-title="Discussing Strengths &amp; Soft Skills" data-component-id="card-interactive-2" data-component-type="card" data-component-variant="interactive" class="topic-card w-full bg-light-surface-container-lowest border border-light-outline-variant rounded-lg p-6 hover:border-light-primary-container cursor-pointer transition-colors duration-state-change focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary">
+          <div class="flex flex-col gap-gutter-md">
+            <!-- Top Metadata Row -->
+            <div class="flex flex-wrap items-center justify-between gap-gutter-sm">
+              <span data-component-id="badge-numeric" data-component-type="badge" data-component-variant="numeric" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-light-primary-container text-light-on-primary-container">
+                <span class="material-symbols-outlined text-body-md" style="font-variation-settings: &#39;FILL&#39; 1;" aria-hidden="true">work</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md uppercase tracking-wide">INTERVIEW #2</span>
+              </span>
+
+              <div class="flex flex-wrap items-center gap-gutter-sm">
+                <span data-component-id="badge-duration" data-component-type="badge" data-component-variant="status" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-light-surface-container-low border border-light-outline-variant text-light-on-surface-variant">
+                  <span class="material-symbols-outlined text-body-md" aria-hidden="true">schedule</span>
+                  <span data-design-text-token="label-sm" class="font-label text-label-sm tabular-nums">3–5 Mnt</span>
+                </span>
+
+                <span data-component-id="badge-level" data-component-type="badge" data-component-variant="warning" role="status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-peach-tint text-peach-ink">
+                  <span class="material-symbols-outlined text-body-md" aria-hidden="true">layers</span>
+                  <span data-design-text-token="label-md" class="font-label text-label-md">B1</span>
+                </span>
+
+                <span data-selected-badge data-component-id="badge-selected" data-component-type="badge" data-component-variant="success" role="status" class="hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-tint text-light-primary">
+                  <span class="material-symbols-outlined text-body-md" style="font-variation-settings: &#39;FILL&#39; 1;" aria-hidden="true">check_circle</span>
+                  <span data-design-text-token="label-md" class="font-label text-label-md">Terpilih</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Topic Title -->
+            <h2 data-design-text-token="title-lg" class="font-title text-title-lg text-light-on-surface">
+              Discussing Strengths &amp; Soft Skills
+            </h2>
+
+            <!-- Capaian Target Box -->
+            <div data-component-id="card-action" data-component-type="card" data-component-variant="action" class="w-full bg-light-surface-container-low border border-light-outline-variant/60 rounded-md p-4 flex flex-col gap-gutter-xs">
+              <div class="flex items-center gap-1.5 text-light-primary-container">
+                <span class="material-symbols-outlined text-body-lg" aria-hidden="true">adjust</span>
+                <span data-design-text-token="label-md" class="font-label text-label-md uppercase tracking-wider">CAPAIAN TARGET</span>
+              </div>
+              <p data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface text-pretty">
+                Mahasiswa mampu menyebutkan 1–2 kelebihan diri (soft skills) beserta contoh singkat penerapannya dalam kerja tim di kampus.
+              </p>
+            </div>
+
+            <!-- Fokus Frasa Row -->
+            <div class="flex flex-wrap items-center gap-gutter-sm">
+              <div class="inline-flex items-center gap-1.5 text-light-on-surface-variant">
+                <span class="material-symbols-outlined text-body-md text-light-outline" aria-hidden="true">sell</span>
+                <span data-design-text-token="body-sm" class="font-body text-body-sm">Fokus Frasa:</span>
+              </div>
+              <span data-component-id="chip-action" data-component-type="chip" data-component-variant="action" class="inline-flex items-center px-3 py-1 rounded-sm bg-teal-tint text-light-on-surface-variant">
+                <span data-design-text-token="body-sm" class="font-body text-body-sm italic">One of my key strengths is...</span>
+              </span>
+              <span data-component-id="chip-action" data-component-type="chip" data-component-variant="action" class="inline-flex items-center px-3 py-1 rounded-sm bg-teal-tint text-light-on-surface-variant">
+                <span data-design-text-token="body-sm" class="font-body text-body-sm italic">In my recent group project, I...</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- Sticky Bottom Action Bar -->
+    <footer class="sticky bottom-0 z-20 bg-light-surface-container-lowest border-t border-light-outline-variant py-4 px-page-margin">
+      <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-gutter-md">
+        <!-- Left: Change Category -->
+        <button data-component-id="button-with-icon" data-component-type="button" data-component-variant="with-icon" type="button" class="inline-flex items-center justify-center gap-gutter-sm px-5 py-2.5 rounded-md bg-light-surface-container-lowest border border-light-outline-variant text-light-on-surface hover:bg-light-surface-container-low focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary transition-colors duration-state-change">
+          <span class="material-symbols-outlined text-body-lg" aria-hidden="true">arrow_back</span>
+          <span data-design-text-token="label-lg" class="font-label text-label-lg">Ganti Kategori</span>
+        </button>
+
+        <!-- Center: Selected Topic Summary -->
+        <div class="hidden md:flex items-center gap-gutter-sm">
+          <span id="footer-topic-tag" data-design-text-token="label-md" class="px-2.5 py-1 rounded-sm bg-teal-tint font-label text-label-md text-light-on-surface-variant">
+            Interview #1
+          </span>
+          <span id="footer-topic-title" data-design-text-token="body-md" class="font-body text-body-md text-light-on-surface-variant">
+            Self-Introduction &amp; Background
+          </span>
+        </div>
+
+        <!-- Right: Primary CTA -->
+        <button data-component-id="button-primary" data-component-type="button" data-component-variant="primary" type="button" class="inline-flex items-center justify-center gap-gutter-sm px-6 py-3 rounded-md bg-cta-warm text-cta-warm-ink shadow-sm hover:bg-light-secondary-container active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-light-primary transition-colors duration-state-change">
+          <span data-design-text-token="label-lg" class="font-label text-label-lg">Lanjut ke Pengenalan Materi</span>
+          <span class="material-symbols-outlined text-body-lg" aria-hidden="true">arrow_forward</span>
+        </button>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    (function () {
+      const cards = document.querySelectorAll('.topic-card');
+      const footerTag = document.getElementById('footer-topic-tag');
+      const footerTitle = document.getElementById('footer-topic-title');
+
+      function selectCard(selectedCard) {
+        cards.forEach(function (card) {
+          const isSelected = card === selectedCard;
+          const badge = card.querySelector('[data-selected-badge]');
+          card.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+
+          if (isSelected) {
+            card.classList.remove('border', 'border-light-outline-variant');
+            card.classList.add('border-2', 'border-light-primary-container', 'shadow-sm');
+            if (badge) badge.classList.remove('hidden');
+          } else {
+            card.classList.remove('border-2', 'border-light-primary-container', 'shadow-sm');
+            card.classList.add('border', 'border-light-outline-variant');
+            if (badge) badge.classList.add('hidden');
+          }
+        });
+
+        if (footerTag) {
+          footerTag.textContent = selectedCard.getAttribute('data-topic-tag') || '';
+        }
+        if (footerTitle) {
+          footerTitle.textContent = selectedCard.getAttribute('data-topic-title') || '';
+        }
+      }
+
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          selectCard(card);
+        });
+        card.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            selectCard(card);
+          }
+        });
+      });
+    })();
+  </script>
+
+
+</body></html>

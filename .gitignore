@@ -85,3 +85,6 @@ milo_dev.db
 # UV Cache
 .uv_cache/
 
+# Scratch directory
+scratch/
+

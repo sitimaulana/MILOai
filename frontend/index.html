@@ -10,2320 +10,406 @@
     <meta name="description"
         content="Latihan berbicara bahasa Inggris interaktif bersama MILO, teman virtual 2D dengan evaluasi CEFR langsung dan bantuan terjemahan.">
 
-    <!-- Google Fonts: DM Sans & Nunito -->
+    <!-- Google Fonts: DM Sans & Nunito (Exact fonts used in Figma) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Nunito:wght@500;600;700;800;900&display=swap"
         rel="stylesheet">
 
-    <!-- Icons: FontAwesome (auth nav) & Lucide (interface) -->
+    <!-- Icons: FontAwesome & Lucide -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
 
-    <style>
-        :root {
-            --cream: #faf5eb;
-            --paper: #fffdf8;
-            --sand-bg: #f5efe3;
-            --ink: #344557;
-            --ink-dark: #233342;
-            --muted: #586875;
-            --blue: #778aa4;
-            --deep-teal: #407e79;
-            --deep-teal-dark: #2f605c;
-            --orange: #e99965;
-            --orange-hover: #f0a879;
-            --line: #e9e5dc;
-            --line-subtle: #f0ede6;
-            --danger: #d86662;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            margin: 0;
-            background: var(--cream);
-            color: var(--ink);
-            font-family: "DM Sans", sans-serif;
-            line-height: 1.65;
-            overflow-x: hidden;
-        }
-
-        button,
-        input,
-        select,
-        a {
-            font-family: "DM Sans", sans-serif;
-        }
-
-        button,
-        a[href],
-        summary {
-            cursor: pointer;
-        }
-
-        button:disabled {
-            cursor: not-allowed;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-        a:focus-visible,
-        button:focus-visible,
-        input:focus-visible {
-            outline: 2px solid var(--deep-teal);
-            outline-offset: 2px;
-        }
-
-        .wrap {
-            width: min(1160px, calc(100% - 48px));
-            margin: auto;
-        }
-
-        /* Site Header */
-        .site-header {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            background: rgba(250, 245, 235, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 12px 0;
-        }
-
-        .nav-inner {
-            min-height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 8px 20px;
-            box-shadow: 0 10px 30px rgba(52, 69, 87, 0.05);
-            position: relative;
-        }
-
-        .brand {
-            display: inline-flex;
-            align-items: center;
-            gap: 9px;
-            font-family: "Nunito", sans-serif;
-            font-size: 19px;
-            font-weight: 900;
-            letter-spacing: -0.04em;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .brand small {
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0;
-            color: var(--muted);
-        }
-
-        .brand-mark {
-            width: 32px;
-            height: 32px;
-            flex: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .brand-mark-img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            font-size: 13px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .nav-links a:hover,
-        .footer-links a:hover,
-        .mobile-nav-link:hover {
-            color: var(--deep-teal);
-        }
-
-        .pill {
-            border: 0;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            font-size: 14px;
-            font-weight: 700;
-            min-height: 44px;
-            padding: 10px 20px;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .pill:hover {
-            transform: translateY(-2px);
-        }
-
-        .pill:active {
-            transform: translateY(0);
-        }
-
-        /* Auth & Action Wrapper in Navbar */
-        .nav-action-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-
-        .nav-cta,
-        .nav-cta-btn {
-            background: var(--ink);
-            color: white;
-            padding: 10px 18px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 700;
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: transform 0.2s, background 0.2s;
-        }
-
-        .nav-cta:hover,
-        .nav-cta-btn:hover {
-            background: var(--ink-dark);
-            transform: translateY(-2px);
-            color: white;
-        }
-
-        .nav-secondary-btn {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--ink);
-            padding: 10px 16px;
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-            border-radius: 999px;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-
-        .nav-secondary-btn:hover {
-            background: var(--cream);
-        }
-
-        .user-profile-nav-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--cream);
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 4px 12px 4px 6px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--ink);
-            white-space: nowrap;
-        }
-
-        .user-nav-avatar {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: var(--deep-teal);
-            color: white;
-            display: grid;
-            place-items: center;
-            font-size: 11px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .user-nav-cefr {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 2px 7px;
-            font-size: 10px;
-            color: var(--deep-teal);
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-
-        .btn-nav-logout {
-            border: 0;
-            background: transparent;
-            color: var(--muted);
-            cursor: pointer;
-            min-width: 32px;
-            min-height: 32px;
-            display: grid;
-            place-items: center;
-            font-size: 12px;
-            border-radius: 50%;
-            transition: color 0.2s;
-            flex-shrink: 0;
-        }
-
-        .btn-nav-logout:hover {
-            color: var(--danger);
-        }
-
-        /* Mobile Nav Toggle & Drawer */
-        .nav-toggle {
-            display: none;
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 1px solid var(--line);
-            background: var(--paper);
-            color: var(--ink);
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: background 0.2s, transform 0.2s;
-            flex-shrink: 0;
-        }
-
-        .nav-toggle:hover {
-            background: var(--cream);
-        }
-
-        .nav-toggle:active {
-            transform: scale(0.95);
-        }
-
-        .mobile-nav-drawer {
-            display: none;
-        }
-
-        .drawer-user-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 12px;
-            background: var(--cream);
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            margin-bottom: 14px;
-        }
-
-        .drawer-user-pill {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Hero Section */
-        .hero {
-            position: relative;
-            overflow: hidden;
-            padding: 48px 0 96px;
-        }
-
-        .hero::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: var(--line);
-        }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            gap: 36px;
-        }
-
-        .eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-transform: uppercase;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            color: var(--deep-teal);
-            background: rgba(64, 126, 121, 0.08);
-            border: 1px solid rgba(64, 126, 121, 0.2);
-            border-radius: 999px;
-            padding: 6px 14px;
-            line-height: 1.3;
-            margin-bottom: 14px;
-            max-width: 100%;
-            box-sizing: border-box;
-        }
-
-        .eyebrow::before {
-            content: "";
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--orange);
-            flex-shrink: 0;
-        }
-
-        h1,
-        h2,
-        h3,
-        p {
-            margin-top: 0;
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-family: "Nunito", sans-serif;
-            line-height: 1.16;
-            letter-spacing: -0.035em;
-        }
-
-        h1,
-        .hero-title {
-            font-size: clamp(30px, 4.6vw, 60px);
-            font-weight: 900;
-            line-height: 1.18;
-            letter-spacing: -0.035em;
-            margin: 16px 0 20px;
-            max-width: 630px;
-            text-wrap: balance;
-        }
-
-        .accent {
-            color: var(--deep-teal);
-        }
-
-        .hero-copy>p {
-            max-width: 520px;
-            font-size: 16px;
-            color: var(--muted);
-            margin-bottom: 28px;
-            line-height: 1.75;
-        }
-
-        .hero-actions {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 14px;
-        }
-
-        .primary-btn {
-            background: var(--orange);
-            color: var(--ink-dark);
-            padding: 12px 24px;
-            font-weight: 800;
-            box-shadow: 0 4px 14px rgba(233, 153, 101, 0.35);
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 48px;
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-
-        .primary-btn:hover {
-            background: var(--orange-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(233, 153, 101, 0.45);
-        }
-
-        .primary-btn:active {
-            transform: translateY(0);
-        }
-
-        .secondary-link {
-            font-size: 14px;
-            font-weight: 700;
-            min-height: 48px;
-            padding: 10px 22px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            background: var(--paper);
-            border: 1.5px solid var(--line);
-            color: var(--ink);
-            box-shadow: 0 2px 8px rgba(52, 69, 87, 0.04);
-            transition: background 0.2s, border-color 0.2s, transform 0.2s;
-        }
-
-        .secondary-link:hover {
-            background: var(--cream);
-            border-color: var(--deep-teal);
-            color: var(--deep-teal);
-            transform: translateY(-2px);
-        }
-
-        .secondary-link:active {
-            transform: translateY(0);
-        }
-
-        .trust-strip {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px 22px;
-            border-top: 1px solid var(--line);
-            margin-top: 32px;
-            padding-top: 20px;
-            color: var(--deep-teal);
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .trust-strip span {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .trust-strip svg {
-            width: 17px;
-            height: 17px;
-            flex-shrink: 0;
-        }
-
-        /* Hero Studio Showcase Card */
-        .hero-art {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
-
-        .studio {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 525px;
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 25px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(52, 69, 87, 0.08);
-        }
-
-        .studio-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--paper);
-            padding: 12px 18px;
-            border-bottom: 1px solid var(--line);
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 0.05em;
-        }
-
-        .studio-head-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .level-chip {
-            border: 1px solid rgba(64, 126, 121, 0.22);
-            border-radius: 999px;
-            padding: 3px 9px;
-            color: var(--deep-teal);
-            background: rgba(64, 126, 121, 0.08);
-            font-size: 10px;
-        }
-
-        .studio-full-btn {
-            background: var(--deep-teal);
-            color: white;
-            border-radius: 999px;
-            padding: 4px 11px;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 0;
-            min-height: 28px;
-            display: inline-flex;
-            align-items: center;
-            transition: opacity 0.2s;
-        }
-
-        .studio-full-btn:hover {
-            opacity: 0.9;
-        }
-
-        /* Studio Stage */
-        .studio-stage {
-            background: var(--cream);
-            min-height: 310px;
-            padding: 16px;
-            display: grid;
-            grid-template-columns: 1fr 1.2fr 1fr;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .hud,
-        .chat-bubble {
-            background: white;
-            border-radius: 13px;
-            padding: 11px;
-            box-shadow: 0 4px 12px rgba(52, 69, 87, 0.04);
-            font-size: 11px;
-            line-height: 1.4;
-            overflow-wrap: anywhere;
-        }
-
-        .hud-label {
-            display: block;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            color: var(--deep-teal);
-            font-size: 9px;
-            font-weight: 900;
-            margin-bottom: 4px;
-        }
-
-        .hud strong {
-            display: block;
-            font-size: 12px;
-        }
-
-        .hud small {
-            display: block;
-            color: var(--muted);
-            margin-top: 5px;
-        }
-
-        .hud-divider {
-            border-top: 1px solid var(--line);
-            margin: 8px 0;
-        }
-
-        .studio-avatar {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            min-width: 0;
-            align-self: stretch;
-        }
-
-        .hero-milo {
-            height: 236px;
-            width: 100%;
-            object-fit: contain;
-            object-position: bottom;
-            filter: drop-shadow(0 8px 3px rgba(70, 75, 70, 0.09));
-        }
-
-        .avatar-status {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            padding: 4px 10px;
-            white-space: nowrap;
-            font-size: 10px;
-            color: var(--deep-teal);
-            font-weight: 800;
-            margin-top: 4px;
-        }
-
-        .chat-column {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-width: 0;
-        }
-
-        .chat-bubble.milo-bubble {
-            background: var(--deep-teal);
-            color: white;
-        }
-
-        .chat-bubble.user-bubble {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            color: var(--ink);
-        }
-
-        .waveform {
-            height: 29px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-        }
-
-        .waveform i {
-            display: block;
-            width: 2px;
-            height: 8px;
-            background: var(--deep-teal);
-            border-radius: 3px;
-        }
-
-        .waveform i:nth-child(2),
-        .waveform i:nth-child(6) {
-            height: 15px;
-        }
-
-        .waveform i:nth-child(3),
-        .waveform i:nth-child(5) {
-            height: 21px;
-        }
-
-        .waveform i:nth-child(4) {
-            height: 12px;
-        }
-
-        .waveform.active i {
-            animation: pulse 0.65s ease-in-out infinite alternate;
-        }
-
-        .waveform.active i:nth-child(even) {
-            animation-delay: 0.25s;
-        }
-
-        @keyframes pulse {
-            to {
-                transform: scaleY(0.35);
-            }
-        }
-
-        .studio-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 14px;
-            padding: 12px;
-            background: white;
-        }
-
-        .round-control {
-            border: 1px solid var(--line);
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            display: grid;
-            place-items: center;
-            background: var(--paper);
-            color: var(--deep-teal);
-            pointer-events: none;
-            user-select: none;
-            cursor: default;
-        }
-
-        .round-control svg {
-            width: 18px;
-            height: 18px;
-        }
-
-        .round-control.mic {
-            background: var(--deep-teal);
-            color: white;
-            border-color: var(--deep-teal);
-        }
-
-        .round-control.end {
-            background: rgba(216, 102, 98, 0.1);
-            color: var(--danger);
-            border-color: rgba(216, 102, 98, 0.25);
-        }
-
-        .studio-note {
-            margin: 0 12px 14px;
-            text-align: center;
-            color: var(--muted);
-            font-size: 11.5px;
-        }
-
-        /* Benefits Section */
-        .section {
-            padding: 90px 0;
-        }
-
-        .benefits {
-            background: var(--sand-bg);
-            color: var(--ink);
-            position: relative;
-        }
-
-        .section-heading {
-            max-width: 690px;
-            margin-bottom: 38px;
-        }
-
-        .section-heading h2 {
-            font-size: clamp(32px, 4vw, 54px);
-            margin: 14px 0;
-            color: var(--ink);
-        }
-
-        .section-heading p {
-            color: var(--muted);
-            font-size: 15.5px;
-            line-height: 1.75;
-        }
-
-        .benefit-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .benefit-card {
-            background: var(--paper);
-            color: var(--ink);
-            border: 1px solid var(--line);
-            border-radius: 24px;
-            padding: 28px;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-shadow: 0 4px 16px rgba(52, 69, 87, 0.04);
-            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-        }
-
-        .benefit-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(52, 69, 87, 0.07);
-            border-color: rgba(64, 126, 121, 0.3);
-        }
-
-        .card-icon {
-            width: 58px;
-            height: 58px;
-            border-radius: 18px;
-            background: rgba(64, 126, 121, 0.1);
-            border: 1px solid rgba(64, 126, 121, 0.18);
-            display: grid;
-            place-items: center;
-            color: var(--deep-teal);
-            margin-bottom: auto;
-        }
-
-        .benefit-card:nth-child(2) .card-icon {
-            background: rgba(233, 153, 101, 0.12);
-            border-color: rgba(233, 153, 101, 0.24);
-            color: var(--orange);
-        }
-
-        .benefit-card:nth-child(3) .card-icon {
-            background: rgba(64, 126, 121, 0.1);
-            border-color: rgba(64, 126, 121, 0.18);
-            color: var(--deep-teal);
-        }
-
-        .card-icon svg {
-            width: 26px;
-            height: 26px;
-        }
-
-        .benefit-card h3 {
-            font-size: 22px;
-            margin: 22px 0 8px;
-            color: var(--ink);
-        }
-
-        .benefit-card p {
-            font-size: 14px;
-            color: var(--muted);
-            margin: 0;
-            line-height: 1.7;
-        }
-
-        /* Scenarios / Mood Section */
-        .mood-section {
-            background: var(--cream);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .mood-layout {
-            display: grid;
-            grid-template-columns: 0.9fr 1.1fr;
-            align-items: center;
-            gap: 60px;
-        }
-
-        .mood-portrait {
-            position: relative;
-            min-height: 440px;
-            border-radius: 48% 52% 43% 57% / 43% 40% 60% 57%;
-            background: var(--sand-bg);
-            border: 1px solid var(--line);
-            display: grid;
-            place-items: end center;
-            overflow: hidden;
-            margin: 0 auto;
-            width: 100%;
-            max-width: 440px;
-        }
-
-        .mood-portrait:before {
-            content: "";
-            position: absolute;
-            width: 270px;
-            height: 270px;
-            border-radius: 50%;
-            background: rgba(64, 126, 121, 0.08);
-            top: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .mood-milo {
-            position: relative;
-            height: 400px;
-            max-width: 90%;
-            object-fit: contain;
-            object-position: bottom;
-            filter: drop-shadow(0 8px 3px rgba(52, 69, 87, 0.08));
-        }
-
-        .mood-content h2 {
-            font-size: clamp(32px, 4vw, 54px);
-            margin: 15px 0;
-            color: var(--ink);
-        }
-
-        .mood-content>p {
-            color: var(--muted);
-            max-width: 520px;
-            line-height: 1.75;
-        }
-
-        .mood-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 26px 0 20px;
-        }
-
-        .mood-button {
-            border: 1.5px solid var(--line);
-            background: var(--paper);
-            color: var(--ink);
-            padding: 11px 18px;
-            border-radius: 999px;
-            font-size: 14px;
-            font-weight: 700;
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
-        }
-
-        .mood-button:hover,
-        .mood-button[aria-pressed="true"] {
-            background: var(--deep-teal);
-            color: white;
-            border-color: var(--deep-teal);
-        }
-
-        .mood-button:active {
-            transform: scale(0.98);
-        }
-
-        .mood-message {
-            background: var(--paper);
-            border: 1px solid var(--line);
-            border-left: 4px solid var(--orange);
-            padding: 20px 22px;
-            border-radius: 0 18px 18px 0;
-            min-height: 115px;
-            box-shadow: 0 8px 24px rgba(52, 69, 87, 0.04);
-        }
-
-        .mood-title {
-            display: block;
-            font-family: "Nunito", sans-serif;
-            font-size: 19px;
-            font-weight: 700;
-            color: var(--ink);
-            margin: 0 0 4px;
-        }
-
-        .mood-message>.mood-description {
-            color: var(--muted);
-            font-size: 14px;
-            display: block;
-            margin-bottom: 14px;
-            line-height: 1.6;
-        }
-
-        .mood-launch-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--ink);
-            color: white;
-            font-size: 13px;
-            font-weight: 700;
-            padding: 10px 18px;
-            min-height: 44px;
-            border-radius: 999px;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .mood-launch-cta:hover {
-            background: var(--ink-dark);
-            transform: translateY(-2px);
-        }
-
-        /* CEFR Framework Section */
-        .breath {
-            background: var(--sand-bg);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .breath:before,
-        .breath:after {
-            content: "";
-            position: absolute;
-            width: 270px;
-            height: 270px;
-            border-radius: 50%;
-            background: rgba(64, 126, 121, 0.06);
-            opacity: 0.8;
-        }
-
-        .breath:before {
-            top: -140px;
-            left: -100px;
-        }
-
-        .breath:after {
-            right: -120px;
-            bottom: -140px;
-        }
-
-        .breath-inner {
-            position: relative;
-            z-index: 1;
-        }
-
-        .breath h2 {
-            font-size: clamp(32px, 4vw, 54px);
-            margin: 15px 0;
-        }
-
-        .breath-intro {
-            color: var(--muted);
-            max-width: 670px;
-            margin: 0 auto 32px;
-            line-height: 1.75;
-        }
-
-        .level-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            text-align: left;
-        }
-
-        .level-card {
-            border: 1.5px solid var(--line);
-            background: var(--paper);
-            border-radius: 24px;
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            box-shadow: 0 4px 16px rgba(52, 69, 87, 0.03);
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .level-card.selected {
-            border-color: var(--deep-teal);
-            box-shadow: 0 8px 24px rgba(64, 126, 121, 0.12);
-        }
-
-        .level-card h3 {
-            font-size: 24px;
-            margin: 12px 0;
-        }
-
-        .level-card p {
-            color: var(--muted);
-            font-size: 14px;
-            flex: 1;
-            line-height: 1.7;
-        }
-
-        .level-card-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .level-card button {
-            background: var(--ink);
-            color: white;
-            min-height: 44px;
-            padding: 10px 20px;
-        }
-
-        .level-direct-link {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: var(--deep-teal);
-            border-bottom: 1px solid currentColor;
-            padding-bottom: 2px;
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        /* Dashboard Preview Section */
-        .dashboard-actions {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        /* CTA Section */
-        .cta {
-            background: var(--cream);
-            border-top: 1px solid var(--line);
-            overflow: hidden;
-        }
-
-        .cta-grid {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            align-items: center;
-            gap: 32px;
-        }
-
-        .cta h2 {
-            font-size: clamp(34px, 4.5vw, 58px);
-            margin: 16px 0 18px;
-        }
-
-        .cta p {
-            max-width: 500px;
-            color: var(--muted);
-            margin-bottom: 26px;
-            line-height: 1.75;
-        }
-
-        .cta-art {
-            height: 360px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .cta-art:before {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            width: 340px;
-            max-width: 100%;
-            height: 300px;
-            background: var(--sand-bg);
-            border: 1px solid var(--line);
-            border-radius: 50% 50% 12% 12%;
-        }
-
-        .cta-milo {
-            position: relative;
-            height: 325px;
-            max-width: 90%;
-            object-fit: contain;
-            filter: drop-shadow(0 7px 2px rgba(65, 70, 62, 0.08));
-        }
-
-        .cta-star {
-            position: absolute;
-            color: var(--orange);
-            font-size: 42px;
-            top: 35px;
-            right: 10%;
-        }
-
-        /* Footer */
-        .site-footer {
-            background: var(--paper);
-            border-top: 1px solid var(--line);
-            padding: 50px 0 30px;
-        }
-
-        .footer-top {
-            display: flex;
-            justify-content: space-between;
-            gap: 30px;
-            align-items: flex-start;
-            padding-bottom: 40px;
-        }
-
-        .footer-top p {
-            max-width: 320px;
-            color: var(--muted);
-            font-size: 14px;
-            margin: 12px 0 0;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 16px 20px;
-            flex-wrap: wrap;
-            font-size: 13px;
-            font-weight: 700;
-            max-width: 560px;
-        }
-
-        .footer-links a {
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .footer-bottom {
-            border-top: 1px solid var(--line);
-            padding-top: 20px;
-            color: var(--muted);
-            font-size: 12px;
-            display: flex;
-            justify-content: space-between;
-            gap: 18px;
-            flex-wrap: wrap;
-        }
-
-        /* ═══════════════════════════════════════════════════════════════════════
-       RESPONSIVE BREAKPOINTS (Fluid Three-Stage Reflow: Desktop, Tablet, Phone)
-       ═══════════════════════════════════════════════════════════════════════ */
-
-        /* Tablet & Medium Screen Reflow (max-width: 900px) */
-        @media (max-width: 900px) {
-            .nav-links {
-                display: none !important;
-            }
-
-            .nav-toggle {
-                display: inline-flex !important;
-                flex-shrink: 0 !important;
-            }
-
-            /* Suppress redundant CTA button inside navbar to prevent overcrowding */
-            .nav-inner .nav-action-wrapper .nav-cta,
-            .nav-inner .nav-action-wrapper .nav-cta-btn {
-                display: none !important;
-            }
-
-            .nav-action-wrapper {
-                margin-left: auto;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .mobile-nav-drawer {
-                display: block;
-                position: absolute;
-                top: calc(100% + 10px);
-                left: 14px;
-                right: 14px;
-                background: var(--paper);
-                border: 1px solid var(--line);
-                border-radius: 22px;
-                padding: 18px;
-                box-shadow: 0 16px 40px rgba(52, 69, 87, 0.12);
-                z-index: 100;
-                max-height: calc(100vh - 90px);
-                overflow-y: auto;
-            }
-
-            .mobile-nav-drawer[hidden] {
-                display: none !important;
-            }
-
-            .mobile-nav-links {
-                display: flex;
-                flex-direction: column;
-                gap: 4px;
-                margin-bottom: 14px;
-            }
-
-            .mobile-nav-link {
-                display: flex;
-                align-items: center;
-                padding: 10px 14px;
-                font-size: 14.5px;
-                font-weight: 700;
-                color: var(--ink);
-                border-radius: 12px;
-                min-height: 44px;
-                transition: background 0.2s, color 0.2s;
-            }
-
-            .mobile-nav-link:hover,
-            .mobile-nav-link:active {
-                background: var(--cream);
-                color: var(--deep-teal);
-            }
-
-            .mobile-nav-actions {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                padding-top: 14px;
-                border-top: 1px solid var(--line);
-            }
-
-            .hero {
-                padding-top: 24px;
-                padding-bottom: 72px;
-            }
-
-            .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 36px;
-            }
-
-            .hero-copy {
-                text-align: center;
-            }
-
-            .hero-copy .eyebrow {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .hero-title {
-                text-align: center;
-                margin-left: auto;
-                margin-right: auto;
-                max-width: 560px;
-            }
-
-            .hero-title .accent {
-                display: block;
-                margin-top: 4px;
-            }
-
-            .hero-copy>p {
-                margin-left: auto;
-                margin-right: auto;
-                max-width: 480px;
-            }
-
-            .hero-actions {
-                justify-content: center;
-            }
-
-            .trust-strip {
-                justify-content: center;
-            }
-
-            .mood-layout {
-                grid-template-columns: 1fr;
-                gap: 36px;
-            }
-
-            .mood-portrait {
-                max-width: 400px;
-            }
-
-            .cta-grid {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-
-            .cta p {
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .cta-art {
-                order: -1;
-            }
-
-            .section {
-                padding: 68px 0;
-            }
-        }
-
-        /* Small Tablet & Mobile Phone (max-width: 640px) */
-        @media (max-width: 640px) {
-            .wrap {
-                width: min(100% - 28px, 1160px);
-            }
-
-            .site-header {
-                padding: 10px 0;
-            }
-
-            .nav-inner {
-                min-height: 56px;
-                padding: 6px 12px 6px 16px;
-                gap: 8px;
-                border-radius: 999px;
-            }
-
-            .brand {
-                font-size: 17px;
-                gap: 7px;
-            }
-
-            .brand-mark {
-                width: 28px;
-                height: 28px;
-            }
-
-            .brand small {
-                display: none !important;
-            }
-
-            .user-profile-nav-pill {
-                padding: 3px 10px 3px 5px;
-                gap: 6px;
-                font-size: 11.5px;
-            }
-
-            .user-profile-nav-pill .btn-nav-logout {
-                display: none !important;
-            }
-
-            .user-nav-avatar {
-                width: 24px;
-                height: 24px;
-                font-size: 10.5px;
-            }
-
-            .user-nav-username {
-                max-width: 75px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: inline-block;
-            }
-
-            .user-nav-cefr {
-                font-size: 9.5px;
-                padding: 1px 6px;
-            }
-
-            .nav-toggle {
-                width: 44px;
-                height: 44px;
-                min-width: 44px;
-                min-height: 44px;
-                margin-left: 2px;
-            }
-
-            .nav-toggle svg {
-                width: 20px;
-                height: 20px;
-            }
-
-            .mobile-nav-drawer {
-                left: 14px;
-                right: 14px;
-                padding: 16px;
-            }
-
-            /* Hero section mobile adjustments */
-            .hero {
-                padding-top: 18px;
-                padding-bottom: 60px;
-            }
-
-            .hero::after {
-                height: 38px;
-            }
-
-            .eyebrow {
-                font-size: 10.5px;
-                padding: 5px 12px;
-                letter-spacing: 0.05em;
-                margin-bottom: 10px;
-            }
-
-            .hero-title {
-                font-size: clamp(25px, 6.8vw, 34px);
-                line-height: 1.22;
-                max-width: 380px;
-                margin: 10px auto 14px;
-            }
-
-            .hero-copy>p {
-                font-size: 14.5px;
-                line-height: 1.65;
-                max-width: 360px;
-                margin: 0 auto 20px;
-                color: var(--muted);
-            }
-
-            .hero-actions {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-                max-width: 320px;
-                gap: 10px;
-                margin: 0 auto;
-            }
-
-            .hero-actions .primary-btn {
-                width: 100%;
-                min-height: 48px;
-                font-size: 14.5px;
-                font-weight: 800;
-                justify-content: center;
-                box-shadow: 0 4px 14px rgba(233, 153, 101, 0.35);
-            }
-
-            .hero-actions .secondary-link {
-                width: 100%;
-                min-height: 48px;
-                font-size: 14px;
-                font-weight: 700;
-                justify-content: center;
-                background: var(--paper);
-                border: 1.5px solid var(--line);
-                border-radius: 999px;
-                color: var(--ink);
-                box-shadow: 0 2px 8px rgba(52, 69, 87, 0.04);
-                text-align: center;
-            }
-
-            .hero-actions .secondary-link:hover,
-            .hero-actions .secondary-link:active {
-                background: var(--cream);
-            }
-
-            .trust-strip {
-                flex-direction: column;
-                align-items: center;
-                gap: 9px;
-                margin: 20px auto 0;
-                padding-top: 16px;
-                border-top: 1px solid rgba(52, 69, 87, 0.1);
-                width: 100%;
-                max-width: 290px;
-            }
-
-            .trust-strip span {
-                font-size: 12px;
-                color: var(--deep-teal);
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .trust-strip svg {
-                width: 15px;
-                height: 15px;
-            }
-
-            /* Hero Studio card mobile reflow */
-            .studio {
-                max-width: 440px;
-                margin: 0 auto;
-            }
-
-            .studio-head {
-                padding: 10px 14px;
-                gap: 8px;
-            }
-
-            .studio-head>span:first-child {
-                font-size: 10px;
-                letter-spacing: 0.03em;
-                font-weight: 900;
-            }
-
-            .studio-head-actions {
-                gap: 6px;
-            }
-
-            .level-chip {
-                padding: 2px 8px;
-                font-size: 9.5px;
-            }
-
-            .studio-full-btn {
-                padding: 4px 10px;
-                font-size: 9.5px;
-                min-height: 28px;
-            }
-
-            .studio-stage {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                padding: 14px;
-                min-height: auto;
-            }
-
-            .studio-avatar {
-                order: 1;
-                margin: 2px auto 6px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .hero-milo {
-                height: 180px;
-                max-width: 140px;
-                object-fit: contain;
-            }
-
-            .avatar-status {
-                background: var(--paper);
-                border: 1px solid var(--line);
-                border-radius: 999px;
-                padding: 4px 12px;
-                font-size: 10px;
-                color: var(--deep-teal);
-                font-weight: 800;
-                margin-top: 6px;
-            }
-
-            .hud {
-                order: 2;
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-start;
-                padding: 11px 14px;
-                background: var(--paper);
-                border: 1px solid var(--line);
-                border-radius: 14px;
-                gap: 12px;
-                box-sizing: border-box;
-            }
-
-            .hud-divider {
-                display: none;
-            }
-
-            .hud>div {
-                display: flex;
-                flex-direction: column;
-                text-align: left;
-            }
-
-            .hud-feedback-group {
-                display: flex;
-                flex-direction: column;
-                text-align: right;
-            }
-
-            .chat-column {
-                order: 3;
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
-            }
-
-            .chat-bubble {
-                font-size: 12.5px;
-                line-height: 1.5;
-                padding: 11px 14px;
-                border-radius: 14px;
-            }
-
-            .waveform {
-                height: 28px;
-            }
-
-            .studio-controls {
-                padding: 10px;
-                gap: 14px;
-            }
-
-            .round-control {
-                width: 40px;
-                height: 40px;
-            }
-
-            .round-control svg {
-                width: 17px;
-                height: 17px;
-            }
-
-            .studio-note {
-                margin: 0 12px 14px;
-                font-size: 11px;
-            }
-
-            /* Sections & cards */
-            .section {
-                padding: 56px 0;
-            }
-
-            .section-heading h2 {
-                font-size: clamp(28px, 7vw, 36px);
-            }
-
-            .benefit-grid {
-                grid-template-columns: 1fr;
-                gap: 14px;
-            }
-
-            .benefit-card {
-                min-height: auto;
-                padding: 22px 18px;
-                border-radius: 20px;
-            }
-
-            .benefit-card h3 {
-                margin-top: 16px;
-            }
-
-            .mood-buttons {
-                flex-direction: column;
-                gap: 8px;
-                margin: 20px 0 16px;
-            }
-
-            .mood-button {
-                width: 100%;
-                min-height: 44px;
-                justify-content: flex-start;
-                padding: 12px 18px;
-            }
-
-            .mood-portrait {
-                min-height: 260px;
-                max-height: 320px;
-                max-width: 340px;
-            }
-
-            .mood-portrait:before {
-                width: 200px;
-                height: 200px;
-            }
-
-            .mood-milo {
-                height: 250px;
-            }
-
-            .mood-message {
-                padding: 16px 18px;
-                border-radius: 0 14px 14px 0;
-            }
-
-            .mood-launch-cta {
-                width: 100%;
-                min-height: 44px;
-                justify-content: center;
-            }
-
-            .level-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-
-            .level-card {
-                padding: 22px 20px;
-                border-radius: 20px;
-            }
-
-            .level-card-actions {
-                width: 100%;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-
-            .level-card button {
-                width: 100%;
-                min-height: 44px;
-                justify-content: center;
-            }
-
-            .level-direct-link {
-                justify-content: center;
-                min-height: 44px;
-            }
-
-            .dashboard-actions {
-                flex-direction: column;
-                align-items: stretch;
-                width: 100%;
-                max-width: 320px;
-                gap: 10px;
-                margin: 18px auto 0;
-            }
-
-            .dashboard-actions .primary-btn {
-                width: 100%;
-                justify-content: center;
-                min-height: 48px;
-            }
-
-            .dashboard-actions .secondary-link {
-                width: 100%;
-                min-height: 48px;
-                justify-content: center;
-            }
-
-            .cta-grid {
-                gap: 20px;
-            }
-
-            .cta-art {
-                height: 250px;
-            }
-
-            .cta-art:before {
-                height: 210px;
-                width: 240px;
-            }
-
-            .cta-milo {
-                height: 230px;
-            }
-
-            .cta .primary-btn {
-                width: 100%;
-                max-width: 320px;
-                min-height: 48px;
-                justify-content: center;
-                margin: 0 auto;
-            }
-
-            .footer-top {
-                flex-direction: column;
-                gap: 20px;
-                padding-bottom: 24px;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 4px;
-                width: 100%;
-            }
-
-            .footer-links a {
-                min-height: 44px;
-                padding: 8px 0;
-            }
-
-            .footer-bottom {
-                flex-direction: column;
-                gap: 8px;
-                text-align: center;
-                font-size: 11.5px;
-            }
-        }
-
-        /* Narrow Phone Reflow (max-width: 380px) */
-        @media (max-width: 380px) {
-            .user-nav-username {
-                display: none !important;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
-
-            *,
-            *:before,
-            *:after {
-                transition-duration: 0.01ms !important;
-                animation-duration: 0.01ms !important;
-            }
-        }
-    </style>
+    <!-- Main Stylesheet (Figma Desktop - 1) with cache buster -->
+    <link rel="stylesheet" href="css/index.css?v=1.9">
 </head>
 
 <body>
-    <!-- Header & Navigation -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVBAR (Desktop - 2 Floating Pill)
+         ═══════════════════════════════════════════════════════════════════════ -->
     <header class="site-header">
-        <nav class="nav-inner wrap" aria-label="Navigasi utama">
-            <a id="brand-link" class="brand" href="index.html" aria-label="MILO Speaking Companion">
-                <span class="brand-mark">
-                    <img src="assets/Icon logo milo.svg" alt="" width="32" height="32" class="brand-mark-img">
-                </span>
-                MILO <small>(Speaking Companion)</small>
-            </a>
-            <div class="nav-links">
-                <a href="index.html">Beranda</a>
-                <a href="#manfaat">Manfaat</a>
-                <a href="#perasaan">Skenario</a>
-                <a href="#latihan">Level CEFR</a>
-                <a href="dashboard.html">Dashboard</a>
-            </div>
-            <div class="nav-action-wrapper">
-                <a href="login.html" class="nav-secondary-btn">Masuk</a>
-                <a href="setup.html" class="pill nav-cta">Mulai Latihan</a>
-            </div>
-            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi"
-                aria-expanded="false" aria-controls="mobile-nav-drawer">
-                <i data-lucide="menu" aria-hidden="true"></i>
-            </button>
-        </nav>
-
-        <!-- Mobile Navigation Drawer -->
-        <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
-            <div id="drawer-user-info" class="drawer-user-info" style="display:none;"></div>
-            <div class="mobile-nav-links">
-                <a href="index.html" class="mobile-nav-link">Beranda</a>
-                <a href="setup.html" class="mobile-nav-link">Ruang Latihan</a>
-                <a href="#manfaat" class="mobile-nav-link">Manfaat &amp; Fitur</a>
-                <a href="#perasaan" class="mobile-nav-link">Skenario Percakapan</a>
-                <a href="#latihan" class="mobile-nav-link">Level CEFR</a>
-                <a href="dashboard.html" class="mobile-nav-link">Dashboard Progres</a>
-            </div>
-            <div class="mobile-nav-actions">
-                <a href="setup.html" class="pill primary-btn"
-                    style="width: 100%; min-height: 44px; justify-content: center;">
-                    Mulai Latihan Sekarang <i data-lucide="arrow-right" aria-hidden="true"></i>
+        <div class="wrap">
+            <nav class="nav-pill" aria-label="Navigasi utama">
+                <!-- Full Logo exactly as shown in Figma -->
+                <a href="index.html" class="brand-logo-wrap" aria-label="MILO Interactive Companion">
+                    <img src="assets/milo-logo-full.svg" alt="MiLo (Interactive Companion)" class="brand-logo-img">
                 </a>
+
+                <!-- Desktop Nav Links -->
+                <div class="nav-menu">
+                    <a href="index.html">Beranda</a>
+                    <a href="#manfaat">Manfaat</a>
+                    <a href="#skenario">Skenario</a>
+                    <a href="#level-cefr">Level CEFR</a>
+                    <a href="setup.html" class="auth-required-nav">Ruang Latihan</a>
+                    <a href="dashboard.html" class="auth-required-nav">Dashboard</a>
+                    <a href="login.html" id="nav-link-masuk">Masuk</a>
+                    <!-- Auth / Profile Pill (Syncs automatically with login session) -->
+                    <div class="nav-action-wrapper"></div>
+                </div>
+
+                <!-- Mobile Hamburger Toggle -->
+                <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi"
+                    aria-expanded="false" aria-controls="mobile-nav-drawer">
+                    <i data-lucide="menu" aria-hidden="true"></i>
+                </button>
+            </nav>
+
+            <!-- Mobile Navigation Drawer -->
+            <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
+                <div id="drawer-user-info" style="display:none;margin-bottom:12px;"></div>
+                <div class="mobile-nav-links">
+                    <a href="index.html" class="mobile-nav-link">Beranda</a>
+                    <a href="setup.html" class="mobile-nav-link auth-required-nav">Ruang Latihan</a>
+                    <a href="#manfaat" class="mobile-nav-link">Manfaat</a>
+                    <a href="#skenario" class="mobile-nav-link">Skenario</a>
+                    <a href="#level-cefr" class="mobile-nav-link">Level CEFR</a>
+                    <a href="dashboard.html" class="mobile-nav-link auth-required-nav">Dashboard</a>
+                    <a href="login.html" class="mobile-nav-link" id="mobile-nav-link-masuk">Masuk</a>
+                </div>
             </div>
         </div>
     </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section id="beranda" class="hero">
-            <div class="wrap hero-grid">
-                <div class="hero-copy">
-                    <span class="eyebrow">Ruang latihan yang aman untuk berani bicara</span>
-                    <h1 class="hero-title">Latihan bahasa Inggris kapan saja. <span class="accent">Bicara lebih percaya
-                            diri.</span></h1>
-                    <p>Milo adalah teman latihan virtual 2D yang siap mendengarkan, merespons dengan suara alami, dan
-                        membantumu mengenal kemampuan berbicara berdasarkan standar CEFR. Salah tidak apa-apa, yang
-                        penting terus mencoba.</p>
-                    <div class="hero-actions">
-                        <a id="hero-action" href="setup.html" class="pill primary-btn">
-                            Mulai Percakapan Pertama <i data-lucide="arrow-right" aria-hidden="true"></i>
-                        </a>
-                        <a href="dashboard.html" class="secondary-link">Lihat Riwayat Latihan</a>
-                    </div>
-                    <div class="trust-strip">
-                        <span><i data-lucide="shield-check" aria-hidden="true"></i> Bebas takut salah</span>
-                        <span><i data-lucide="mic" aria-hidden="true"></i> Pengenalan suara Whisper AI</span>
-                        <span><i data-lucide="book-open" aria-hidden="true"></i> RAG Grounding Cambridge &
-                            Collins</span>
-                        <span><i data-lucide="languages" aria-hidden="true"></i> Terjemahan Bahasa Indonesia
-                            instan</span>
-                    </div>
+    <main id="beranda">
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             SECTION 1: HERO (Desktop - 2)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="hero-section">
+            <!-- Room Background Decor: Bookshelves, Clock, Window, Floor Curve -->
+            <div class="hero-bg-curve"></div>
+            <img src="assets/figma/bookshelf_1.png" alt="" class="hero-decor-shelf-1" aria-hidden="true"
+                style="opacity: 0.2;">
+            <img src="assets/figma/bookshelf_2.png" alt="" class="hero-decor-shelf-2" aria-hidden="true"
+                style="opacity: 0.2;">
+            <img src="assets/figma/clock.png" alt="" class="hero-decor-clock" aria-hidden="true">
+            <img src="assets/figma/window.png" alt="" class="hero-decor-window" aria-hidden="true">
+
+            <div class="wrap hero-container">
+                <!-- Left: Milo sitting on stool reading book -->
+                <div class="hero-left-reader">
+                    <img src="assets/membaca buku.png" alt="Milo sedang membaca buku" class="hero-reader-img"
+                        loading="lazy">
                 </div>
 
-                <!-- Hero Right: Studio Preview Showcase -->
-                <div id="practice-room" class="hero-art">
-                    <div class="studio" aria-label="Pratinjau ruang latihan Milo">
-                        <div class="studio-head">
-                            <span>RUANG LATIHAN MILO</span>
-                            <div class="studio-head-actions">
-                                <span id="studio-level" class="level-chip">Level B1</span>
-                                <a href="setup.html" class="studio-full-btn"
-                                    title="Buka sesi latihan penuh di Studio">Studio Penuh &rarr;</a>
-                            </div>
-                        </div>
-                        <div class="studio-stage">
-                            <div class="hud">
-                                <div>
-                                    <span class="hud-label">Topik latihan</span>
-                                    <strong id="studio-topic">Wawancara Kerja</strong>
-                                </div>
-                                <div class="hud-divider"></div>
-                                <div class="hud-feedback-group">
-                                    <span class="hud-label">Saran latihan</span>
-                                    <small id="grammar-feedback">Grammar: Siap berlatih</small>
-                                    <small id="vocab-feedback">Kosakata: Saran muncul di sini</small>
-                                </div>
-                            </div>
-                            <div class="studio-avatar">
-                                <img id="hero-milo" class="hero-milo" src="assets/milo_companion.png"
-                                    alt="Ilustrasi 2D Milo teman latihan speaking" width="180" height="236"
-                                    fetchpriority="high">
-                                <span id="avatar-status" class="avatar-status">● Milo siap menemanimu</span>
-                            </div>
-                            <div class="chat-column">
-                                <div id="milo-bubble" class="chat-bubble milo-bubble">
-                                    <span class="bubble-line">Good morning! Please have a seat. Could you tell me a
-                                        little bit about yourself?</span>
-                                </div>
-                                <div id="user-bubble" class="chat-bubble user-bubble">
-                                    Thank you for having me. I have three years of experience in project management.
-                                </div>
-                                <div id="waveform" class="waveform" aria-label="Indikator aktivitas suara">
-                                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="studio-controls" aria-hidden="true">
-                            <span class="round-control preview-control" title="Input Teks (Pratinjau antarmuka)">
-                                <i data-lucide="keyboard" aria-hidden="true"></i>
-                            </span>
-                            <span class="round-control preview-control mic" title="Mikrofon (Pratinjau antarmuka)">
-                                <i data-lucide="mic" aria-hidden="true"></i>
-                            </span>
-                            <span class="round-control preview-control end" title="Akhiri Sesi (Pratinjau antarmuka)">
-                                <i data-lucide="phone-off" aria-hidden="true"></i>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Benefits Section -->
-        <section id="manfaat" class="benefits section">
-            <div class="wrap">
-                <div class="section-heading">
-                    <span class="eyebrow">Dukungan di setiap langkah</span>
-                    <h2>Teman latihan yang membuatmu berani bicara</h2>
-                    <p>Tak perlu menunggu kalimat sempurna. Coba dulu, dengarkan respons Milo, lalu pelan-pelan jadi
-                        lebih lancar.</p>
-                </div>
-                <div class="benefit-grid">
-                    <article class="benefit-card">
-                        <div class="card-icon" aria-hidden="true">
-                            <i data-lucide="scan-text"></i>
-                        </div>
-                        <h3>Evaluasi Langsung</h3>
-                        <p>Kenali struktur kalimat, tenses, grammar, dan pilihan kosakata lewat saran sederhana saat
-                            kamu berlatih. Bukan nilai resmi CEFR.</p>
-                    </article>
-                    <article class="benefit-card">
-                        <div class="card-icon" aria-hidden="true">
-                            <i data-lucide="message-circle-heart"></i>
-                        </div>
-                        <h3>Milo, Teman Virtualmu</h3>
-                        <p>Milo menanggapi suara atau pesanmu dengan ramah. Di sini, salah ucap bukan masalah, setiap
-                            percobaan tetap berarti.</p>
-                    </article>
-                    <article class="benefit-card">
-                        <div class="card-icon" aria-hidden="true">
-                            <i data-lucide="languages"></i>
-                        </div>
-                        <h3>Bantuan Dwibahasa</h3>
-                        <p>Putar ulang pelafalan lewat TTS, yaitu suara dari teks, dan lihat terjemahan Bahasa Indonesia
-                            saat butuh sedikit bantuan.</p>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- Scenarios / Mood Section -->
-        <section id="perasaan" class="mood-section section">
-            <div class="wrap mood-layout">
-                <div class="mood-portrait">
-                    <img id="mood-milo" class="mood-milo" src="assets/milo_2.png"
-                        alt="Milo menyambutmu untuk memilih situasi percakapan" width="280" height="430" loading="lazy">
-                </div>
-                <div class="mood-content">
-                    <span class="eyebrow">Skenario percakapan</span>
-                    <h2>Latihan sesuai situasi nyata</h2>
-                    <p>Pilih yang paling dekat dengan kebutuhanmu. Milo akan menyiapkan pembuka percakapan, lalu kamu
-                        bisa mulai dengan caramu sendiri.</p>
-                    <div class="mood-buttons" role="group" aria-label="Pilih skenario percakapan">
-                        <button class="mood-button" type="button" data-mood="interview" aria-pressed="true"> Wawancara
-                            Kerja</button>
-                        <button class="mood-button" type="button" data-mood="academic" aria-pressed="false"> Diskusi
-                            Akademik</button>
-                        <button class="mood-button" type="button" data-mood="daily" aria-pressed="false"> Percakapan
-                            Sehari-hari</button>
-                    </div>
-                    <div id="mood-message" class="mood-message" role="status" aria-live="polite">
-                        <h3 class="mood-title" style="font-size:19px;margin:0 0 6px;">Wawancara Kerja</h3>
-                        <span class="mood-description">Coba perkenalkan diri dan ceritakan kelebihanmu. Cocok untuk
-                            pemanasan sebelum Job Interview sungguhan.</span>
-                        <div style="margin-top:12px;">
-                            <a id="mood-launch-link" href="setup.html?topic=job_interview" class="mood-launch-cta">
-                                <span>Mulai Skenario di Studio Penuh</span>
-                                <i data-lucide="arrow-right" aria-hidden="true" style="width:14px;height:14px;"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- CEFR Framework Section -->
-        <section id="latihan" class="breath section">
-            <div class="breath-inner wrap">
-                <span class="eyebrow">Panduan level CEFR</span>
-                <h2>Temukan level yang tepat untukmu</h2>
-                <p class="breath-intro">Tak perlu menebak level yang “sempurna”. Pilih fokus yang terasa pas sekarang;
-                    kamu selalu bisa berganti nanti.</p>
-                <div class="level-grid">
-                    <article class="level-card selected" data-level-card="B1">
-                        <span class="eyebrow">Titik awal yang nyaman</span>
-                        <h3>B1: Menengah</h3>
-                        <p>Bangun kelancaran dasar dan kurangi rasa ragu saat berbicara tentang topik sehari-hari dan
-                            pengalaman pribadi.</p>
-                        <div class="level-card-actions">
-                            <button type="button" class="pill" data-level="B1" aria-pressed="true">Pilih B1</button>
-                            <a href="setup.html?level=B1" class="level-direct-link">Mulai Sesi Level B1 &rarr;</a>
-                        </div>
-                    </article>
-                    <article class="level-card" data-level-card="B2">
-                        <span class="eyebrow">Untuk ide yang lebih mendalam</span>
-                        <h3>B2: Menengah Atas</h3>
-                        <p>Latih argumen yang lebih tajam, analisis terstruktur, dan pembawaan formal untuk kebutuhan
-                            profesional serta akademik.</p>
-                        <div class="level-card-actions">
-                            <button type="button" class="pill" data-level="B2" aria-pressed="false">Pilih B2</button>
-                            <a href="setup.html?level=B2" class="level-direct-link">Mulai Sesi Level B2 &rarr;</a>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="section"
-            style="background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
-            <div class="wrap section-heading" style="margin-bottom:0">
-                <span class="eyebrow">Dashboard Progres</span>
-                <h2>Setiap percakapan adalah langkah maju</h2>
-                <p style="color:var(--muted)">Pantau perkembangan skor CEFR, akurasi grammar, pengayaan kosakata, dan
-                    riwayat rekaman percakapanmu bersama Milo secara transparan.</p>
-                <div class="dashboard-actions">
-                    <a href="dashboard.html" class="pill primary-btn">
-                        Buka Dashboard Progres <i data-lucide="arrow-right" aria-hidden="true"></i>
+                <!-- Center Content: Title, Description, Dark Pill CTA -->
+                <div class="hero-center-content">
+                    <h1 class="hero-heading">Latihan bahasa Inggris<br>kapan saja.</h1>
+                    <p class="hero-desc">
+                        Milo adalah teman latihan virtual 2D yang siap mendengarkan, merespons dengan suara alami,
+                        dan membantumu mengenal kemampuan berbicara berdasarkan standar CEFR. Salah tidak apa-apa,
+                        yang penting terus mencoba.
+                    </p>
+                    <a href="setup.html" class="btn-pill-dark">
+                        <span>Mulai Percakapan</span>
+                        <i data-lucide="arrow-right" aria-hidden="true" style="width:16px;height:16px;"></i>
                     </a>
-                    <a href="setup.html" class="secondary-link">Atur Sesi Latihan Baru</a>
+                </div>
+
+                <!-- Right Side: Milo standing waving happily with shadow -->
+                <div class="hero-right-milo">
+                    <img src="assets/melambai.png" alt="Milo melambaikan tangan menyapa" class="hero-waving-img"
+                        fetchpriority="high">
+                    <img src="assets/figma/svgs/hero_milo_shadow.svg" alt="" class="hero-milo-shadow"
+                        aria-hidden="true">
                 </div>
             </div>
         </section>
 
-        <!-- Bottom CTA Section -->
-        <section id="ajakan" class="cta section">
-            <div class="wrap cta-grid">
-                <div>
-                    <span class="eyebrow">Sedikit latihan, banyak kemajuan</span>
-                    <h2>Luangkan 3 sampai 15 menit hari ini untuk membuat bahasa Inggrismu lebih lancar.</h2>
-                    <p>Tak perlu takut salah atau merasa dihakimi. Milo siap menemanimu mulai dari satu kalimat
-                        sederhana.</p>
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             SECTION 2: BENEFITS (Desktop - 4)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="manfaat" class="benefits-section">
+            <div class="wrap">
+                <div class="section-header-figma">
+                    <h2 class="section-title-figma">Teman latihan yang<br>membuatmu berani bicara</h2>
+                    <p class="section-subtitle-figma">
+                        Tak perlu menunggu kalimat sempurna. Coba dulu, dengarkan respons Milo, lalu pelan-pelan jadi
+                        lebih lancar.
+                    </p>
                 </div>
-                <div class="cta-art">
-                    <span class="cta-star" aria-hidden="true">✳</span>
-                    <img id="cta-milo" class="cta-milo" src="assets/milo_3.png"
-                        alt="Milo mengajakmu berlatih berbicara bahasa Inggris" width="260" height="345" loading="lazy">
+
+                <!-- 3 Colorful Cards matching Figma Frame 175, 176, 177 -->
+                <div class="cards-row-figma">
+                    <!-- Card 1: Pink/Coral (Evaluasi Langsung) -->
+                    <div class="figma-feature-card card-pink">
+                        <div class="card-text-block">
+                            <h3>Evaluasi Langsung</h3>
+                            <p>Kenali struktur kalimat, tenses, grammar, dan pilihan kosakata lewat saran sederhana saat
+                                kamu berlatih. Bukan nilai resmi CEFR.</p>
+                        </div>
+                        <div class="card-illu-container">
+                            <img src="assets/figma/svgs/card1_wave.svg" alt="" class="card-bg-wave" aria-hidden="true">
+                            <img src="assets/figma/card1_milo.png" alt="Evaluasi Langsung bersama Milo"
+                                class="card-illu-img" loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Green (Milo, Teman Virtualmu) -->
+                    <div class="figma-feature-card card-green">
+                        <div class="card-text-block">
+                            <h3>Milo, Teman Virtualmu</h3>
+                            <p>Milo menanggapi suara atau pesanmu dengan ramah. Di sini, salah ucap bukan masalah setiap
+                                percobaan tetap berarti.</p>
+                        </div>
+                        <div class="card-illu-container">
+                            <img src="assets/figma/svgs/card2_wave.svg" alt="" class="card-bg-wave" aria-hidden="true">
+                            <img src="assets/figma/card2_milo.png" alt="Milo teman virtual latihan"
+                                class="card-illu-img" loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Blue (Evaluasi Bantuan Dwibahasa) -->
+                    <div class="figma-feature-card card-blue">
+                        <div class="card-text-block">
+                            <h3>Evaluasi Bantuan Dwibahasa</h3>
+                            <p>Putar ulang pelafalan lewat TTS, yaitu suara dari teks, dan lihat terjemahan Bahasa
+                                Indonesia saat butuh sedikit bantuan.</p>
+                        </div>
+                        <div class="card-illu-container">
+                            <img src="assets/figma/svgs/card3_wave.svg" alt="" class="card-bg-wave" aria-hidden="true">
+                            <img src="assets/figma/card3_milo.png" alt="Bantuan dwibahasa bersama Milo"
+                                class="card-illu-img" loading="lazy">
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             SECTION 3: SCENARIOS (Desktop - 5)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="skenario" class="scenarios-section">
+            <div class="wrap scenarios-grid">
+                <!-- Left Column -->
+                <div class="scenarios-left-col">
+                    <h2 class="section-title-figma">Latihan sesuai<br>situasi nyata</h2>
+                    <p class="section-subtitle-figma">
+                        Pilih yang paling dekat dengan kebutuhanmu. Milo akan menyiapkan pembuka percakapan,
+                        lalu kamu bisa mulai dengan caramu sendiri.
+                    </p>
+
+                    <!-- Scenario Pill Buttons with icons -->
+                    <div class="scenario-pills-wrap" role="group" aria-label="Pilih situasi percakapan">
+                        <button type="button" class="btn-scenario-pill" data-scenario="interview" aria-pressed="true">
+                            <img src="assets/figma/icon_interview.svg" alt="" class="scenario-pill-icon">
+                            <span>Wawancara Kerja</span>
+                        </button>
+                        <button type="button" class="btn-scenario-pill" data-scenario="academic" aria-pressed="false">
+                            <img src="assets/figma/icon_academic.svg" alt="" class="scenario-pill-icon">
+                            <span>Diskusi Akademik</span>
+                        </button>
+                        <button type="button" class="btn-scenario-pill" data-scenario="daily" aria-pressed="false">
+                            <img src="assets/figma/icon_daily.svg" alt="" class="scenario-pill-icon">
+                            <span>Percakapan Sehari Hari</span>
+                        </button>
+                    </div>
+
+                    <p class="scenario-help-text">
+                        Pilih situasi di atas, lalu mulai ngobrol dengan Milo di ruang latihan.
+                    </p>
+                    <div style="margin-top: 18px;">
+                        <a href="setup.html?topic=job_interview" id="btn-start-scenario" class="btn-pill-dark">
+                            <span>Latih Skenario Ini</span>
+                            <i data-lucide="arrow-right" aria-hidden="true" style="width:16px;height:16px;"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Column: Milo standing waist-up & stacked dialog bubbles -->
+                <div class="scenarios-right-stage">
+                    <div class="scenario-milo-box">
+                        <img src="assets/figma/scenarios_milo_waist.png"
+                            alt="Milo menyambut untuk latihan situasi nyata" class="scenario-milo-img" loading="lazy">
+                    </div>
+                    <div class="scenario-dialog-column">
+                        <div class="bubble-brown" id="bubble-scenario-milo">
+                            Good morning! Please have a seat. Could you tell me a little bit about yourself?
+                        </div>
+                        <div class="bubble-white" id="bubble-scenario-user">
+                            Thank you for having me. I have three years of experience in project management.
+                        </div>
+                        <div class="bubble-brown" id="bubble-scenario-milo-repeat">
+                            Good morning! Please have a seat. Could you tell me a little bit about yourself?
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             SECTION 4: CEFR LEVEL GUIDE (Desktop - 6)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section id="level-cefr" class="cefr-section">
+            <div class="wrap cefr-inner">
+                <h2 class="cefr-title">Temukan level yang tepat untukmu</h2>
+                <p class="cefr-subtitle">
+                    Tak perlu menebak level yang “sempurna”. Pilih fokus yang terasa pas sekarang; kamu selalu bisa
+                    berganti nanti.
+                </p>
+
+                <!-- Two White Wide Cards with Rounded Corners -->
+                <div class="cefr-cards-grid">
+                    <!-- Card Level B1 -->
+                    <div class="cefr-wide-card active-card" data-cefr-card="B1">
+                        <div>
+                            <div class="cefr-tag-row">
+                                <span class="cefr-tag-line"></span>
+                                <span class="cefr-tag-text">Titik awal yang nyaman</span>
+                            </div>
+                            <h3 class="cefr-card-name">B1 — Menengah</h3>
+                            <p class="cefr-card-desc">Bangun kelancaran dasar dan kurangi rasa ragu saat berbicara.</p>
+                        </div>
+                        <a href="setup.html?level=B1" class="btn-gold-pill" data-level="B1">
+                            <span>Pilih B1</span>
+                            <i data-lucide="arrow-right" aria-hidden="true" style="width:16px;height:16px;"></i>
+                        </a>
+                    </div>
+
+                    <!-- Card Level B2 -->
+                    <div class="cefr-wide-card" data-cefr-card="B2">
+                        <div>
+                            <div class="cefr-tag-row">
+                                <span class="cefr-tag-line"></span>
+                                <span class="cefr-tag-text">Untuk ide yang lebih mendalam</span>
+                            </div>
+                            <h3 class="cefr-card-name">B2 — Menengah Atas</h3>
+                            <p class="cefr-card-desc">Latih argumen yang lebih tajam untuk kebutuhan profesional dan
+                                akademik.</p>
+                        </div>
+                        <a href="setup.html?level=B2" class="btn-gold-pill" data-level="B2">
+                            <span>Pilih B2</span>
+                            <i data-lucide="arrow-right" aria-hidden="true" style="width:16px;height:16px;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             SECTION 5: BOTTOM CALL-TO-ACTION (Desktop - 7)
+             ═══════════════════════════════════════════════════════════════════════ -->
+        <section class="bottom-cta-section">
+            <div class="wrap bottom-cta-inner">
+                <h2 class="bottom-cta-title">Setiap percakapan adalah<br>langkah maju</h2>
+                <p class="bottom-cta-desc">
+                    Latihanmu saat ini berlangsung di halaman ini. Riwayat latihan dan rekomendasi topik akan tersimpan
+                    rapi untuk akunmu.
+                </p>
+                <a href="setup.html" class="btn-gold-pill-large">
+                    <span>Mulai Percakapan Pertama</span>
+                    <i data-lucide="arrow-right" aria-hidden="true" style="width:18px;height:18px;"></i>
+                </a>
             </div>
         </section>
     </main>
 
-    <!-- Site Footer -->
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         FOOTER (Desktop - 7 Footer)
+         ═══════════════════════════════════════════════════════════════════════ -->
     <footer class="site-footer">
         <div class="wrap">
-            <div class="footer-top">
-                <div>
-                    <a class="brand" href="index.html" aria-label="MILO Speaking Companion">
-                        <span class="brand-mark">
-                            <img src="assets/Icon logo milo.svg" alt="" width="32" height="32" class="brand-mark-img">
-                        </span>
-                        MILO <small>(Speaking Companion)</small>
+            <div class="footer-top-row">
+                <div class="footer-brand-box">
+                    <a href="index.html" aria-label="MILO Interactive Companion">
+                        <img src="assets/milo-logo-full.svg" alt="MiLo (Interactive Companion)"
+                            style="height:36px;width:auto;">
                     </a>
-                    <p>Tempat yang ramah untuk mencoba, belajar dari kesalahan, dan menemukan keberanian bicara
-                        bahasa
-                        Inggris.</p>
+                    <p class="footer-brand-desc">
+                        Tempat yang ramah untuk mencoba, belajar dari kesalahan, dan menemukan keberanian bicara bahasa
+                        Inggris.
+                    </p>
                 </div>
-                <nav class="footer-links" aria-label="Navigasi bagian bawah">
+                <nav class="footer-nav-links" aria-label="Navigasi bagian bawah">
                     <a href="index.html">Beranda</a>
                     <a href="setup.html">Mulai Latihan</a>
-                    <a href="dashboard.html">Dashboard Progres</a>
+                    <a href="dashboard.html">Dashboard</a>
                     <a href="login.html">Masuk</a>
-                    <a href="register.html">Daftar Akun</a>
+                    <a href="register.html">Buat Akun</a>
                 </nav>
             </div>
-            <div class="footer-bottom">
-                <span>© MILO (Speaking Companion). Multimodal Interactive Learning Companion.</span>
-                <span>Berbasis Standar CEFR.</span>
+            <div class="footer-bottom-row">
+                <span>© 2026 MILO (Speaking Companion).</span>
             </div>
         </div>
     </footer>
 
     <!-- Common Utilities (Auth & Session State) -->
-    <script src="js/common.js"></script>
+    <script src="js/common.js?v=1.4"></script>
 
-    <!-- Navigation, scenario, and level selection logic -->
+    <!-- Interactive script matching Figma prototype interactions -->
     <script>
         lucide.createIcons();
 
-        // Mobile nav drawer controller & user drawer state sync
+        // Mobile nav toggle
         const navToggle = document.getElementById("nav-toggle");
         const navDrawer = document.getElementById("mobile-nav-drawer");
-        const drawerUserInfo = document.getElementById("drawer-user-info");
-
-        function syncMobileDrawerAuth() {
-            if (!drawerUserInfo) return;
-            const rawUser = localStorage.getItem("milo_user");
-            const token = localStorage.getItem("milo_token");
-
-            if (rawUser && token) {
-                try {
-                    const user = JSON.parse(rawUser);
-                    const initial = (user.full_name || user.username || "M").charAt(0).toUpperCase();
-                    const name = user.full_name || user.username || "Pengguna";
-                    const cefr = user.cefr_level || "B1";
-
-                    drawerUserInfo.innerHTML = `
-            <div class="drawer-user-pill">
-              <span class="user-nav-avatar">${initial}</span>
-              <div>
-                <strong style="display:block;font-size:13px;color:var(--ink);">${name}</strong>
-                <span style="font-size:10px;color:var(--deep-teal);font-weight:800;">Level ${cefr}</span>
-              </div>
-            </div>
-            <button type="button" class="btn-nav-logout" title="Keluar dari akun" onclick="logoutUser()" style="min-width:34px;min-height:34px;display:grid;place-items:center;">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            </button>
-          `;
-                    drawerUserInfo.style.display = "flex";
-                } catch {
-                    drawerUserInfo.style.display = "none";
-                }
-            } else {
-                drawerUserInfo.innerHTML = `
-          <a href="login.html" class="nav-secondary-btn" style="flex:1;text-align:center;justify-content:center;background:var(--paper);border:1px solid var(--line);">Masuk</a>
-          <a href="register.html" class="nav-cta-btn" style="flex:1;text-align:center;justify-content:center;">Daftar</a>
-        `;
-                drawerUserInfo.style.display = "flex";
-            }
-        }
 
         if (navToggle && navDrawer) {
             navToggle.addEventListener("click", () => {
                 const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
                 navToggle.setAttribute("aria-expanded", String(!isExpanded));
                 navDrawer.hidden = isExpanded;
-                navToggle.setAttribute("aria-label", isExpanded ? "Buka menu navigasi" : "Tutup menu navigasi");
-                if (!isExpanded) {
-                    syncMobileDrawerAuth();
-                }
-            });
-
-            navDrawer.querySelectorAll("a").forEach(link => {
-                link.addEventListener("click", () => {
-                    navToggle.setAttribute("aria-expanded", "false");
-                    navDrawer.hidden = true;
-                    navToggle.setAttribute("aria-label", "Buka menu navigasi");
-                });
-            });
-
-            document.addEventListener("keydown", event => {
-                if (event.key === "Escape" && !navDrawer.hidden) {
-                    navToggle.setAttribute("aria-expanded", "false");
-                    navDrawer.hidden = true;
-                    navToggle.setAttribute("aria-label", "Buka menu navigasi");
-                    navToggle.focus();
-                }
             });
         }
 
-        // Initialize drawer auth status on DOM load
-        document.addEventListener("DOMContentLoaded", () => {
-            syncMobileDrawerAuth();
-        });
-
-        const scenarioTopics = {
+        // Scenario switcher data & interactions
+        const scenarioData = {
             interview: {
-                topicCode: "job_interview",
-                title: "Wawancara Kerja",
-                description: "Coba perkenalkan diri dan ceritakan kelebihanmu. Cocok untuk pemanasan sebelum Job Interview sungguhan.",
-                prompt: "Good morning! Please have a seat. Could you tell me a little bit about yourself?",
-                userReply: "Thank you for having me. I have three years of experience in project management."
+                milo: "Good morning! Please have a seat. Could you tell me a little bit about yourself?",
+                user: "Thank you for having me. I have three years of experience in project management."
             },
             academic: {
-                topicCode: "academic_discussion",
-                title: "Diskusi Akademik",
-                description: "Punya ide yang ingin disampaikan? Latih cara menjelaskan pendapat dan mendukungnya dengan alasan yang jelas.",
-                prompt: "What is the main argument or hypothesis of your research?",
-                userReply: "My research focuses on evaluating multimodal learning companions for language acquisition."
+                milo: "What is the primary argument or hypothesis behind your current research paper?",
+                user: "My research focuses on evaluating multimodal learning companions for language acquisition."
             },
             daily: {
-                topicCode: "daily_conversation",
-                title: "Percakapan Sehari-hari",
-                description: "Mulai dari topik ringan seperti hobi atau akhir pekan. Daily Conversation bisa jadi langkah pertama yang menyenangkan.",
-                prompt: "Hi! What do you like to do to unwind on the weekend?",
-                userReply: "I usually enjoy reading books and practicing my conversational English."
+                milo: "Hi! What do you like to do to unwind when you have some free time on the weekend?",
+                user: "I usually enjoy reading books and practicing my conversational English."
             }
         };
 
-        function showScenario(key) {
-            const item = scenarioTopics[key];
-            if (!item) return;
+        const scenarioButtons = document.querySelectorAll("[data-scenario]");
+        const bubbleMilo = document.getElementById("bubble-scenario-milo");
+        const bubbleUser = document.getElementById("bubble-scenario-user");
+        const bubbleMiloRepeat = document.getElementById("bubble-scenario-milo-repeat");
+        const btnStartScenario = document.getElementById("btn-start-scenario");
 
-            document.querySelectorAll("[data-mood]").forEach(button => {
-                button.setAttribute("aria-pressed", String(button.dataset.mood === key));
+        const scenarioTopicMap = {
+            interview: "job_interview",
+            academic: "academic_discussion",
+            daily: "daily_conversation"
+        };
+
+        scenarioButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const scKey = btn.dataset.scenario;
+                scenarioButtons.forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+
+                if (scenarioData[scKey]) {
+                    if (bubbleMilo) bubbleMilo.textContent = scenarioData[scKey].milo;
+                    if (bubbleUser) bubbleUser.textContent = scenarioData[scKey].user;
+                    if (bubbleMiloRepeat) bubbleMiloRepeat.textContent = scenarioData[scKey].milo;
+                }
+
+                if (btnStartScenario && scenarioTopicMap[scKey]) {
+                    btnStartScenario.href = `setup.html?topic=${scenarioTopicMap[scKey]}`;
+                }
             });
-
-            const moodTitle = document.querySelector("#mood-message .mood-title");
-            if (moodTitle) moodTitle.textContent = item.title;
-
-            const moodDesc = document.querySelector("#mood-message .mood-description");
-            if (moodDesc) moodDesc.textContent = item.description;
-
-            const launchLink = document.getElementById("mood-launch-link");
-            if (launchLink) {
-                launchLink.href = "setup.html?topic=" + item.topicCode;
-            }
-
-            const studioTopic = document.getElementById("studio-topic");
-            if (studioTopic) studioTopic.textContent = item.title;
-
-            const bubbleLine = document.querySelector("#milo-bubble .bubble-line");
-            if (bubbleLine) bubbleLine.textContent = item.prompt;
-
-            const userBubble = document.getElementById("user-bubble");
-            if (userBubble) userBubble.textContent = item.userReply;
-        }
-
-        document.querySelectorAll("[data-mood]").forEach(button => {
-            button.addEventListener("click", () => showScenario(button.dataset.mood));
         });
 
-        document.querySelectorAll("[data-level]").forEach(button => {
-            button.addEventListener("click", () => {
-                const level = button.dataset.level;
-                document.querySelectorAll("[data-level]").forEach(item => {
-                    item.setAttribute("aria-pressed", String(item === button));
+        // Level selection toggle
+        const cefrCards = document.querySelectorAll("[data-cefr-card]");
+        const levelButtons = document.querySelectorAll("[data-level]");
+
+        levelButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const lvl = btn.dataset.level;
+                cefrCards.forEach(card => {
+                    card.classList.toggle("active-card", card.dataset.cefrCard === lvl);
                 });
-                document.querySelectorAll("[data-level-card]").forEach(card => {
-                    card.classList.toggle("selected", card.dataset.levelCard === level);
-                });
-                const studioLevel = document.getElementById("studio-level");
-                if (studioLevel) studioLevel.textContent = "Level " + level;
             });
         });
     </script>
