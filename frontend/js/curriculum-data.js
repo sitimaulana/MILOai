@@ -22,22 +22,38 @@ window.MILO_CURRICULUM_DATA = {
       {
         "phrase": "I am currently a final-year student majoring in...",
         "meaning": "Saat ini saya mahasiswa tingkat akhir jurusan...",
-        "example": "Contoh: \"I am currently a final-year student majoring in\" digunakan secara alami dalam percakapan."
+        "example": "Contoh: \"I am currently a final-year student majoring in\" digunakan secara alami dalam percakapan.",
+        "dialogue": {
+          "milo": "Could you tell me a little bit about your current studies?",
+          "user": "Sure! I am currently a final-year student majoring in Informatics."
+        }
       },
       {
         "phrase": "My academic focus has been on...",
         "meaning": "Fokus akademik saya adalah pada...",
-        "example": "Contoh: \"My academic focus has been on\" digunakan secara alami dalam percakapan."
+        "example": "Contoh: \"My academic focus has been on\" digunakan secara alami dalam percakapan.",
+        "dialogue": {
+          "milo": "What specific domain within your field interests you the most?",
+          "user": "My academic focus has been on software engineering and intelligent system design."
+        }
       },
       {
         "phrase": "I have developed a strong passion for...",
         "meaning": "Saya telah membangun ketertarikan yang kuat pada...",
-        "example": "Contoh: \"I have developed a strong passion for\" digunakan secara alami dalam percakapan."
+        "example": "Contoh: \"I have developed a strong passion for\" digunakan secara alami dalam percakapan.",
+        "dialogue": {
+          "milo": "What drives you when tackling complex technical challenges?",
+          "user": "I have developed a strong passion for creating accessible and user-friendly digital tools."
+        }
       },
       {
         "phrase": "Hands-on experience",
         "meaning": "Pengalaman praktik langsung",
-        "example": "Contoh: \"Hands-on experience\" digunakan secara alami dalam percakapan."
+        "example": "Contoh: \"Hands-on experience\" digunakan secara alami dalam percakapan.",
+        "dialogue": {
+          "milo": "Have you worked on real-world projects during your studies?",
+          "user": "Yes, I gained solid hands-on experience by collaborating on team software development projects."
+        }
       }
     ],
     "milo_prompts": [

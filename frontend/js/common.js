@@ -301,7 +301,7 @@ function initAuthNav() {
     });
 
     // 1. Navbar Action Wrapper (index, dashboard, summary)
-    const isIndexOrSetup = currentPage === '' || currentPage === 'index.html' || currentPage === 'setup.html';
+    const isIndexOrSetup = currentPage === '' || currentPage === 'index.html' || currentPage === 'setup.html' || currentPage === 'briefing.html';
     const containers = document.querySelectorAll('.nav-action-wrapper');
     containers.forEach(container => {
         if (isLoggedIn) {

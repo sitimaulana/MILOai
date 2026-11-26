@@ -5,52 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="assets/Icon logo milo.svg">
     <title>Evaluasi Sesi & Ringkasan CEFR: MILO English Speaking Practice</title>
-    <!-- Google Fonts & Font Awesome -->
+    <!-- Google Fonts: DM Sans & Nunito (Exact typography used in briefing.html) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Dedicated Warm Sand Theme CSS (Matching index.css, setup.css, practice.css & dashboard.css) -->
-    <link rel="stylesheet" href="css/summary.css?v=20261112e">
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.577.0/dist/umd/lucide.min.js"></script>
+    <link rel="stylesheet" href="css/index.css?v=20261126_v6">
+    <link rel="stylesheet" href="css/summary.css?v=20261126_v11">
 </head>
 <body class="summary-body">
 
     <!-- ═══════════════════════════════════════════════════════════════════════
-         1. TOP FLOATING NAVBAR (Senada dengan index.html & dashboard.html)
+         NAVBAR (Desktop - 2 Floating Pill matching Figma, setup.html & briefing.html)
          ═══════════════════════════════════════════════════════════════════════ -->
     <header class="site-header">
-        <nav class="nav-inner wrap" aria-label="Navigasi utama">
-            <a id="brand-link" class="brand" href="index.html" aria-label="MILO Evaluasi">
-                <span class="brand-mark">
-                    <img src="assets/Icon logo milo.svg" alt="" width="32" height="32" class="brand-mark-img">
-                </span>
-                MILO <small>(Evaluasi)</small>
-            </a>
-            <div class="nav-links">
-                <a href="index.html">Beranda</a>
-                <a href="setup.html">Ruang Latihan</a>
-                <a href="dashboard.html">Dashboard</a>
-            </div>
-            <div class="nav-action-wrapper">
-                <a href="setup.html" class="pill nav-cta">Latihan Lagi</a>
-            </div>
-            <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-nav-drawer">
-                <i class="fa-solid fa-bars"></i>
-            </button>
-        </nav>
-
-        <!-- Mobile Navigation Drawer -->
-        <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
-            <div id="drawer-user-info" class="drawer-user-info" style="display:none;"></div>
-            <div class="mobile-nav-links">
-                <a href="index.html" class="mobile-nav-link">Beranda</a>
-                <a href="setup.html" class="mobile-nav-link">Ruang Latihan</a>
-                <a href="dashboard.html" class="mobile-nav-link">Dashboard Progres</a>
-            </div>
-            <div class="mobile-nav-actions">
-                <a href="setup.html" class="pill primary-btn" style="width: 100%; min-height: 44px; justify-content: center;">
-                    Latihan Lagi <i class="fa-solid fa-arrow-right"></i>
+        <div class="wrap">
+            <nav class="nav-pill" aria-label="Navigasi utama">
+                <!-- Full Logo exactly as shown in Figma -->
+                <a href="index.html" class="brand-logo-wrap" aria-label="MILO Interactive Companion">
+                    <img src="assets/milo-logo-full.svg" alt="MiLo (Interactive Companion)" class="brand-logo-img">
                 </a>
+
+                <!-- Desktop Nav Links -->
+                <div class="nav-menu">
+                    <a href="index.html">Beranda</a>
+                    <a href="setup.html" class="auth-required-nav">Ruang Latihan</a>
+                    <a href="dashboard.html" class="active auth-required-nav">Dashboard</a>
+                </div>
+
+                <!-- Auth / Profile Pill (Syncs automatically with login session via common.js) -->
+                <div class="nav-action-wrapper"></div>
+
+                <!-- Mobile Hamburger Toggle -->
+                <button type="button" class="nav-toggle" id="nav-toggle" aria-label="Buka menu navigasi"
+                    aria-expanded="false" aria-controls="mobile-nav-drawer">
+                    <i data-lucide="menu" aria-hidden="true"></i>
+                </button>
+            </nav>
+
+            <!-- Mobile Navigation Drawer -->
+            <div id="mobile-nav-drawer" class="mobile-nav-drawer" hidden>
+                <div id="drawer-user-info" style="display:none;margin-bottom:12px;"></div>
+                <div class="mobile-nav-links">
+                    <a href="index.html" class="mobile-nav-link">Beranda</a>
+                    <a href="setup.html" class="mobile-nav-link auth-required-nav">Ruang Latihan</a>
+                    <a href="index.html#manfaat" class="mobile-nav-link">Manfaat</a>
+                    <a href="index.html#skenario" class="mobile-nav-link">Skenario</a>
+                    <a href="index.html#level-cefr" class="mobile-nav-link">Level CEFR</a>
+                    <a href="dashboard.html" class="mobile-nav-link active auth-required-nav">Dashboard</a>
+                    <a href="login.html" class="mobile-nav-link auth-guest-nav" id="mobile-nav-link-masuk">Masuk</a>
+                </div>
+                <div id="drawer-auth-btn-wrap" style="margin-top:16px;"></div>
             </div>
         </div>
     </header>
@@ -90,9 +96,9 @@
         </section>
 
         <!-- ═══════════════════════════════════════════════════════════════════════
-             0. POST-PRACTICE MICRO-QUIZ (Reinforcement & Gamification)
+             0. POST-PRACTICE MICRO-QUIZ (Reinforcement & Gamification) [TEMPORARILY HIDDEN]
              ═══════════════════════════════════════════════════════════════════════ -->
-        <section class="summary-card" id="microQuizCard" style="display: none; margin-bottom: 24px; border: 2px solid var(--primary-border);">
+        <section class="summary-card" id="microQuizCard" style="display: none !important; margin-bottom: 24px; border: 2px solid var(--primary-border);">
             <div class="card-header-with-badge" style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
                 <div class="title-with-icon">
                     <div class="title-icon-circle" style="background: var(--primary-tint); color: var(--primary-dark);">
@@ -238,8 +244,8 @@
             </ul>
         </section>
 
-        <!-- RAG Grounded Recommended Reading Section -->
-        <section class="summary-card rag-recommendation-card" id="ragRecommendationCard" style="margin-bottom: 24px;">
+        <!-- RAG Grounded Recommended Reading Section [TEMPORARILY HIDDEN] -->
+        <section class="summary-card rag-recommendation-card" id="ragRecommendationCard" style="display: none !important; margin-bottom: 24px;">
             <div class="card-header-with-badge" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
                 <div class="title-with-icon" style="display: flex; align-items: center; gap: 12px;">
                     <div class="title-icon-circle" style="width: 40px; height: 40px; border-radius: 10px; background: #FFF4E5; color: #C87D55; display: flex; align-items: center; justify-content: center; font-size: 18px;">
@@ -315,8 +321,8 @@
             </div>
         </div>
 
-        <!-- Post-Session Evaluation Survey (Thesis/PA Engagement & UEQ) -->
-        <section class="post-session-survey-card" id="postSessionSurveyCard">
+        <!-- Post-Session Evaluation Survey (Thesis/PA Engagement & UEQ) [TEMPORARILY HIDDEN] -->
+        <section class="post-session-survey-card" id="postSessionSurveyCard" style="display: none !important;">
             <div class="survey-header-row">
                 <div class="survey-title-box">
                     <div class="survey-icon">
@@ -382,40 +388,27 @@
             </form>
         </section>
 
-        <!-- Footer Actions -->
-        <div class="summary-actions-row">
-            <a href="setup.html" class="btn-primary-summary">
+    </main>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         BOTTOM DOCK / SHELF (Matching briefing.html & setup.html)
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <footer class="summary-bottom-shelf">
+        <div class="shelf-controls-wrap">
+            <a href="setup.html" class="btn-cta-secondary btn-secondary-summary" id="btnRestartPractice">
                 <i class="fa-solid fa-arrow-rotate-right"></i>
                 <span>Mulai Sesi Baru</span>
             </a>
-            <a href="dashboard.html" class="btn-secondary-summary">
-                <i class="fa-solid fa-chart-line"></i>
+            <a href="dashboard.html" class="btn-cta-next btn-primary-summary" id="btnGoDashboard">
                 <span>Lihat Dashboard Lengkap</span>
+                <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="home-footer" style="border-top: 1px solid var(--border-subtle); padding: 32px 24px; text-align: center; margin-top: 60px;">
-        <div style="display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 8px;">
-            <a href="index.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Beranda</a>
-            <span style="color: var(--border-subtle);">&bull;</span>
-            <a href="setup.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Mulai Latihan</a>
-            <span style="color: var(--border-subtle);">&bull;</span>
-            <a href="dashboard.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Dashboard</a>
-            <span style="color: var(--border-subtle);">&bull;</span>
-            <a href="login.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Masuk</a>
-            <span style="color: var(--border-subtle);">&bull;</span>
-            <a href="register.html" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Daftar</a>
-            <span style="color: var(--border-subtle);">&bull;</span>
-            <a href="/docs" target="_blank" rel="noopener" style="color: var(--text-slate); text-decoration: none; font-size: 13.5px; font-weight: 600;">Dokumentasi API</a>
-        </div>
-        <p style="font-size: 12px; color: var(--text-muted);">&copy; 2026 MILO: Multimodal Interactive Learning Companion.</p>
     </footer>
 
     <!-- Scripts -->
-    <script src="js/common.js?v=20261123_v3"></script>
-    <script src="js/curriculum-data.js?v=20261123_v3"></script>
-    <script src="js/summary.js?v=20261123_v3"></script>
+    <script src="js/common.js?v=20261126_v9"></script>
+    <script src="js/curriculum-data.js?v=20261126_v9"></script>
+    <script src="js/summary.js?v=20261126_v9"></script>
 </body>
 </html>

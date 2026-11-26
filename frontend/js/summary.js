@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+    }
+
     if (typeof requireAuth === 'function' && !requireAuth()) {
         return;
     }
